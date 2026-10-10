@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
-import { Link, NavLink, useLocation } from 'react-router-dom';
-import { collectionLinks, mainLinks } from '../../lib/navigation';
+import { Link, useLocation } from 'react-router-dom';
+import { collectionLinks } from '../../lib/navigation';
 import Logo from './Logo';
 
 function MenuIcon() {
@@ -88,11 +88,6 @@ export default function Navbar() {
     };
   }, []);
 
-  const linkClass = ({ isActive }: { isActive: boolean }) =>
-    `rounded-md px-1 py-2 text-sm font-medium transition-colors hover:text-brand-strong ${
-      isActive ? 'text-brand-strong' : 'text-brand-ink'
-    }`;
-
   return (
     <header
       className={`sticky top-0 z-50 bg-white transition-shadow ${
@@ -131,11 +126,6 @@ export default function Navbar() {
               </div>
             )}
           </div>
-          {mainLinks.map((link) => (
-            <NavLink key={link.to} to={link.to} className={linkClass}>
-              {link.label}
-            </NavLink>
-          ))}
         </nav>
 
         <button
@@ -164,15 +154,6 @@ export default function Navbar() {
                   className="block rounded-xl px-2 py-3 text-lg font-medium text-brand-ink hover:bg-brand-cream"
                 >
                   {collection.title}
-                </Link>
-              </li>
-            ))}
-          </ul>
-          <ul className="mt-6 border-t border-brand-soft pt-4">
-            {mainLinks.map((link) => (
-              <li key={link.to}>
-                <Link to={link.to} className="block rounded-xl px-2 py-3 text-lg font-medium text-brand-ink hover:bg-brand-cream">
-                  {link.label}
                 </Link>
               </li>
             ))}

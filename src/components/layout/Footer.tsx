@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { collectionLinks, legalLinks, mainLinks } from '../../lib/navigation';
+import { collectionLinks } from '../../lib/navigation';
 import Logo from './Logo';
 
 export default function Footer() {
@@ -24,7 +24,7 @@ export default function Footer() {
           </ul>
         </nav>
 
-        <nav aria-label="Empresa">
+        <nav aria-label="Tienda">
           <h2 className="font-display text-sm font-semibold">Miaucraft</h2>
           <ul className="mt-4 space-y-3 text-sm">
             <li>
@@ -32,26 +32,6 @@ export default function Footer() {
                 Tienda
               </Link>
             </li>
-            {mainLinks.map((link) => (
-              <li key={link.to}>
-                <Link to={link.to} className="hover:text-brand-strong">
-                  {link.label}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </nav>
-
-        <nav aria-label="Legal">
-          <h2 className="font-display text-sm font-semibold">Legal</h2>
-          <ul className="mt-4 space-y-3 text-sm">
-            {legalLinks.map((link) => (
-              <li key={link.to}>
-                <Link to={link.to} className="hover:text-brand-strong">
-                  {link.label}
-                </Link>
-              </li>
-            ))}
           </ul>
         </nav>
       </div>

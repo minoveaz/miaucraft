@@ -20,7 +20,7 @@ function NavigationLink({ label, to, onNavigate }: { label: string; to: string; 
   return (
     <NavLink
       to={to}
-      end
+      end={to === '/'}
       onClick={onNavigate}
       className={({ isActive }) => (
         isActive

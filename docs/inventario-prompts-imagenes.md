@@ -1,111 +1,119 @@
-# Inventario de prompts para imágenes de Miaucraft
+# Inventario de prompts para imágenes
 
-Prompts de referencia para volver a generar o ampliar el conjunto visual de
-`public/images/`. Los archivos listados ya existen; este documento no afirma
-que se hayan creado con estos prompts.
+Prompts de producción para preparar una futura sustitución de las composiciones de referencia de Miaucraft por imágenes fotográficas. Este documento no genera ni reemplaza archivos.
 
-## Dirección visual común
+## Estado y reglas comunes
 
-- Fotografía editorial de ecommerce, fotorrealista y cálida, con luz natural
-  suave y sombras difusas.
-- Paleta crema, marfil, rosa suave y rosa Miaucraft; acentos dorados solo en
-  herrajes.
-- Accesorios para perros y gatos de aspecto artesanal, limpios y creíbles.
-- Composición sencilla, premium y acogedora, con textura visible en tela,
-  metal y pelaje.
-- No añadir texto, letras, logotipos, marcas de agua, etiquetas legibles ni
-  accesorios que contradigan la descripción del producto.
-- Mantener los productos centrados y completos en las fotos cuadradas; reservar
-  espacio negativo donde se indica para permitir texto o recorte adaptable.
+- **Estado:** 11 prompts preparados para los assets de referencia; no se generaron imágenes. Los PNG existentes continúan siendo las composiciones de referencia de `docs/assets/ia/` y sus copias públicas en `public/images/ia/`.
+- **Estilo:** fotografía editorial cálida, natural y limpia; fondos marfil `#FFF8F1`, acentos rosa `#E52C77` y rosa suave `#FFE0E4`, con detalles oscuros `#101010`. El rosa es un acento, no un fondo dominante.
+- **Marca y texto:** no generar logotipos, letras, números, marcas de agua, etiquetas legibles, insignias, precios ni claims. El logotipo y cualquier texto se incorporan después en la interfaz o en una plantilla.
+- **Fidelidad comercial:** las escenas con accesorios son imágenes ambientales genéricas, no fotografías de SKU. No inventar estampados, materiales, herrajes, medidas, grabados, certificaciones ni características del catálogo. Las fotos de fichas de producto deben ser fotos reales del artículo exacto.
+- **Consistencia:** si una misma sesión genera varias imágenes, conservar la identidad visual de las mascotas de las escenas lifestyle: perro pequeño mestizo de pelaje crema/canela y gato doméstico gris atigrado. No implican que sean mascotas reales de Miaucraft.
+- **Entrega sugerida:** PNG, sRGB, dimensiones exactas del asset. Revisar rostro, ojos, patas, correas, siluetas y recorte a tamaño móvil antes de sustituir un archivo.
 
-## Prompts por archivo
+## Asset seleccionado y aportado (sin generación)
 
-### `home.png` — Hero de la página de inicio
+### Hero actual de la home
 
-- **Tamaño existente:** 1774 × 887 px (aprox. 2:1).
-- **Uso:** hero desktop; el contenido de texto queda a la izquierda.
-- **Prompt:** `Fotografía editorial fotorrealista para una marca premium de accesorios para mascotas. Un perro pequeño de pelo crema, tranquilo y mirando a cámara, sentado en un estudio luminoso de color marfil y usando una bandana triangular de tela rosa vivo, bien visible y ajustada de forma natural. Colocar al perro en el tercio derecho; dejar casi la mitad izquierda limpia, clara y sin objetos para texto de una web. Luz de ventana suave, sombras naturales, fondo crema cálido, composición panorámica horizontal 2:1, acabado de fotografía de producto profesional.`
-- **Prompt negativo:** `Sin texto ni logotipos; sin collar adicional llamativo; sin bandana deformada, flotante o cubriendo el hocico; sin extremidades duplicadas; sin fondo recargado; sin recorte de orejas, patas o cola.`
-- **Composición/continuidad:** conservar aire limpio a la izquierda y el perro completo hacia la derecha. El rosa de la bandana debe armonizar con el rosa de marca.
+- **Archivo:** `public/images/home.png` (copia sin cambios del archivo aportado por el usuario).
+- **Ubicación:** imagen principal del hero en `src/pages/HomePage.tsx`.
+- **Tamaño / proporción:** **1774 × 887 px**, aproximadamente **2:1**.
+- **Estado:** archivo existente proporcionado por el usuario y usado tal cual. **No requiere prompt ni generación.** El hash SHA-256 del original y de la copia es `27b5ec3634aa085e8c70878cc6e6ff7c2eba48a6f76976bd816a17384d44c371`.
+- **Continuidad / composición:** fotografía de un perro pequeño de pelaje claro con bandana rosa y placa, situado a la derecha sobre fondo marfil; el espacio negativo izquierdo funciona con el texto actual del hero. Mantener el archivo original intacto. `IA-HOME-HERO-D.png` permanece en el inventario de assets de referencia, pero ya no es la imagen que muestra el hero actual.
 
-### `3-gatos.png` — Categoría gatos
+## Prompts por asset
 
-- **Tamaño existente:** 1586 × 992 px (aprox. 1.6:1).
-- **Uso:** tarjeta de gatos y escenas de producto felino.
-- **Prompt:** `Fotografía lifestyle fotorrealista de un gato doméstico atigrado gris descansando sobre un cojín tejido color marfil en una sala luminosa. El gato lleva un collar fino rosa empolvado con una pequeña placa redonda metálica dorada sin grabado. Flores rosas desenfocadas en primer plano, luz natural de mañana, tonos crema y rosa suave, expresión serena, enfoque nítido en el gato y el collar. Encuadre horizontal 16:10, estética editorial cálida de ecommerce.`
-- **Prompt negativo:** `Sin texto, letras ni logotipos; sin collar apretado; sin varias placas superpuestas; sin ojos asimétricos, patas duplicadas ni rasgos caricaturescos; sin saturación excesiva.`
-- **Composición/continuidad:** dejar al gato como sujeto principal y asegurar que el collar siga visible al recortar a tarjeta.
+### 1. Hero de home — escritorio
 
-### `4_collares.png` — Collar
+- **Archivo:** `IA-HOME-HERO-D.png` en `docs/assets/ia/` y `public/images/ia/`
+- **Ubicación / salida:** hero de inicio en escritorio; **2400 × 1200 px**, proporción **2:1**.
+- **Prompt:** Fotografía editorial fotorrealista para la cabecera de una tienda de accesorios para mascotas. Un perro pequeño mestizo de pelaje crema/canela, aspecto natural y expresión tranquila, sentado en un estudio luminoso sobre fondo marfil cálido. Lleva únicamente una bandana rosa lisa y un pequeño colgante metálico sin letras ni diseño identificable; ambos deben parecer genéricos, no reproducir un producto concreto. Composición panorámica 2:1: deja el tercio izquierdo despejado, sencillo y de bajo contraste para colocar después un titular; sitúa al perro en el tercio derecho, con aire alrededor y sin cortar orejas ni patas. Luz suave de ventana, sombras rosa muy pálido, textura real del pelaje, paleta crema con rosa `#E52C77` discreto, acabado editorial de ecommerce cuidado y natural.
+- **Negativo / restricciones:** texto, letras, números, logotipo, marca de agua, marcas comerciales, insignias, precio, estrellas o reseñas; collar o bandana con patrón inventado; grabados legibles; múltiples mascotas; pose agresiva; anatomía deformada; patas u orejas extra; ojos artificiales; piel/plástico; fondo recargado; sombras duras; saturación alta; desenfoque del sujeto; recorte de cabeza o extremidades.
+- **Composición / continuidad:** mantener espacio negativo real a la izquierda, no añadir objetos sobre esa zona. Debe poder recortarse a formatos más estrechos conservando al perro completo; coordinar su aspecto con la versión móvil.
 
-- **Tamaño existente:** 1254 × 1254 px (1:1).
-- **Uso:** tarjetas de collar y galería de producto.
-- **Prompt:** `Fotografía macro de producto fotorrealista, vista tres cuartos desde arriba: un collar ajustable para mascota hecho de cinta textil tejida rosa empolvado, dispuesto en forma ovalada completa sobre lino marfil. Hebilla y anilla metálicas doradas, proporciones funcionales y costuras visibles. Luz lateral suave, sombras delicadas, una flor rosa desenfocada en la esquina superior izquierda, paleta crema y rosa, composición cuadrada limpia de ecommerce.`
-- **Prompt negativo:** `Sin mascota, texto, marca, grabado ni etiqueta; sin hebilla deformada; sin cierres flotantes; sin piezas cortadas por el borde; sin reflejos metálicos quemados.`
-- **Composición/continuidad:** mostrar el collar entero y mantener el herraje distinguible a tamaño de miniatura.
+### 2. Hero de home — móvil
 
-### `5_bandana.png` — Bandana
+- **Archivo:** `IA-HOME-HERO-M.png` en `docs/assets/ia/` y `public/images/ia/`
+- **Ubicación / salida:** variante vertical del hero de inicio; **1080 × 1350 px**, proporción **4:5**.
+- **Prompt:** Crear la versión vertical 4:5 de la fotografía editorial de la cabecera de Miaucraft. Usar el mismo perro pequeño mestizo de pelaje crema/canela y la misma bandana lisa rosa genérica de la versión de escritorio, con colgante metálico pequeño y completamente en blanco. Estudio cálido marfil `#FFF8F1`, iluminación suave de ventana y sombras rosadas muy tenues. Colocar al perro centrado horizontalmente en el tercio inferior, encuadrado con aire por encima y a los lados; reservar la parte superior para texto que se añadirá después. Fotografía fotorrealista, natural, elegante y coherente con una marca de accesorios para mascotas.
+- **Negativo / restricciones:** texto o letras en cualquier forma, logotipo, marca de agua, símbolos comerciales, patrones o grabados inventados, producto con apariencia distinta a la escena de escritorio, recorte de orejas/cabeza/patas, anatomía incorrecta, extremidades extra, ojos irreales, accesorios flotantes, fondo abarrotado, contraste agresivo, rosa fluorescente.
+- **Composición / continuidad:** tratar de conservar la misma identidad visual, tono de pelaje, bandana y luz del hero de escritorio; adaptar el encuadre verticalmente, no estirar ni recortar la versión panorámica. Dejar zona superior despejada y legible para una superposición posterior.
 
-- **Tamaño existente:** 1254 × 1254 px (1:1).
-- **Uso:** categoría de perros y productos de bandana.
-- **Prompt:** `Fotografía de producto fotorrealista, una bandana triangular rosa coral para perro doblada y anudada en forma de lazo, con tejido suave y costuras finas visibles. Colocarla centrada sobre lino color marfil; incluir flores rosadas muy desenfocadas en el borde superior izquierdo. Luz natural difusa, sombras suaves, textura realista de algodón, composición cuadrada y fondo limpio para tienda online.`
-- **Prompt negativo:** `Sin perro, collar, texto, estampado, logotipo ni marca de agua; sin nudo imposible; sin triángulo deformado; sin tela plástica brillante ni elementos cortados.`
-- **Composición/continuidad:** rosa cálido y fondo marfil; la silueta triangular debe leerse claramente en miniatura.
+### 3. Escena de gato en casa
 
-### `6_tags.png` — Placas ID
+- **Archivo:** `IA-HOME-CAT-SCENE.png` en `docs/assets/ia/` y `public/images/ia/`
+- **Ubicación / salida:** escena lifestyle para inicio o historia de marca; **1600 × 1000 px**, proporción **8:5**.
+- **Prompt:** Fotografía editorial fotorrealista de un gato doméstico gris atigrado descansando relajado sobre un cojín de lino color marfil en una casa luminosa. El gato lleva un collar sencillo de tono cálido con un pequeño colgante metálico liso, sin letras, grabado ni forma de producto reconocible. Una flor rosa suave aparece desenfocada en un borde del encuadre; luz matinal natural, textura de lino y pelaje realistas, composición horizontal 8:5 con el gato como protagonista y espacio visual tranquilo alrededor. Paleta cálida `#FFF8F1`, rosa `#FFE0E4` como acento leve y negros naturales; sensación cercana y serena, sin escenografía excesiva.
+- **Negativo / restricciones:** texto, logo, marca de agua, etiquetas o grabados; afirmaciones visuales sobre el accesorio; manos sujetando al gato; pose de estrés, dientes expuestos o pupilas artificiales; ojos asimétricos; patas, cola u orejas extra; pelaje de plástico; flores que tapen al animal; habitación desordenada; luz fría o flash duro; colores chillones.
+- **Composición / continuidad:** ambiente doméstico realista, no taller ni estudio de producto. Mantener espacio de recorte a ambos lados para adaptar la escena a distintos bloques; el accesorio es ambiental y no una representación de un SKU.
 
-- **Tamaño existente:** 1254 × 1254 px (1:1).
-- **Uso:** regalos, tags y productos de identificación.
-- **Prompt:** `Fotografía cenital fotorrealista de tres placas de identificación para mascotas, sin grabado, sobre tela de lino marfil: una placa redonda dorada, una con forma de hueso dorada y una con forma de corazón plateada. Cada placa incluye una pequeña argolla metálica realista. Añadir una cinta rosa empolvado parcialmente visible en el borde superior derecho; luz cálida suave, sombras pequeñas, disposición equilibrada con espacio entre piezas, imagen cuadrada de ecommerce.`
-- **Prompt negativo:** `Sin letras, números, nombres, huellas, logotipos ni marca de agua; sin argollas duplicadas; sin formas fundidas entre sí; sin metal cromado exagerado; sin piezas fuera del encuadre.`
-- **Composición/continuidad:** los tres tags deben ser distintos y reconocibles; superficies lisas listas para personalización.
+### 4. Categoría de collares
 
-### `7_charms.png` — Charm con forma de hueso
+- **Archivo:** `IA-CAT-COLLAR.png` en `docs/assets/ia/` y `public/images/ia/`
+- **Ubicación / salida:** tarjeta cuadrada de categoría en inicio; **1200 × 1200 px**, proporción **1:1**.
+- **Prompt:** Fotografía macro editorial de un collar genérico para mascota, ordenado en una curva suave sobre una superficie textil marfil `#FFF8F1`. Mostrar materiales y cierres sin marca, sin herrajes distintivos ni detalles que sugieran una especificación concreta. Añadir un pequeño acento rosa suave en el fondo, iluminación cálida difusa, sombras blandas, textura nítida y composición minimalista cuadrada. El collar debe quedar entero dentro del encuadre y reconocerse como accesorio para mascota sin incluir al animal.
+- **Negativo / restricciones:** texto, marca, logotipo, etiqueta, grabado, precio, packaging, claims de seguridad, hebillas flotantes, cierre imposible, piezas metálicas deformadas, varias correas cruzadas, producto cortado, objetos desordenados, reflejos quemados, fondo rosa saturado.
+- **Composición / continuidad:** centrar el accesorio y dejar margen uniforme para recortes responsive. No presentar el collar como el diseño exacto de ningún producto actual.
 
-- **Tamaño existente:** 1254 × 1254 px (1:1).
-- **Uso:** detalle de charm y productos de tag con forma de hueso.
-- **Prompt:** `Fotografía de producto en primer plano, fotorrealista, de una única placa metálica dorada con forma de hueso para mascota, sin grabado, unida a una argolla pequeña. La pieza reposa en el centro de una tela de lino color marfil; una cinta rosa suave desenfocada entra desde una esquina sin tapar el producto. Luz difusa cálida, brillo metálico controlado y textura fina, composición cenital cuadrada con bastante aire alrededor.`
-- **Prompt negativo:** `Sin texto, letras, números, logotipo ni huellas; sin varias placas; sin hueso deformado; sin argolla rota; sin reflejos blancos quemados ni fondo oscuro.`
-- **Composición/continuidad:** priorizar la silueta de hueso completa y el acabado dorado mate/satinado.
+### 5. Categoría de bandanas
 
-### `8_banner.png` — Banner de taller
+- **Archivo:** `IA-CAT-BANDANA.png` en `docs/assets/ia/` y `public/images/ia/`
+- **Ubicación / salida:** tarjeta cuadrada de categoría en inicio; **1200 × 1200 px**, proporción **1:1**.
+- **Prompt:** Fotografía editorial cenital de una bandana lisa de tela rosa suave doblada con cuidado sobre una superficie marfil cálida. Añadir una única flor pequeña desenfocada como acento y una sombra natural de ventana. La tela debe verse real, suave y sin estampado reconocible; no mostrar cierres ni costuras técnicas inventadas. Estética minimalista de ecommerce, paleta crema `#FFF8F1` con rosa `#FFE0E4` y un toque de `#E52C77`, encuadre cuadrado y producto completo.
+- **Negativo / restricciones:** letras, logotipos, marca de agua, patrón, bordado o diseño no confirmado; hebilla o botón inventado; animal parcial; manos; múltiples bandanas; flor cubriendo la tela; arrugas excesivas; fondo cargado; color neón; textura plástica; producto fuera de cuadro.
+- **Composición / continuidad:** vista cenital limpia, lectura inmediata de la categoría y espacio de aire alrededor para recorte 1:1. La bandana es una escena genérica, no una foto de producto vendible.
 
-- **Tamaño existente:** 2172 × 724 px (aprox. 3:1).
-- **Uso:** historia de marca o banner de taller.
-- **Prompt:** `Fotografía panorámica fotorrealista de una mesa de trabajo artesanal para accesorios de mascotas en una habitación luminosa. Herramientas pequeñas, carretes de hilo rosa, piezas metálicas para tags y tela crema se agrupan en el tercio derecho; la mitad izquierda queda despejada como espacio negativo. Luz de ventana, madera clara, flores rosadas discretas al fondo, tonos marfil y rosa empolvado, ambiente cuidado y real, encuadre horizontal extremadamente ancho 3:1 para banner web.`
-- **Prompt negativo:** `Sin personas, texto, logotipos, marcas de agua, desorden excesivo, herramientas peligrosas en primer plano ni productos flotantes; sin repetir objetos de forma evidente.`
-- **Composición/continuidad:** concentrar los objetos en la derecha y dejar suficiente espacio libre a la izquierda para un recorte con texto.
+### 6. Categoría de tags / placas
 
-### `9_guia blog.png` — Guía para medir el cuello
+- **Archivo:** `IA-CAT-TAGS.png` en `docs/assets/ia/` y `public/images/ia/`
+- **Ubicación / salida:** tarjeta cuadrada de categoría en inicio; **1200 × 1200 px**, proporción **1:1**.
+- **Prompt:** Fotografía macro editorial de dos o tres placas de identificación genéricas para mascotas, metálicas y lisas, colocadas sobre lino color marfil. Las superficies deben estar completamente en blanco, sin letras, números, símbolos, grabado ni forma exclusiva de una marca. Incorporar una cinta rosa muy discreta y sombras cálidas suaves; composición cuadrada, ordenada, con detalle metálico realista, reflejos controlados y espacio entre cada pieza. Estilo de estudio artesanal limpio, no catálogo técnico.
+- **Negativo / restricciones:** texto o pseudo-letras, nombres, teléfonos, códigos QR, logotipos, marca de agua, marcas comerciales, formas de SKU específicas, precios, packaging; placas duplicadas superpuestas, agujeros imposibles, bordes deformados, reflejos espejo quemados, dedos/manos, fondo desordenado.
+- **Composición / continuidad:** mantener las placas dentro del cuadro y separadas visualmente; no simular personalización ni prometer que el grabado está incluido.
 
-- **Tamaño existente:** 1672 × 941 px (aprox. 16:9).
-- **Uso:** guía de tallas y contenido educativo.
-- **Prompt:** `Fotografía educativa fotorrealista, plano medio cercano de una persona midiendo con cuidado el contorno del cuello de un perro pequeño de pelo claro usando una cinta métrica textil rosa. El perro está tranquilo, de perfil, en una habitación luminosa con fondo crema; manos colocadas correctamente y cinta apoyada suavemente, sin apretar. Enfoque claro en la medición y el pelaje, luz natural cálida, composición horizontal 16:9 apta para una guía web.`
-- **Prompt negativo:** `Sin números o texto legibles en la cinta; sin cinta sobre la garganta o los ojos; sin gesto de tirón; sin manos deformes, dedos extra ni perro angustiado; sin marcas de agua.`
-- **Composición/continuidad:** mostrar claramente dónde pasa la cinta y mantener una interacción amable y segura.
+### 7. Categoría de charms con forma de hueso
 
-### `10_nosotros.png` — Historia de marca
+- **Archivo:** `IA-CAT-BONE.png` en `docs/assets/ia/` y `public/images/ia/`
+- **Ubicación / salida:** tarjeta cuadrada de categoría de accesorios; **1200 × 1200 px**, proporción **1:1**.
+- **Prompt:** Fotografía macro de un charm metálico genérico con silueta sencilla de hueso, colocado sobre una superficie marfil mate. Acabado metálico neutro, sin color de baño, logotipo, grabado, inscripción ni detalle identificable como un artículo específico. Un pétalo rosa suave puede aparecer desenfocado en el borde para conectar con la paleta Miaucraft. Iluminación de estudio cálida y difusa, sombra suave, reflejos controlados, composición cuadrada con el charm completo y centrado.
+- **Negativo / restricciones:** hueso comestible real, producto para consumo, letras, símbolos, marca de agua, marca comercial, grabado, packaging, mosquetón o enganche inventado, deformación de la silueta, reflejos metálicos quemados, múltiples charms amontonados, colores neón.
+- **Composición / continuidad:** comunicar “accesorio/charm”, no alimento ni juguete. Mantener el mismo fondo y temperatura de color que las tarjetas de collares, bandanas y tags.
 
-- **Tamaño existente:** 1586 × 992 px (aprox. 1.6:1).
-- **Uso:** página Nosotros y sección de marca.
-- **Prompt:** `Fotografía lifestyle fotorrealista de una persona cuidando a un perro pequeño color crema mientras comprueba el ajuste de un accesorio rosa alrededor del cuello. Mostrar al perro tranquilo y la interacción cuidadosa desde un ángulo lateral o posterior, con manos naturales y proporciones correctas. Estudio casero luminoso, fondo crema, detalles rosa empolvado, luz de ventana cálida, sensación auténtica de trabajo artesanal, composición horizontal 16:10.`
-- **Prompt negativo:** `Sin texto, logotipos, marca de agua, instrumentos apretando el cuello, perro incómodo, manos deformes ni apariencia de clínica veterinaria.`
-- **Composición/continuidad:** enfatizar cuidado y prueba de ajuste, no una sesión médica ni una pose publicitaria rígida.
+### 8. Banner de colección
 
-### `11_open graph.png` — Vista previa al compartir
+- **Archivo:** `IA-COLL-BANNER.png` en `docs/assets/ia/` y `public/images/ia/`
+- **Ubicación / salida:** cabecera panorámica reutilizable en colecciones; **2400 × 800 px**, proporción **3:1**.
+- **Prompt:** Fondo panorámico abstracto para una cabecera de ecommerce de mascotas, proporción 3:1. Gradiente muy sutil y capas de papel/textil en marfil `#FFF8F1` y rosa pálido `#FFE0E4`, con luz de estudio cálida y textura apenas perceptible. En el tercio derecho, una sola silueta fotográfica genérica y discreta de un accesorio para mascota, parcialmente fuera de foco y sin detalles de producto identificables. Mantener al menos los dos tercios izquierdos limpios, luminosos y de bajo contraste para que el título de la colección se añada en HTML. Elegante, minimalista y compatible con recortes bajos de escritorio y móvil.
+- **Negativo / restricciones:** texto, tipografía, letras, logotipo, marca de agua, iconos, etiquetas, claims, producto reconocible, patrones o grabados inventados, demasiados objetos, alto contraste detrás del área de título, rosas saturados, ruido, viñeta oscura.
+- **Composición / continuidad:** el área izquierda debe conservar contraste suficiente para texto negro superpuesto; no integrar título en píxeles. Mantener los elementos principales lejos de los bordes superior e inferior por los recortes responsive.
 
-- **Tamaño existente:** 1729 × 910 px (aprox. 1.9:1).
-- **Uso:** Open Graph y vista previa social.
-- **Prompt:** `Fotografía editorial fotorrealista para la vista previa social de una marca de accesorios para mascotas. Un perro pequeño de pelo crema, alegre y mirando a cámara, ocupa el tercio derecho y lleva una bandana rosa empolvado con una placa redonda dorada discreta. Fondo de estudio marfil cálido con flores rosas desenfocadas en la esquina superior derecha; dejar espacio negativo amplio y claro a la izquierda para que la plataforma pueda superponer información. Luz natural suave, encuadre horizontal cercano a 1.9:1, alta legibilidad al reducirse a miniatura.`
-- **Prompt negativo:** `Sin texto ni logotipo generado; sin marca de agua; sin accesorios deformes, placas con letras, ojos asimétricos, patas duplicadas ni fondo recargado.`
-- **Composición/continuidad:** mantener la cara del perro y la bandana dentro de la zona segura central para recortes de redes sociales.
+### 9. Cabecera de guía del blog
 
-## Notas de uso
+- **Archivo:** `IA-BLOG-HEADER.png` en `docs/assets/ia/` y `public/images/ia/`
+- **Ubicación / salida:** cabecera de artículo o guía de tallas; **1600 × 900 px**, proporción **16:9**.
+- **Prompt:** Fotografía editorial fotorrealista, plano cercano de dos manos cuidadosas midiendo el cuello de un perro pequeño y tranquilo con una cinta métrica flexible de costura. Mostrar solo manos, cinta y una parte natural del pelaje; no mostrar rostro humano. La cinta puede verse, pero sus marcas y números deben quedar fuera de foco o fuera de cuadro para no comunicar medidas. Fondo marfil cálido, luz de ventana suave, composición horizontal 16:9 con espacio despejado en un lado para el título añadido después, tono didáctico y amable, sin parecer una consulta veterinaria.
+- **Negativo / restricciones:** números o medidas legibles, texto, logotipo, marca de agua, collar apretado, presión sobre el animal, señales de estrés, manos deformes, dedos extra, cinta atravesando el cuerpo, herramienta rígida o peligrosa, fondo clínico, objetos desordenados, promesas sobre tallas o ajuste.
+- **Composición / continuidad:** transmitir la acción de medir con suavidad sin presentar instrucciones numéricas. Dejar margen superior/lateral para superponer el título de la guía sin tapar la acción.
 
-- Generar primero en la proporción indicada y después adaptar versiones responsive
-  mediante recorte; evitar estirar imágenes.
-- Revisar físicamente cada accesorio generado frente al producto real antes de
-  usarlo como fotografía de ficha, pues una imagen conceptual no garantiza que
-  el producto comercial tenga exactamente esa forma o acabado.
-- Las imágenes de gatos/perros son escenas editoriales; no presentarlas como
-  clientes reales ni como reseñas/testimonios.
+### 10. Historia / estudio
+
+- **Archivo:** `IA-ABOUT-STUDIO.png` en `docs/assets/ia/` y `public/images/ia/`
+- **Ubicación / salida:** bloque editorial de “Nosotros” o historia; **1600 × 1000 px**, proporción **8:5**.
+- **Prompt:** Fotografía editorial de una mesa de trabajo ordenada en un estudio luminoso: herramientas pequeñas de manualidades y piezas metálicas genéricas sobre una superficie de madera clara y lino marfil, con una tela rosa suave doblada como acento. Luz natural lateral de ventana, paleta crema `#FFF8F1`, rosa `#FFE0E4` y detalles negros discretos. Encuadre horizontal 8:5, profundidad de campo moderada, composición tranquila con un área de aire para texto de página. Sin personas; mostrar un espacio de trabajo posible, no una fábrica ni evidencia de un método de producción concreto.
+- **Negativo / restricciones:** texto, logos, marca de agua, marca comercial, manos/personas, herramientas peligrosas, equipo industrial, desorden, productos terminados con formas o grabados reconocibles, afirmaciones visuales de fabricación artesanal, certificados, etiquetas, colores saturados, luz fría o sombras duras.
+- **Composición / continuidad:** mantener herramientas como utilería ambiental secundaria. La imagen no debe afirmar que un artículo concreto está hecho a mano, probado o fabricado en ese espacio.
+
+### 11. Open Graph / compartir
+
+- **Archivo:** `IA-OG-SHARE.png` en `docs/assets/ia/` y `public/images/ia/`
+- **Ubicación / salida:** base visual para compartir la home; **1200 × 630 px**, proporción **40:21**.
+- **Prompt:** Crear una fotografía editorial panorámica para la imagen Open Graph de Miaucraft, proporción 40:21. Un perro pequeño mestizo de pelaje crema/canela con una bandana rosa lisa y un colgante metálico genérico completamente en blanco aparece en el tercio derecho, sobre un fondo marfil cálido con sombras suaves rosa pálido. Reservar el 45 % izquierdo como espacio negativo claro y uniforme para superponer después, mediante una plantilla, el logotipo oficial y el título de la página. Luz cálida de estudio, textura natural, composición limpia que siga siendo reconocible en una miniatura pequeña.
+- **Negativo / restricciones:** cualquier texto, letra, logotipo, marca de agua, nombre de marca, interfaz falsa, insignias, precio, estrellas/reseñas, patrones o grabados de producto inventados, objetos sobre el área izquierda, mascotas adicionales, anatomía deformada, accesorios flotantes, saturación alta o fondo ruidoso.
+- **Composición / continuidad:** esta imagen es solo el fondo fotográfico. Añadir logotipo y titular después con recursos oficiales; no pedir al generador que reproduzca la identidad visual. Mantener sujeto y área despejada dentro de una zona segura central para recortes de plataformas.
+
+## Control antes de sustituir un PNG
+
+1. Generar y revisar la imagen a tamaño completo y en los recortes reales de escritorio/móvil.
+2. Confirmar que no contenga texto accidental, anatomía anómala, marcas ni detalles que puedan confundirse con especificaciones reales del catálogo.
+3. Validar licencia y condiciones comerciales de la herramienta antes de publicar.
+4. Exportar con el nombre exacto del asset y actualizar de forma coordinada `docs/assets/ia/` y `public/images/ia/`; no reemplazar fotos de producto reales por imágenes generadas.

@@ -1,4 +1,5 @@
 import { Link, useParams } from 'react-router-dom';
+import ProductCard from '../components/shop/ProductCard';
 import { collectionLinks } from '../lib/navigation';
 import { formatPrice, productImage, productsInCollection } from '../lib/products';
 import StaticPage from './StaticPage';
@@ -16,32 +17,48 @@ export default function CollectionPage() {
   const items = productsInCollection(collection.handle);
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-12">
-      <h1 className="font-display text-4xl font-semibold text-brand-ink">{collection.title}</h1>
-      <ul className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {items.map((p) => (
-          <li key={p.handle} className="rounded-2xl border border-brand-soft p-5">
-          <Link to={`/producto/${p.handle}`} className="mb-4 block overflow-hidden rounded-xl bg-brand-cream">
-            <img
-              src={image(productImage(p))}
-              alt={p.title}
-              width={800}
-              height={800}
-              loading="lazy"
-              className="aspect-square w-full object-cover"
-            />
-          </Link>
-          <h2 className="font-semibold text-brand-ink">{p.title}</h2>
-            <p className="mt-1 text-sm text-brand-ink/70">Desde {formatPrice(p.priceFrom)}</p>
-            <Link
-              to={`/producto/${p.handle}`}
-              className="mt-4 inline-flex min-h-11 items-center rounded-full bg-brand-strong px-5 text-sm font-semibold text-white hover:bg-brand-ink"
-            >
-              Ver producto
-            </Link>
-          </li>
-        ))}
-      </ul>
+    <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-10">
+      <nav aria-label="Migas de pan" className="mb-5 text-sm text-brand-ink/60">
+        <Link to="/" className="hover:text-brand-strong">Inicio</Link>
+        <span aria-hidden="true"> / </span>
+        <span aria-current="page">{collection.title}</span>
+      </nav>
+      <div className="overflow-hidden rounded-2xl bg-brand-soft">
+        <img
+          src={`${import.meta.env.BASE_URL}images/ia/IA-COLL-BANNER.png`}
+          alt=""
+          className="h-36 w-full object-cover sm:h-52"
+        />
+      </div>
+      <div className="mt-7 flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h1 className="font-display text-3xl font-semibold text-brand-ink sm:text-4xl">{collection.title}</h1>
+          <p className="mt-2 text-brand-ink/70">Explora los productos de esta colección.</p>
+        </div>
+        <p className="text-sm text-brand-ink/60">{items.length} {items.length === 1 ? 'producto' : 'productos'}</p>
+      </div>
+
+      {items.length > 0 ? (
+        <ul className="mt-8 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          {items.map((product) => (
+            <li key={product.handle}>
+              <ProductCard
+                href={`/producto/${product.handle}`}
+                image={image(productImage(product))}
+                name={product.title}
+                price={formatPrice(product.priceFrom)}
+              />
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p className="mt-8 rounded-xl border border-brand-soft p-6 text-brand-ink/70">
+          No hay productos disponibles en esta colección.
+        </p>
+      )}
+      <p className="mt-8 text-xs text-brand-ink/60">
+        Vista previa del catálogo. Las imágenes son ilustraciones de referencia; inventario y variantes no están conectados.
+      </p>
     </div>
   );
 }

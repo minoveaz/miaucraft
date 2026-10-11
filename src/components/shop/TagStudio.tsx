@@ -1,6 +1,9 @@
 import { useId } from 'react';
 import type { TagStudioConfig } from '../../lib/products';
 
+const base = import.meta.env.BASE_URL;
+const designImage = (file: string) => `${base}images/${encodeURI(file)}`;
+
 export interface TagStudioValue {
   design: string;
   finish: string;
@@ -148,20 +151,29 @@ export default function TagStudio({ config, value, onChange }: TagStudioProps) {
         {config.designs.length > 1 ? (
           <fieldset>
             <legend className="mb-2 text-sm font-semibold text-brand-ink">01. Elige el diseño</legend>
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
               {config.designs.map((option) => (
                 <button
                   key={option.value}
                   type="button"
+                  aria-label={`Seleccionar diseño ${option.value}`}
                   aria-pressed={value.design === option.value}
                   onClick={() => update({ design: option.value })}
-                  className={`min-h-11 rounded-lg border px-3 py-2 text-sm font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand ${
+                  className={`overflow-hidden rounded-lg border text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand ${
                     value.design === option.value
-                      ? 'border-brand bg-brand-soft text-brand-strong'
-                      : 'border-[#e6dcd3] bg-white text-brand-ink hover:border-brand'
+                      ? 'border-brand ring-1 ring-brand'
+                      : 'border-[#e6dcd3] hover:border-brand'
                   }`}
                 >
-                  {option.label}
+                  <img
+                    src={designImage(option.image)}
+                    alt=""
+                    loading="lazy"
+                    className="aspect-square w-full bg-brand-cream object-contain"
+                  />
+                  <span className="block px-2 py-1.5 text-center text-xs font-semibold text-brand-ink">
+                    {option.label}
+                  </span>
                 </button>
               ))}
             </div>
@@ -177,30 +189,23 @@ export default function TagStudio({ config, value, onChange }: TagStudioProps) {
 
         <fieldset>
           <legend className="mb-2 text-sm font-semibold text-brand-ink">02. Elige el acabado</legend>
-          <div className="grid grid-cols-2 gap-2">
-            {config.finishes.map((option) => {
-              const selected = value.finish === option.value;
-              return (
-                <button
-                  key={option.value}
-                  type="button"
-                  aria-pressed={selected}
-                  onClick={() => update({ finish: option.value })}
-                  className={`flex min-h-11 items-center gap-2 rounded-lg border px-3 py-2 text-left text-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand ${
-                    selected
-                      ? 'border-brand bg-brand-soft text-brand-strong'
-                      : 'border-[#e6dcd3] bg-white text-brand-ink hover:border-brand'
-                  }`}
-                >
-                  <span
-                    aria-hidden="true"
-                    className="h-4 w-4 shrink-0 rounded-full border border-black/15"
-                    style={{ backgroundColor: config.finishSwatches?.[option.value] ?? '#d9d4cb' }}
-                  />
-                  {option.label}
-                </button>
-              );
-            })}
+          <div className="flex items-center gap-3">
+            <span
+              aria-hidden="true"
+              className="h-5 w-5 shrink-0 rounded-full border border-black/15"
+              style={{ backgroundColor: config.finishSwatches?.[value.finish] ?? '#d9d4cb' }}
+            />
+            <select
+              id={`${instanceId}-finish`}
+              value={value.finish}
+              onChange={(event) => update({ finish: event.target.value })}
+              className="h-11 min-w-0 flex-1 rounded-lg border border-[#cfc4bb] bg-white px-3 text-sm text-brand-ink outline-none focus:border-brand focus:ring-2 focus:ring-brand/20"
+            >
+              <option value="" disabled>Elige un acabado</option>
+              {config.finishes.map((option) => (
+                <option key={option.value} value={option.value}>{option.label}</option>
+              ))}
+            </select>
           </div>
         </fieldset>
 
@@ -245,35 +250,28 @@ export default function TagStudio({ config, value, onChange }: TagStudioProps) {
 
         <fieldset>
           <legend className="mb-2 text-sm font-semibold text-brand-ink">04. Elige la tipografía</legend>
-          <div className="grid grid-cols-3 gap-2">
-            {config.fonts.map((option) => {
-              const selected = value.font === option.value;
-              return (
-                <button
-                  key={option.value}
-                  type="button"
-                  aria-pressed={selected}
-                  onClick={() => update({ font: option.value })}
-                  className={`min-h-[58px] rounded-lg border px-2 py-2 text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand ${
-                    selected
-                      ? 'border-brand bg-brand-soft text-brand-strong'
-                      : 'border-[#e6dcd3] bg-white text-brand-ink hover:border-brand'
-                  }`}
-                >
-                  <span className="block text-[10px] font-semibold tracking-wide">{option.label}</span>
-                  <span
-                    className="mt-1 block truncate text-lg leading-tight"
-                    style={{
-                      fontFamily: option.previewFontFamily,
-                      fontWeight: option.previewFontWeight ?? 'normal',
-                      fontStyle: option.previewFontStyle ?? 'normal',
-                    }}
-                  >
-                    {previewName}
-                  </span>
-                </button>
-              );
-            })}
+          <div className="flex items-center gap-3">
+            <select
+              id={`${instanceId}-font`}
+              value={value.font}
+              onChange={(event) => update({ font: event.target.value })}
+              className="h-11 min-w-0 flex-1 rounded-lg border border-[#cfc4bb] bg-white px-3 text-sm text-brand-ink outline-none focus:border-brand focus:ring-2 focus:ring-brand/20"
+            >
+              {config.fonts.map((option) => (
+                <option key={option.value} value={option.value}>{option.label}</option>
+              ))}
+            </select>
+            <span
+              aria-label={`Muestra de ${font.label}`}
+              className="max-w-28 truncate text-lg text-brand-ink"
+              style={{
+                fontFamily: font.previewFontFamily,
+                fontWeight: font.previewFontWeight ?? 'normal',
+                fontStyle: font.previewFontStyle ?? 'normal',
+              }}
+            >
+              {previewName}
+            </span>
           </div>
           <p className="mt-2 text-xs text-brand-ink/70">
             Las muestras son orientativas; se conserva el código de la fuente elegida.

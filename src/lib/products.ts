@@ -33,7 +33,7 @@ export interface ProductOption {
 }
 
 export interface TagStudioConfig {
-  designs: { value: string; label: string; shape: 'cat-head' | 'round' | 'bone' | 'paw' }[];
+  designs: { value: string; label: string; shape: 'cat-head' | 'round' | 'bone' | 'paw'; image: string }[];
   finishes: { value: string; label: string }[];
   fonts: {
     value: string;
@@ -71,7 +71,15 @@ const goldenCatFonts: TagStudioConfig['fonts'] = [
 ];
 
 const goldenCatTagStudio: TagStudioConfig = {
-  designs: [{ value: 'golden-cat', label: 'Golden Cat', shape: 'cat-head' }],
+  designs: Array.from({ length: 23 }, (_, index) => {
+    const value = `DSA${String(66 + index).padStart(3, '0')}`;
+    return {
+      value,
+      label: value,
+      shape: 'cat-head' as const,
+      image: `tag-cats/designs/${value}.png`,
+    };
+  }),
   finishes: [
     { value: 'Custom Silver', label: 'Silver' },
     { value: 'Custom Gold', label: 'Gold' },
@@ -79,7 +87,7 @@ const goldenCatTagStudio: TagStudioConfig = {
     { value: 'Custom Black', label: 'Black' },
   ],
   fonts: goldenCatFonts,
-  defaultDesign: 'golden-cat',
+  defaultDesign: 'DSA066',
   defaultFont: 'FT12',
   finishSwatches: {
     'Custom Silver': '#aeb3bb',

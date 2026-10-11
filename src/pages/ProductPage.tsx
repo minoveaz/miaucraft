@@ -77,7 +77,7 @@ function ProductDetails({ product }: { product: Product }) {
   const canPurchase = !product.tagStudio || tagStudioReady;
   const tagStudioOptions = product.tagStudio
     ? {
-        'Diseño del tag': product.tagStudio.designs.find((item) => item.value === tagStudioValue.design)?.label ?? tagStudioValue.design,
+        'Diseño del tag': tagStudioValue.design,
         Acabado: tagStudioValue.finish,
         'Nombre grabado': tagStudioValue.name.trim(),
         Tipografía: tagStudioValue.font,

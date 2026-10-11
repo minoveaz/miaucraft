@@ -1,6 +1,6 @@
 # Benchmark ecommerce USA: Wild One y Max & Molly
 
-Estado: primera pasada. Fuentes: lectura directa de Wild One (HTML público de Shopify) y búsquedas web para Max & Molly. Max & Molly bloquea la lectura directa (el dominio redirige a `/lander`), por lo que sus datos vienen de búsquedas y deben verificarse en navegador antes de tomar decisiones de diseño.
+Estado: segunda pasada. Wild One: lectura directa del HTML público de Shopify. Max & Molly: verificada en navegador en `https://www.max-molly.com/en-es` (la tienda real). `www.maxandmolly.com` es una página de dominio en venta (GoDaddy), no la tienda. Max & Molly es una marca alemana con precios en EUR y envío gratis solo en Alemania. Es una referencia de UX y estructura, no de mercado USA.
 
 ## 1. Enfoque visual de producto
 
@@ -12,11 +12,14 @@ Estado: primera pasada. Fuentes: lectura directa de Wild One (HTML público de S
 - Imagen: foto de estilo de vida con perros, fondo neutro, colección "Shop All" con imagen de portada vertical (2000x2500).
 - Precios en USD, locale `en-US`, país `US`, Apple Pay y PayPal/Venmo activos.
 
-### Max & Molly (max-molly.com, dominio redirige a `/lander`)
-- Marca de accesorios urbanos para perros y gatos, con colores vivos y diseño llamativo.
-- Diferenciador: personalización (nombre, diseño, patrón) y producto tecnológico (collar "GOTCHA!" con tag QR y app de perfil de mascota).
-- Materiales y seguridad como argumento: neopreno acolchado, hebillas resistentes, tag inteligente.
-- Dato a verificar: el sitio parece tener blog en `/blogs/news` (artículos sobre personalización y tecnología para mascotas).
+### Max & Molly (max-molly.com/en-es, verificada)
+- Marca de accesorios urbanos para perros y gatos, con estampados llamativos por colección (Garden, Kindergarten, Little Monsters, Tropical, Cherry Bloom).
+- Enfoque de producto: "GOTCHA! Smart ID Collar" (collar con tag QR y app de perfil de mascota) es el producto estrella, con variantes por estampado. También Soundshield (ultrasonido contra garrapatas y pulgas), H-Harness y Multi Function Leash.
+- Mensaje de portada: "Finally available" con el nuevo tag GOTCHA! y CTA "Discover Now". Sin imagen de lifestyle en el hero visible en texto; a revisar en capturas.
+- Barra de confianza en home: envío gratis (en Alemania desde €39,90), atención telefónica, "Quality since 2010", "500,000+ satisfied customers", pagos (Klarna, PayPal, tarjeta).
+- Reseñas en home con 720 opiniones (en alemán e inglés), y precios con "From €15,90" en la card.
+- Categorías del menú: Leashes, Harnesses, Collars, Matrix Ultra LED, Accessories, Grooming, Raincoats, Bathrobes, Toys.
+- Enlaces de utilidad: B2B, cuenta, carrito, selector de idioma, búsqueda, FAQ, guía de tallas, sobre nosotros, devoluciones (14 días).
 
 ### Lectura para Miaucraft
 - Ambas marcas usan fotografía de mascota en uso, no fondos de catálogo.
@@ -39,17 +42,17 @@ Pasos típicos observados en tiendas de este tipo (Wild One confirmado en estruc
 
 | Componente | Wild One | Max & Molly | Recomendación Miaucraft |
 |---|---|---|---|
-| Anuncio superior | Sí (promos y envíos) | A verificar | Barra con envío y promos |
-| Header | Logo, menú, búsqueda, cuenta, carrito | Logo, menú, carrito | Logo, menú con mega menú, búsqueda, carrito |
-| Mega menú | A verificar | A verificar | Por categoría con imágenes |
-| Búsqueda | Predictiva (Shopify) | A verificar | Predictiva |
-| Card de producto | Imagen, nombre, precio | Imagen, nombre, precio | Imagen con hover, nombre, precio, colores |
+| Anuncio superior | Sí (promos y envíos) | Sí (barra "Novelties" con enlace a novedades) | Barra con envío y promos |
+| Header | Logo, menú, búsqueda, cuenta, carrito | Logo, menú, búsqueda, B2B, idioma, cuenta, carrito | Logo, menú con mega menú, búsqueda, carrito |
+| Mega menú | A verificar | Menú de categorías en barra (enlaces directos) | Por categoría con imágenes |
+| Búsqueda | Predictiva (Shopify) | Campo de búsqueda en header | Predictiva |
+| Card de producto | Imagen, nombre, precio | Imagen, nombre, "From" precio, número de reseñas, "+N" variantes | Imagen con hover, nombre, precio, colores |
 | Filtros | Por tipo y precio | A verificar | Talla, color, precio, tipo de mascota |
-| Página de producto | Galería, descripción, compra | Galería, personalización | Galería, selector de talla, personalización, reseñas |
-| Carrito | Drawer / página | A verificar | Drawer lateral con upsell |
-| Checkout | Shopify | Shopify/propio (a verificar) | Shopify Checkout |
-| Footer | Enlaces, newsletter | A verificar | Newsletter, redes, políticas |
-| Móvil | Menú hamburguesa | A verificar | Menú a pantalla completa, CTA sticky en producto |
+| Página de producto | Galería, descripción, compra | A verificar (abrir ficha de producto) | Galería, selector de talla, personalización, reseñas |
+| Carrito | Drawer / página | Página de carrito (`/cart`) | Drawer lateral con upsell |
+| Checkout | Shopify | A verificar (Klarna, PayPal, tarjeta anunciados) | Shopify Checkout |
+| Footer | Enlaces, newsletter | Marketing, legal, contacto, pagos, Facebook/Instagram/TikTok | Newsletter, redes, políticas |
+| Móvil | Menú hamburguesa | Botón "Toggle menu" en header | Menú a pantalla completa, CTA sticky en producto |
 
 ## 4. Blog y redes sociales
 
@@ -61,9 +64,9 @@ Pasos típicos observados en tiendas de este tipo (Wild One confirmado en estruc
 - Presencia en retail: Petco, Target, Chewy, Nordstrom (según búsqueda).
 
 ### Max & Molly
-- Blog: sí, con artículos sobre personalización y tecnología para mascotas.
-- Instagram: @maxandmollyurbanpets (cifra de seguidores no verificada).
-- Presencia en Amazon (listados de collares personalizados).
+- Blog: enlace `/blogs/news` presente en el sitio (contenido no abierto; verificar).
+- Redes verificadas por enlace en la tienda: Instagram `@maxmollyurbanpets`, TikTok `@maxmolly_official`, Facebook `maxmollyurbanpets`. Cifras de seguidores no verificadas.
+- Amazon: no verificado en esta pasada.
 
 ### Implicación para Miaucraft
 - El blog de Max & Molly es de contenido de marca, no de noticias. Es una buena referencia para SEO de personalización.
@@ -84,7 +87,9 @@ No copiar:
 
 ## 6. Pendientes de verificación
 
-- Abrir Max & Molly en navegador real (el fetch recibe `/lander`).
+- Abrir una ficha de producto de Max & Molly y el checkout (no revisados).
+- Abrir `/blogs/news` y revisar contenido (no revisado).
 - Confirmar número de seguidores en Instagram y TikTok con capturas.
+- Confirmar si Max & Molly tiene tienda USA o solo UE (solo se ve EUR y envío a Alemania).
 - Revisar checkout y cuenta de cliente de ambas tiendas.
 - Revisar versión móvil de ambas.

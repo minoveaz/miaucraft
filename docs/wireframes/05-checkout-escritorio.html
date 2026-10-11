@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Miaucraft wireframe 05 - Checkout (escritorio)</title>
+<link rel="stylesheet" href="wireframe.css">
+</head>
+<body>
+<div class="announce">Envío gratis en pedidos desde $49 · Garantía de reemplazo de 30 días · Hecho para perros y gatos</div>
+
+<header class="header" style="justify-content:center;gap:0">
+  <div class="logo">MIAUCRAFT</div>
+</header>
+
+<section class="wrap" style="padding-top:28px">
+  <!-- Pasos -->
+  <div class="row" style="justify-content:center;gap:28px;margin-bottom:28px">
+    <div class="step done"><b>✓</b>Carrito</div>
+    <div class="progress" style="width:90px;align-self:center"><i style="width:100%"></i></div>
+    <div class="step on"><b>2</b>Información</div>
+    <div class="progress" style="width:90px;align-self:center"><i style="width:0%"></i></div>
+    <div class="step"><b>3</b>Envío</div>
+    <div class="progress" style="width:90px;align-self:center"><i style="width:0%"></i></div>
+    <div class="step"><b>4</b>Pago</div>
+  </div>
+
+  <div class="note" style="margin:0 auto 24px;max-width:1000px;text-align:center">Pantallas 2 a 4 las renderiza Shopify Checkout. Solo podemos cambiar marca, logo, colores y textos. Esta maqueta muestra lo que sí controlamos: el resumen y la confianza.</div>
+
+  <div class="row" style="gap:48px;align-items:flex-start;max-width:1200px;margin:0 auto">
+    <!-- Formulario (Shopify) -->
+    <div class="grow col" style="gap:18px">
+      <div class="between"><h2 style="font-size:22px">Contacto</h2><span style="font-size:13px">¿Ya tienes cuenta? <u>Entrar</u></span></div>
+      <div class="field">Email</div>
+      <div class="field-label" style="margin-top:4px">Newsletter</div>
+      <div style="font-size:13px"><span class="pill sel">☑ Recibir novedades y 10% de descuento</span></div>
+
+      <h2 style="font-size:22px;margin-top:14px">Dirección de envío</h2>
+      <div class="row" style="gap:12px"><div class="field grow">Nombre</div><div class="field grow">Apellido</div></div>
+      <div class="field">Dirección</div>
+      <div class="row" style="gap:12px"><div class="field grow">Ciudad</div><div class="field" style="width:140px">Estado</div><div class="field" style="width:160px">ZIP code</div></div>
+      <div class="field">Teléfono (para la entrega)</div>
+
+      <h2 style="font-size:22px;margin-top:14px">Método de envío</h2>
+      <div class="card" style="padding:0">
+        <div class="between" style="padding:14px 16px;border-bottom:1px solid var(--line)"><span><input type="radio" checked> <b>Estándar (2–4 días hábiles)</b></span><b>Gratis</b></div>
+        <div class="between" style="padding:14px 16px"><span><input type="radio"> <b>Express (1–2 días)</b></span><b>$9.00</b></div>
+      </div>
+
+      <div class="row" style="justify-content:space-between;align-items:center;margin-top:12px">
+        <span style="color:var(--brand-strong);font-size:13px">← Volver al carrito</span>
+        <span class="btn" style="width:280px">Continuar al pago</span>
+      </div>
+    </div>
+
+    <!-- Resumen (nuestro control) -->
+    <div class="col" style="width:380px;gap:16px">
+      <div class="summary">
+        <div class="cart-item" style="padding-top:0"><div class="img" style="width:64px;height:64px">Foto</div><div class="grow"><div class="between"><span>Bandana Luna · S · Coral</span><b>$18.00</b></div><div style="font-size:12px;color:var(--muted)">× 1</div></div></div>
+        <div class="cart-item"><div class="img" style="width:64px;height:64px">Foto</div><div class="grow"><div class="between"><span>Collar ID Bolt · M · Grabado</span><b>$24.00</b></div><div style="font-size:12px;color:var(--muted)">× 1</div></div></div>
+        <div class="cart-item" style="border:none"><div class="img" style="width:64px;height:64px">Foto</div><div class="grow"><div class="between"><span>Tag Gato Coral</span><b>$12.00</b></div><div style="font-size:12px;color:var(--muted)">× 1</div></div></div>
+        <div class="sum-line" style="margin-top:8px"><span>Subtotal</span><span>$54.00</span></div>
+        <div class="sum-line"><span>Envío</span><span>Gratis</span></div>
+        <div class="sum-line"><span>Impuestos</span><span>$4.46</span></div>
+        <div class="sum-line sum-total"><span>Total</span><span>USD $58.46</span></div>
+      </div>
+      <div class="card" style="font-size:13px">
+        <div class="row" style="gap:10px;align-items:center"><span class="badge">Garantía</span><span>Reemplazo gratis durante 30 días si el producto llega dañado o no le queda.</span></div>
+      </div>
+      <div class="card" style="font-size:13px">
+        <b>Envío gratis</b> desde $49. <span style="color:var(--muted)">Enviamos desde Texas, EE. UU.</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="footer" style="margin-top:40px">
+  <div><h4>MIAUCRAFT</h4><p>Accesorios para perros y gatos, diseñados y probados en casa.</p></div>
+  <div><h4>Ayuda</h4><ul><li>Guía de tallas</li><li>Envíos</li><li>Devoluciones</li></ul></div>
+  <div><h4>Políticas</h4><ul><li>Privacidad</li><li>Términos</li><li>Reembolsos</li></ul></div>
+  <div><h4>Contacto</h4><ul><li>hola@miaucraft.com</li><li>Instagram · TikTok</li></ul></div>
+</footer>
+</body>
+</html>

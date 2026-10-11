@@ -1,55 +1,63 @@
 import { Link } from 'react-router-dom';
-import { collectionLinks, secondaryLinks } from '../../lib/navigation';
-import Logo from './Logo';
 
-const footerLinks = [
-  ...secondaryLinks,
-  { to: '/envios-devoluciones', label: 'Envíos y devoluciones' },
-  { to: '/privacidad', label: 'Privacidad' },
-  { to: '/terminos', label: 'Términos de servicio' },
-  { to: '/cookies', label: 'Cookies' },
+const shopLinks = [
+  { label: 'Bandanas', to: '/coleccion/bandanas' },
+  { label: 'Collares ID', to: '/coleccion/id-tags-anderson' },
+  { label: 'Tags', to: '/coleccion/tag-cat' },
+  { label: 'Accesorios' },
 ];
+
+const helpLinks = ['Guía de tallas', 'Envíos', 'Devoluciones', 'Contacto'];
+
+const brandLinks = [
+  { label: 'Nosotros', to: '/nosotros' },
+  { label: 'Blog y guías' },
+  { label: 'Instagram · TikTok' },
+  { label: 'Políticas' },
+];
+
+function FooterList({ items }: { items: { label: string; to?: string }[] }) {
+  return (
+    <ul>
+      {items.map((item) => (
+        <li key={item.label} className="py-[3px] text-[#cfc8c2]">
+          {item.to ? <Link to={item.to} className="hover:text-white">{item.label}</Link> : item.label}
+        </li>
+      ))}
+    </ul>
+  );
+}
 
 export default function Footer() {
   return (
-    <footer className="mt-auto bg-brand-cream text-brand-ink">
-      <div className="mx-auto grid max-w-6xl grid-cols-2 gap-8 px-4 py-12 md:grid-cols-4">
-        <div className="col-span-2 md:col-span-1">
-          <Logo />
-          <p className="mt-4 max-w-xs text-sm text-brand-ink/80">Accesorios para mascotas con diseño propio.</p>
-        </div>
-
-        <nav aria-label="Colecciones del pie">
-          <h2 className="font-display text-sm font-semibold">Colecciones</h2>
-          <ul className="mt-4 space-y-3 text-sm">
-            {collectionLinks.map((collection) => (
-              <li key={collection.handle}>
-                <Link to={`/coleccion/${collection.handle}`} className="hover:text-brand-strong">
-                  {collection.title}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </nav>
-
-        <nav aria-label="Ayuda y legal">
-          <h2 className="font-display text-sm font-semibold">Ayuda</h2>
-          <ul className="mt-4 space-y-3 text-sm">
-            {footerLinks.map((item) => (
-              <li key={item.to}>
-                <Link to={item.to} className="hover:text-brand-strong">
-                  {item.label}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </nav>
+    <footer className="grid grid-cols-1 gap-8 bg-brand-ink px-10 py-12 text-[13px] text-white sm:grid-cols-2 md:grid-cols-[1.4fr_1fr_1fr_1fr] max-md:px-4 max-md:py-8">
+      <div>
+        <h4 className="mb-2.5 font-display text-sm font-bold">MIAUCRAFT</h4>
+        <p className="text-[#cfc8c2]">Accesorios para perros y gatos, diseñados y probados en casa.</p>
+        <form className="mt-2.5 flex gap-2" onSubmit={(event) => event.preventDefault()}>
+          <label className="sr-only" htmlFor="footer-email">Tu email</label>
+          <input
+            id="footer-email"
+            type="email"
+            placeholder="Tu email"
+            className="h-[38px] min-w-0 flex-1 rounded-md bg-[#2a2a2a] px-3 text-white placeholder:text-[#8a8a8a]"
+          />
+          <button type="submit" className="h-[38px] w-[100px] rounded-md bg-brand font-bold text-white">
+            OK
+          </button>
+        </form>
       </div>
-
-      <div className="border-t border-brand-soft">
-        <p className="mx-auto max-w-6xl px-4 py-6 text-xs text-brand-ink/70">
-          © {new Date().getFullYear()} Miaucraft. Todos los derechos reservados.
-        </p>
+      <div>
+        <h4 className="mb-2.5 font-display text-sm font-bold">Tienda</h4>
+        <FooterList items={shopLinks} />
+      </div>
+      <div>
+        <h4 className="mb-2.5 font-display text-sm font-bold">Ayuda</h4>
+        <FooterList items={helpLinks.map((label) => ({ label }))} />
+      </div>
+      <div>
+        <h4 className="mb-2.5 font-display text-sm font-bold">Marca</h4>
+        <FooterList items={brandLinks} />
       </div>
     </footer>
   );

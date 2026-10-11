@@ -1,41 +1,57 @@
 import { Link } from 'react-router-dom';
-import { formatPrice, type Product } from '../../lib/products';
 
-// Imagen de demo por colección (placeholder IA). Sustituir por fotos reales de producto.
-export const collectionImage: Record<string, string> = {
-  bandanas: 'IA-CAT-BANDANA.png',
-  'id-tags-anderson': 'IA-CAT-TAGS.png',
-  'tag-cat': 'IA-CAT-COLLAR.png',
-};
-
-export function productImageSrc(product: Product): string {
-  const file = collectionImage[product.collections[0]] ?? 'IA-CAT-COLLAR.png';
-  return `${import.meta.env.BASE_URL}images/ia/${file}`;
+// Tarjeta de producto según .pcard del wireframe 01 (card blanca, foto 240px, badge, estrellas y precio).
+export interface ProductCardProps {
+  href: string;
+  image: string;
+  name: string;
+  rating?: number;
+  reviews?: number;
+  price: string;
+  compareAtPrice?: string;
+  badge?: string;
 }
 
-export default function ProductCard({ product }: { product: Product }) {
+export default function ProductCard({
+  href,
+  image,
+  name,
+  rating,
+  reviews,
+  price,
+  compareAtPrice,
+  badge,
+}: ProductCardProps) {
   return (
-    <article className="group flex flex-col">
-      <Link
-        to={`/producto/${product.handle}`}
-        className="block overflow-hidden rounded-2xl bg-brand-cream"
-        aria-label={`Ver ${product.title}`}
-      >
-        <img
-          src={productImageSrc(product)}
-          alt=""
-          width={800}
-          height={800}
-          loading="lazy"
-          className="aspect-square w-full object-cover transition-transform duration-300 group-hover:scale-105"
-        />
+    <article className="rounded-[14px] border border-[#e6dcd3] bg-white p-3.5">
+      <Link to={href} className="block h-[240px] overflow-hidden rounded-xl bg-[#e9e4df]" aria-label={name}>
+        <img src={image} alt="" width={800} height={800} loading="lazy" className="h-full w-full object-cover" />
       </Link>
-      <h3 className="mt-4 text-base font-semibold text-brand-ink">
-        <Link to={`/producto/${product.handle}`} className="hover:text-brand-strong">
-          {product.title}
-        </Link>
-      </h3>
-      <p className="mt-1 text-sm text-brand-ink/70">Desde {formatPrice(product.priceFrom)}</p>
+      <div className="px-0.5 py-2.5">
+        {badge && (
+          <span className="inline-block rounded-full bg-brand-soft px-2 py-[3px] text-[11px] font-bold text-brand-strong">
+            {badge}
+          </span>
+        )}
+        <h3 className={`text-sm font-semibold text-brand-ink ${badge ? 'mt-1.5' : ''}`}>
+          <Link to={href} className="hover:text-brand-strong">
+            {name}
+          </Link>
+        </h3>
+        {rating !== undefined && (
+          <div className="text-[13px] tracking-[2px] text-brand">
+            {'★'.repeat(Math.round(rating))}
+            {'☆'.repeat(5 - Math.round(rating))}
+            {reviews !== undefined && (
+              <span className="ml-1 text-xs tracking-normal text-[#6b6b6b]">({reviews})</span>
+            )}
+          </div>
+        )}
+        <p className="mt-0.5 font-bold text-brand-ink">
+          {price}
+          {compareAtPrice && <s className="ml-1.5 font-normal text-[#6b6b6b]">{compareAtPrice}</s>}
+        </p>
+      </div>
     </article>
   );
 }

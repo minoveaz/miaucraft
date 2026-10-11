@@ -5,13 +5,14 @@ import HomePage from './pages/HomePage';
 import AboutPage from './pages/AboutPage';
 import CartPage from './pages/CartPage';
 import ProductPage from './pages/ProductPage';
-import { NotFoundPage } from './pages/StaticPages';
+import { BlogPage, NotFoundPage } from './pages/StaticPages';
 
 export default function App() {
   return (
     <Routes>
       <Route element={<PublicLayout />}>
         <Route path="/" element={<HomePage />} />
+        <Route path="/blog" element={<BlogPage />} />
         <Route path="/nosotros" element={<AboutPage />} />
         <Route path="/carrito" element={<CartPage />} />
         <Route path="/coleccion/:handle" element={<CollectionPage />} />

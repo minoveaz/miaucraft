@@ -11,7 +11,7 @@ const helpLinks = ['Guía de tallas', 'Envíos', 'Devoluciones', 'Contacto'];
 
 const brandLinks = [
   { label: 'Nosotros', to: '/nosotros' },
-  { label: 'Blog y guías' },
+  { label: 'Blog y guías', to: '/blog' },
   { label: 'Instagram · TikTok' },
   { label: 'Políticas' },
 ];

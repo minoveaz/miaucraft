@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, NavLink } from 'react-router-dom';
 import { Menu, Search, ShoppingBag, UserRound, X } from 'lucide-react';
 import Logo from './Logo';
 import { useCart } from '../../lib/cart';
@@ -8,23 +8,28 @@ import { formatPrice, productImage, products } from '../../lib/products';
 const base = import.meta.env.BASE_URL;
 
 const navItems = [
-  { label: 'Bandanas', to: '/coleccion/bandanas', active: true },
+  { label: 'Home', to: '/' },
+  { label: 'Bandanas', to: '/coleccion/bandanas' },
   { label: 'Collares ID', to: '/coleccion/id-tags-anderson' },
   { label: 'Tags', to: '/coleccion/tag-cat' },
-  { label: 'Accesorios' },
-  { label: 'Guías' },
+  { label: 'Blog', to: '/blog' },
   { label: 'Nosotros', to: '/nosotros' },
 ];
 
-function NavLabel({ label, to, active }: { label: string; to?: string; active?: boolean }) {
-  const className = active
-    ? 'border-b-2 border-brand pb-0.5 text-brand'
-    : 'text-brand-ink hover:text-brand';
-  if (!to) return <span className={`${className} cursor-default text-brand-ink/50`}>{label}</span>;
+function NavigationLink({ label, to, onNavigate }: { label: string; to: string; onNavigate: () => void }) {
   return (
-    <Link to={to} className={className}>
+    <NavLink
+      to={to}
+      end
+      onClick={onNavigate}
+      className={({ isActive }) => (
+        isActive
+          ? 'border-b-2 border-brand pb-0.5 text-brand'
+          : 'border-b-2 border-transparent pb-0.5 text-brand-ink hover:border-brand/50 hover:text-brand'
+      )}
+    >
       {label}
-    </Link>
+    </NavLink>
   );
 }
 
@@ -175,7 +180,14 @@ export default function Navbar() {
           >
             <div className="flex flex-col gap-4 text-sm font-semibold">
               {navItems.map((item) => (
-                <NavLabel key={item.label} {...item} />
+                <NavigationLink
+                  key={item.label}
+                  {...item}
+                  onNavigate={() => {
+                    setMobileMenuOpen(false);
+                    setSearchOpen(false);
+                  }}
+                />
               ))}
             </div>
           </nav>
@@ -186,7 +198,14 @@ export default function Navbar() {
         className="hidden justify-center gap-7 border-b border-[#e6dcd3] bg-white py-3 text-sm font-semibold md:flex"
       >
         {navItems.map((item) => (
-          <NavLabel key={item.label} {...item} />
+          <NavigationLink
+            key={item.label}
+            {...item}
+            onNavigate={() => {
+              setMobileMenuOpen(false);
+              setSearchOpen(false);
+            }}
+          />
         ))}
       </nav>
     </>

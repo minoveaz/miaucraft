@@ -10,6 +10,7 @@ export interface Product {
   reviewCount?: number;
   media?: ProductMedia[];
   options?: ProductOption[];
+  tagStudio?: TagStudioConfig;
   personalization?: {
     label: string;
     description?: string;
@@ -30,6 +31,63 @@ export interface ProductOption {
   label: string;
   values: { value: string; label: string; available?: boolean }[];
 }
+
+export interface TagStudioConfig {
+  designs: { value: string; label: string; shape: 'cat-head' | 'round' | 'bone' | 'paw' }[];
+  finishes: { value: string; label: string }[];
+  fonts: {
+    value: string;
+    label: string;
+    previewFontFamily: string;
+    previewFontWeight?: 'normal' | 'bold';
+    previewFontStyle?: 'normal' | 'italic';
+  }[];
+  defaultDesign?: string;
+  defaultFont?: string;
+  maxNameLength?: number;
+  phoneEnabled?: boolean;
+  phoneMaxLength?: number;
+  finishSwatches?: Record<string, string>;
+}
+
+const goldenCatFonts: TagStudioConfig['fonts'] = [
+  { value: 'FT12', label: 'FT12', previewFontFamily: 'Georgia, serif' },
+  { value: 'FT13', label: 'FT13', previewFontFamily: '"Times New Roman", serif', previewFontStyle: 'italic' },
+  { value: 'FT14', label: 'FT14', previewFontFamily: '"Arial Narrow", Arial, sans-serif' },
+  { value: 'FT15', label: 'FT15', previewFontFamily: '"Brush Script MT", cursive' },
+  { value: 'FT16', label: 'FT16', previewFontFamily: '"Trebuchet MS", sans-serif', previewFontWeight: 'bold' },
+  { value: 'FT17', label: 'FT17', previewFontFamily: 'Georgia, serif', previewFontWeight: 'bold' },
+  { value: 'FT18', label: 'FT18', previewFontFamily: 'Arial, sans-serif' },
+  { value: 'FT19', label: 'FT19', previewFontFamily: '"Palatino Linotype", Palatino, serif' },
+  { value: 'FT20', label: 'FT20', previewFontFamily: 'Georgia, serif', previewFontStyle: 'italic' },
+  { value: 'FT21', label: 'FT21', previewFontFamily: '"Courier New", monospace' },
+  { value: 'FT22', label: 'FT22', previewFontFamily: 'Verdana, sans-serif' },
+  { value: 'FT23', label: 'FT23', previewFontFamily: 'cursive', previewFontWeight: 'bold' },
+  { value: 'FT24', label: 'FT24', previewFontFamily: '"Comic Sans MS", cursive' },
+  { value: 'FT25', label: 'FT25', previewFontFamily: 'cursive', previewFontStyle: 'italic' },
+  { value: 'FT26', label: 'FT26', previewFontFamily: 'Impact, sans-serif' },
+  { value: 'FT27', label: 'FT27', previewFontFamily: '"American Typewriter", serif' },
+  { value: 'FT28', label: 'FT28', previewFontFamily: '"Snell Roundhand", cursive' },
+];
+
+const goldenCatTagStudio: TagStudioConfig = {
+  designs: [{ value: 'golden-cat', label: 'Golden Cat', shape: 'cat-head' }],
+  finishes: [
+    { value: 'Custom Silver', label: 'Silver' },
+    { value: 'Custom Gold', label: 'Gold' },
+    { value: 'Custom Champagne', label: 'Champagne' },
+    { value: 'Custom Black', label: 'Black' },
+  ],
+  fonts: goldenCatFonts,
+  defaultDesign: 'golden-cat',
+  defaultFont: 'FT12',
+  finishSwatches: {
+    'Custom Silver': '#aeb3bb',
+    'Custom Gold': '#c89537',
+    'Custom Champagne': '#cba982',
+    'Custom Black': '#292622',
+  },
+};
 
 export function productImage(product: Product): string {
   if (product.handle === 'golden-cat') return 'tag-cats/tag-Cat-Gold-1.png';
@@ -75,14 +133,15 @@ export const products: Product[] = [
     priceFrom: 0.99,
     collections: ['id-tags-anderson', 'tag-cat'],
     description: 'Placa dorada con diseño de gato y opciones de personalización.',
+    tagStudio: goldenCatTagStudio,
     media: [
       { image: 'tag-cats/tag-Cat-Gold-1.png', alt: 'Placa Golden cat dorada con el nombre Amber grabado' },
       { image: 'tag-cats/tag-Cat-Gold-7.png', alt: 'Gato con collar y placa Golden cat personalizada' },
-      { image: 'tag-cats/tag-Cat-Gold-2.jpeg', alt: 'Placa Golden cat y opciones de personalización' },
-      { image: 'tag-cats/tag-Cat-Gold-5.jpeg', alt: 'Gato con placa dorada personalizada Daisy' },
-      { image: 'tag-cats/tag-Cat-Gold-6.jpeg', alt: 'Detalle de un gato con la placa Golden cat' },
-      { image: 'tag-cats/tag-Cat-Gold-4.jpeg', alt: 'Ejemplo de placa Golden cat colocada en un collar' },
-      { image: 'tag-cats/tag-Cat-Gold-3.jpeg', alt: 'Lámina de referencia con diferentes diseños de placas' },
+      { image: 'tag-cats/tag-Cat-Gold-2.jpeg', alt: 'Placa Golden cat dorada, vista de cerca para mostrar su calidad' },
+      { image: 'tag-cats/tag-Cat-Gold-5.jpeg', alt: 'Gato con placa Golden cat y anilla de unión incluida' },
+      { image: 'tag-cats/tag-Cat-Gold-3.jpeg', alt: 'Opciones de diseño para personalizar la placa Golden cat' },
+      { image: 'tag-cats/tag-Cat-Gold-4.jpeg', alt: 'Gato con una placa Golden cat personalizada con el nombre Daisy' },
+      { image: 'tag-cats/tag-Cat-Gold-6.jpeg', alt: 'Gato con placa Golden cat personalizada y opciones de diseño disponibles' },
     ],
     options: [
       {
@@ -104,12 +163,7 @@ export const products: Product[] = [
     personalization: {
       label: 'Personalización',
       description: 'Elige el acabado y escribe el texto para personalizar la placa.',
-      values: [
-        { value: 'Custom Silver', label: 'Silver' },
-        { value: 'Custom Gold', label: 'Gold' },
-        { value: 'Custom Champagne', label: 'Champagne' },
-        { value: 'Custom Black', label: 'Black' },
-      ],
+      values: goldenCatTagStudio.finishes.map(({ value, label }) => ({ value, label })),
     },
     purchaseHighlights: [
       'Entrega estimada: 3–5 días',

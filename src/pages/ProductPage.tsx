@@ -4,6 +4,7 @@ import { Minus, Plus } from 'lucide-react';
 import { collectionLinks } from '../lib/navigation';
 import { formatPrice, productImage, products, type Product } from '../lib/products';
 import { useCart } from '../lib/cart';
+import TagStudio, { type TagStudioValue } from '../components/shop/TagStudio';
 import StaticPage from './StaticPage';
 
 const base = import.meta.env.BASE_URL;
@@ -56,12 +57,40 @@ function ProductDetails({ product }: { product: Product }) {
   const [added, setAdded] = useState(false);
   const [personalization, setPersonalization] = useState('');
   const [personalizationStyle, setPersonalizationStyle] = useState('');
+  const [tagStudioValue, setTagStudioValue] = useState<TagStudioValue>(() => ({
+    design: product.tagStudio?.defaultDesign ?? product.tagStudio?.designs[0]?.value ?? '',
+    finish: '',
+    name: '',
+    font: product.tagStudio?.defaultFont ?? product.tagStudio?.fonts[0]?.value ?? '',
+    phone: '',
+  }));
   const [selectedOptions, setSelectedOptions] = useState<Record<string, string>>(() =>
     Object.fromEntries((product.options ?? []).map((option) => [option.name, option.values[0]?.value ?? ''])),
   );
+  const tagStudioReady = Boolean(
+    product.tagStudio
+      && tagStudioValue.design
+      && tagStudioValue.finish
+      && tagStudioValue.name.trim()
+      && tagStudioValue.font,
+  );
+  const canPurchase = !product.tagStudio || tagStudioReady;
+  const tagStudioOptions = product.tagStudio
+    ? {
+        'Diseño del tag': product.tagStudio.designs.find((item) => item.value === tagStudioValue.design)?.label ?? tagStudioValue.design,
+        Acabado: tagStudioValue.finish,
+        'Nombre grabado': tagStudioValue.name.trim(),
+        Tipografía: tagStudioValue.font,
+        ...(product.tagStudio.phoneEnabled && tagStudioValue.phone.trim()
+          ? { Teléfono: tagStudioValue.phone.trim() }
+          : {}),
+      }
+    : {};
   const cartOptions = {
     ...selectedOptions,
-    ...(product.personalization && personalizationStyle
+    ...(product.tagStudio
+      ? tagStudioOptions
+      : product.personalization && personalizationStyle
       ? {
           [product.personalization.label]: personalizationStyle,
           ...(personalization.trim() ? { 'Texto grabado': personalization.trim() } : {}),
@@ -74,6 +103,7 @@ function ProductDetails({ product }: { product: Product }) {
   ];
 
   const addConfiguredProduct = () => {
+    if (!canPurchase) return;
     addLine({
       handle: product.handle,
       title: product.title,
@@ -145,7 +175,16 @@ function ProductDetails({ product }: { product: Product }) {
         </fieldset>
       ))}
 
-      {product.personalization && (
+      {product.tagStudio ? (
+        <TagStudio
+          config={product.tagStudio}
+          value={tagStudioValue}
+          onChange={(value) => {
+            setTagStudioValue(value);
+            setAdded(false);
+          }}
+        />
+      ) : product.personalization ? (
         <div className="mt-5">
           <fieldset>
             <legend className="mb-2 text-sm font-semibold text-brand-ink">
@@ -195,7 +234,7 @@ function ProductDetails({ product }: { product: Product }) {
             <p className="mt-1.5 text-xs text-brand-ink/70">{product.personalization.description}</p>
           )}
         </div>
-      )}
+      ) : null}
 
       {product.collections.includes('bandanas') && (
         <section aria-labelledby="size-guide-title" className="mt-6">
@@ -241,7 +280,8 @@ function ProductDetails({ product }: { product: Product }) {
         <button
           type="button"
           onClick={addConfiguredProduct}
-          className="inline-flex min-h-11 flex-1 items-center justify-center rounded-full bg-brand px-4 text-sm font-bold text-white hover:bg-brand-strong focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+          disabled={!canPurchase}
+          className="inline-flex min-h-11 flex-1 items-center justify-center rounded-full bg-brand px-4 text-sm font-bold text-white hover:bg-brand-strong focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand disabled:cursor-not-allowed disabled:opacity-50"
         >
           <span className="sm:hidden">Añadir · {formatPrice(product.priceFrom)}</span>
           <span className="hidden sm:inline">Añadir al carrito · {formatPrice(product.priceFrom)}</span>
@@ -251,9 +291,10 @@ function ProductDetails({ product }: { product: Product }) {
         type="button"
         onClick={() => {
           addConfiguredProduct();
-          navigate('/carrito');
+          if (canPurchase) navigate('/carrito');
         }}
-        className="mt-2 inline-flex min-h-11 w-full items-center justify-center rounded-full border border-brand-ink px-4 text-sm font-semibold text-brand-ink hover:bg-brand-cream focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+        disabled={!canPurchase}
+        className="mt-2 inline-flex min-h-11 w-full items-center justify-center rounded-full border border-brand-ink px-4 text-sm font-semibold text-brand-ink hover:bg-brand-cream focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand disabled:cursor-not-allowed disabled:opacity-50"
       >
         Comprar ahora
       </button>

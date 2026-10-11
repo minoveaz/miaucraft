@@ -12,12 +12,13 @@ const trustItems = [
 ];
 
 const petCards = [
-  { title: 'Perros', image: '5_bandana.png', to: '/coleccion/bandanas' },
-  { title: 'Gatos', image: '3-gatos.png', to: '/coleccion/tag-cat' },
-  { title: 'Regalos', image: '6_tags.png', to: '/coleccion/id-tags-anderson' },
+  { title: 'Perros', image: '11-perros.jpeg', alt: 'Perro con bandana y placa Miaucraft', to: '/coleccion/bandanas', imagePosition: 'object-top' },
+  { title: 'Gatos', image: '3-gatos.png', alt: 'Gato con collar Miaucraft', to: '/coleccion/tag-cat', imagePosition: 'object-center' },
+  { title: 'Regalos', image: '12-regalos.jpeg', alt: 'Caja de regalo con placas personalizadas para mascotas', to: '/coleccion/id-tags-anderson', imagePosition: 'object-center' },
 ];
 
 const bestSellers = [
+  { href: '/producto/golden-cat', name: 'Golden cat', image: 'tag-cats/tag-Cat-Gold-1.png', price: '$0.99', badge: 'Más vendido' },
   { href: '/coleccion/bandanas', name: 'Bandana Luna', image: '5_bandana.png', rating: 5, reviews: 128, price: '$18.00', badge: 'Bestseller' },
   { href: '/coleccion/id-tags-anderson', name: 'Collar ID Bolt', image: '4_collares.png', rating: 4, reviews: 64, price: '$24.00', compareAtPrice: '$29.00' },
   { href: '/coleccion/tag-cat', name: 'Tag Gato Coral', image: '6_tags.png', rating: 5, reviews: 41, price: '$12.00', badge: 'Quedan 3' },
@@ -79,11 +80,11 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* Compra por mascota */}
-      <section className={frame} aria-labelledby="home-tipo">
+      {/* Compra por categoría */}
+      <section className={frame} aria-labelledby="home-categorias">
         <div className="flex items-center justify-between">
           <div>
-            <h2 id="home-tipo" className={sectionHead}>Compra por tipo de mascota</h2>
+            <h2 id="home-categorias" className={sectionHead}>Comprar por categoría</h2>
           </div>
           <Link to="/" className={link}>Ver todo →</Link>
         </div>
@@ -96,11 +97,11 @@ export default function HomePage() {
             >
               <img
                 src={image(card.image)}
-                alt=""
+                alt={card.alt}
                 width={800}
                 height={800}
                 loading="lazy"
-                className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                className={`h-full w-full object-cover ${card.imagePosition} transition-transform duration-300 group-hover:scale-105`}
               />
               <span className="absolute bottom-3 left-3 rounded-full bg-white px-3 py-1 text-sm font-semibold text-brand-ink">
                 {card.title}

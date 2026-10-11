@@ -1,7 +1,9 @@
 import { Link, useParams } from 'react-router-dom';
 import { collectionLinks } from '../lib/navigation';
-import { formatPrice, productsInCollection } from '../lib/products';
+import { formatPrice, productImage, productsInCollection } from '../lib/products';
 import StaticPage from './StaticPage';
+
+const image = (file: string) => `${import.meta.env.BASE_URL}images/${file}`;
 
 export default function CollectionPage() {
   const { handle } = useParams();
@@ -19,7 +21,17 @@ export default function CollectionPage() {
       <ul className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {items.map((p) => (
           <li key={p.handle} className="rounded-2xl border border-brand-soft p-5">
-            <h2 className="font-semibold text-brand-ink">{p.title}</h2>
+          <Link to={`/producto/${p.handle}`} className="mb-4 block overflow-hidden rounded-xl bg-brand-cream">
+            <img
+              src={image(productImage(p))}
+              alt={p.title}
+              width={800}
+              height={800}
+              loading="lazy"
+              className="aspect-square w-full object-cover"
+            />
+          </Link>
+          <h2 className="font-semibold text-brand-ink">{p.title}</h2>
             <p className="mt-1 text-sm text-brand-ink/70">Desde {formatPrice(p.priceFrom)}</p>
             <Link
               to={`/producto/${p.handle}`}

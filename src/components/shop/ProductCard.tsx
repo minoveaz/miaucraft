@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 
-// Tarjeta de producto según .pcard del wireframe 01 (card blanca, foto 240px, badge, estrellas y precio).
+// Tarjeta de producto con imagen cuadrada y datos visuales del catálogo.
 export interface ProductCardProps {
   href: string;
   image: string;
@@ -24,7 +24,7 @@ export default function ProductCard({
 }: ProductCardProps) {
   return (
     <article className="rounded-[14px] border border-[#e6dcd3] bg-white p-3.5">
-      <Link to={href} className="block h-[240px] overflow-hidden rounded-xl bg-[#e9e4df]" aria-label={name}>
+      <Link to={href} className="block aspect-square overflow-hidden rounded-xl bg-[#e9e4df]" aria-label={name}>
         <img src={image} alt="" width={800} height={800} loading="lazy" className="h-full w-full object-cover" />
       </Link>
       <div className="px-0.5 py-2.5">

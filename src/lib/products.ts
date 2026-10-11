@@ -1,11 +1,42 @@
-// Catálogo de demo extraído de Shopify (products.json). Solo productos con precio real:
-// se excluyen test-one y los que solo tienen variantes a $0.00 o $0.99 (placeholders).
-// Sustituir por la Storefront API cuando se conecte Shopify.
+// Catálogo de demo extraído de Shopify (products.json); sustituir por Storefront API al conectar Shopify.
 export interface Product {
   handle: string;
   title: string;
   priceFrom: number;
   collections: string[];
+  description?: string;
+  badge?: string;
+  rating?: number;
+  reviewCount?: number;
+  media?: ProductMedia[];
+  options?: ProductOption[];
+  personalization?: {
+    label: string;
+    description?: string;
+    values?: { value: string; label: string }[];
+  };
+  purchaseHighlights?: string[];
+  details?: { title: string; content: string }[];
+  relatedHandles?: string[];
+}
+
+export interface ProductMedia {
+  image: string;
+  alt: string;
+}
+
+export interface ProductOption {
+  name: string;
+  label: string;
+  values: { value: string; label: string; available?: boolean }[];
+}
+
+export function productImage(product: Product): string {
+  if (product.handle === 'golden-cat') return 'tag-cats/tag-Cat-Gold-1.png';
+  if (product.collections.includes('bandanas')) return '5_bandana.png';
+  if (product.handle.includes('bone')) return '7_charms.png';
+  if (product.collections.includes('tag-cat')) return '3-gatos.png';
+  return '6_tags.png';
 }
 
 export const CURRENCY = 'USD';
@@ -38,4 +69,63 @@ export const products: Product[] = [
   { handle: 'tags-orbits-collection', title: 'Tags Orbits Collection', priceFrom: 9.99, collections: ['id-tags-anderson'] },
   { handle: 'rose-cat', title: 'Rose Cat', priceFrom: 9.99, collections: ['id-tags-anderson', 'tag-cat'] },
   { handle: 'cat-product', title: 'Silver Cat', priceFrom: 9.99, collections: ['id-tags-anderson', 'tag-cat'] },
+  {
+    handle: 'golden-cat',
+    title: 'Golden cat',
+    priceFrom: 0.99,
+    collections: ['id-tags-anderson', 'tag-cat'],
+    description: 'Placa dorada con diseño de gato y opciones de personalización.',
+    media: [
+      { image: 'tag-cats/tag-Cat-Gold-1.png', alt: 'Placa Golden cat dorada con el nombre Amber grabado' },
+      { image: 'tag-cats/tag-Cat-Gold-7.png', alt: 'Gato con collar y placa Golden cat personalizada' },
+      { image: 'tag-cats/tag-Cat-Gold-2.jpeg', alt: 'Placa Golden cat y opciones de personalización' },
+      { image: 'tag-cats/tag-Cat-Gold-5.jpeg', alt: 'Gato con placa dorada personalizada Daisy' },
+      { image: 'tag-cats/tag-Cat-Gold-6.jpeg', alt: 'Detalle de un gato con la placa Golden cat' },
+      { image: 'tag-cats/tag-Cat-Gold-4.jpeg', alt: 'Ejemplo de placa Golden cat colocada en un collar' },
+      { image: 'tag-cats/tag-Cat-Gold-3.jpeg', alt: 'Lámina de referencia con diferentes diseños de placas' },
+    ],
+    options: [
+      {
+        name: 'Size',
+        label: 'Talla',
+        values: [
+          { value: 'Babies', label: 'Babies' },
+          { value: 'Small', label: 'Small' },
+          { value: 'Large', label: 'Large' },
+          { value: 'Extra-large', label: 'Extra-large' },
+        ],
+      },
+      {
+        name: 'Color',
+        label: 'Color (Gold)',
+        values: [{ value: 'Gold', label: 'Gold' }],
+      },
+    ],
+    personalization: {
+      label: 'Personalización',
+      description: 'Elige el acabado y escribe el texto para personalizar la placa.',
+      values: [
+        { value: 'Custom Silver', label: 'Silver' },
+        { value: 'Custom Gold', label: 'Gold' },
+        { value: 'Custom Champagne', label: 'Champagne' },
+        { value: 'Custom Black', label: 'Black' },
+      ],
+    },
+    purchaseHighlights: [
+      'Entrega estimada: 3–5 días',
+      'Política de devolución de 14 días',
+      'Envío gratis en pedidos superiores a $50',
+    ],
+    details: [
+      {
+        title: 'Descripción',
+        content: 'Tags Cat Collection',
+      },
+      {
+        title: 'Envíos y devoluciones',
+        content: 'Enviamos con seguimiento. Puedes solicitar una devolución durante los 14 días posteriores a la compra para obtener un reembolso o cambio. Envío gratis en pedidos superiores a $50.',
+      },
+    ],
+    relatedHandles: ['rose-cat', 'cat-product'],
+  },
 ];

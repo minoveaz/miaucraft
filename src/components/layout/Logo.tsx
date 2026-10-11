@@ -13,7 +13,7 @@ export default function Logo({ className = '' }: LogoProps) {
         alt="Miaucraft"
         width={960}
         height={295}
-        className="h-9 w-auto sm:h-11"
+        className="h-8 w-auto sm:h-11"
       />
     </Link>
   );

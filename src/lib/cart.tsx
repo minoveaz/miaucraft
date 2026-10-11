@@ -6,6 +6,12 @@ export interface CartLine {
   title: string;
   unitPrice: number;
   quantity: number;
+  options?: Record<string, string>;
+}
+
+export function cartLineKey(line: Pick<CartLine, 'handle' | 'options'>): string {
+  const options = Object.entries(line.options ?? {}).sort(([left], [right]) => left.localeCompare(right));
+  return `${line.handle}:${JSON.stringify(options)}`;
 }
 
 interface CartContextValue {
@@ -13,8 +19,8 @@ interface CartContextValue {
   count: number;
   subtotal: number;
   addLine: (line: Omit<CartLine, 'quantity'>, quantity?: number) => void;
-  setQuantity: (handle: string, quantity: number) => void;
-  removeLine: (handle: string) => void;
+  setQuantity: (lineKey: string, quantity: number) => void;
+  removeLine: (lineKey: string) => void;
   clear: () => void;
 }
 
@@ -49,21 +55,22 @@ export function CartProvider({ children }: { children: ReactNode }) {
       subtotal: lines.reduce((total, line) => total + line.unitPrice * line.quantity, 0),
       addLine: (line, quantity = 1) =>
         setLines((current) => {
-          const existing = current.find((item) => item.handle === line.handle);
+          const key = cartLineKey(line);
+          const existing = current.find((item) => cartLineKey(item) === key);
           if (existing) {
             return current.map((item) =>
-              item.handle === line.handle
+              cartLineKey(item) === key
                 ? { ...item, quantity: clampQuantity(item.quantity + quantity) }
                 : item,
             );
           }
           return [...current, { ...line, quantity: clampQuantity(quantity) }];
         }),
-      setQuantity: (handle, quantity) =>
+      setQuantity: (lineKey, quantity) =>
         setLines((current) =>
-          current.map((item) => (item.handle === handle ? { ...item, quantity: clampQuantity(quantity) } : item)),
+          current.map((item) => (cartLineKey(item) === lineKey ? { ...item, quantity: clampQuantity(quantity) } : item)),
         ),
-      removeLine: (handle) => setLines((current) => current.filter((item) => item.handle !== handle)),
+      removeLine: (lineKey) => setLines((current) => current.filter((item) => cartLineKey(item) !== lineKey)),
       clear: () => setLines([]),
     };
   }, [lines]);

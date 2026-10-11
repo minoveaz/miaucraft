@@ -9,7 +9,7 @@ export default function PublicLayout() {
     <CartProvider>
       <div className="flex min-h-screen flex-col">
         <div className="bg-brand-ink px-2 py-2 text-center text-xs text-white">
-          Envío gratis en pedidos desde $49 · Garantía de reemplazo de 30 días · Hecho para perros y gatos
+          Envío gratis en pedidos superiores a $50 · Devoluciones durante 14 días · Hecho para perros y gatos
         </div>
         <Navbar />
         <main className="flex-1">

@@ -33,19 +33,8 @@ export default function Footer() {
     <footer className="grid grid-cols-1 gap-8 bg-brand-ink px-10 py-12 text-[13px] text-white sm:grid-cols-2 md:grid-cols-[1.4fr_1fr_1fr_1fr] max-md:px-4 max-md:py-8">
       <div>
         <h4 className="mb-2.5 font-display text-sm font-bold">MIAUCRAFT</h4>
-        <p className="text-[#cfc8c2]">Accesorios para perros y gatos, diseñados y probados en casa.</p>
-        <form className="mt-2.5 flex gap-2" onSubmit={(event) => event.preventDefault()}>
-          <label className="sr-only" htmlFor="footer-email">Tu email</label>
-          <input
-            id="footer-email"
-            type="email"
-            placeholder="Tu email"
-            className="h-[38px] min-w-0 flex-1 rounded-md bg-[#2a2a2a] px-3 text-white placeholder:text-[#8a8a8a]"
-          />
-          <button type="submit" className="h-[38px] w-[100px] rounded-md bg-brand font-bold text-white">
-            OK
-          </button>
-        </form>
+        <p className="text-[#cfc8c2]">Accesorios para perros y gatos.</p>
+        <p className="mt-3 text-xs text-[#cfc8c2]">El formulario de novedades no está conectado en esta vista previa.</p>
       </div>
       <div>
         <h4 className="mb-2.5 font-display text-sm font-bold">Tienda</h4>

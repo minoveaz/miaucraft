@@ -1,10 +1,10 @@
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import Logo from './Logo';
 import { useCart } from '../../lib/cart';
 
 // Enlaces del wireframe 01. Los que aún no tienen ruta se muestran sin enlace.
 const navItems = [
-  { label: 'Bandanas', to: '/coleccion/bandanas', active: true },
+  { label: 'Bandanas', to: '/coleccion/bandanas' },
   { label: 'Collares ID', to: '/coleccion/id-tags-anderson' },
   { label: 'Tags', to: '/coleccion/tag-cat' },
   { label: 'Accesorios' },
@@ -28,13 +28,18 @@ function NavLabel({ label, to, active }: { label: string; to?: string; active?: 
 
 export default function Navbar() {
   const { count } = useCart();
+  const { pathname } = useLocation();
+  const items = navItems.map((item) => ({
+    ...item,
+    active: item.to !== undefined && (pathname === item.to || pathname.startsWith(`${item.to}/`)),
+  }));
 
   return (
     <header className="relative border-b border-[#e6dcd3] bg-white">
       <div className="flex items-center justify-between px-10 py-4 max-md:px-4 max-md:py-3">
         <Logo />
         <nav aria-label="Principal" className="hidden gap-7 text-sm font-semibold md:flex">
-          {navItems.map((item) => (
+          {items.map((item) => (
             <NavLabel key={item.label} {...item} />
           ))}
         </nav>
@@ -54,7 +59,7 @@ export default function Navbar() {
       <details className="border-t border-[#e6dcd3] px-4 py-3 md:hidden">
         <summary className="cursor-pointer text-sm font-semibold">Menú</summary>
         <nav aria-label="Principal móvil" className="mt-3 flex flex-col gap-3 text-sm font-semibold">
-          {navItems.map((item) => (
+          {items.map((item) => (
             <NavLabel key={item.label} {...item} />
           ))}
         </nav>

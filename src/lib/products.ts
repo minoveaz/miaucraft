@@ -18,6 +18,16 @@ export function productsInCollection(handle: string): Product[] {
   return products.filter((p) => p.collections.includes(handle));
 }
 
+export function productImage(product: Product): string {
+  const base = import.meta.env.BASE_URL;
+  const image = product.collections.includes('bandanas')
+    ? 'IA-CAT-BANDANA.png'
+    : product.collections.includes('tag-cat')
+      ? 'IA-CAT-TAGS.png'
+      : 'IA-CAT-COLLAR.png';
+  return `${base}images/ia/${image}`;
+}
+
 export const products: Product[] = [
   { handle: 'pet-bandana-collar', title: 'Pet bandana collar', priceFrom: 22.5, collections: ['bandanas'] },
   { handle: 'pet-bandana-collar-animal-print', title: 'Pet bandana collar Animal Print', priceFrom: 22, collections: ['bandanas'] },

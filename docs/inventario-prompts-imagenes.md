@@ -4,12 +4,22 @@ Prompts de producción para preparar una futura sustitución de las composicione
 
 ## Estado y reglas comunes
 
-- **Estado:** 11 prompts preparados; no se generaron imágenes en esta tarea. Los PNG existentes continúan siendo las composiciones de referencia de `docs/assets/ia/` y sus copias públicas en `public/images/ia/`.
+- **Estado:** 11 prompts preparados para los assets de referencia; no se generaron imágenes. Los PNG existentes continúan siendo las composiciones de referencia de `docs/assets/ia/` y sus copias públicas en `public/images/ia/`.
 - **Estilo:** fotografía editorial cálida, natural y limpia; fondos marfil `#FFF8F1`, acentos rosa `#E52C77` y rosa suave `#FFE0E4`, con detalles oscuros `#101010`. El rosa es un acento, no un fondo dominante.
 - **Marca y texto:** no generar logotipos, letras, números, marcas de agua, etiquetas legibles, insignias, precios ni claims. El logotipo y cualquier texto se incorporan después en la interfaz o en una plantilla.
 - **Fidelidad comercial:** las escenas con accesorios son imágenes ambientales genéricas, no fotografías de SKU. No inventar estampados, materiales, herrajes, medidas, grabados, certificaciones ni características del catálogo. Las fotos de fichas de producto deben ser fotos reales del artículo exacto.
 - **Consistencia:** si una misma sesión genera varias imágenes, conservar la identidad visual de las mascotas de las escenas lifestyle: perro pequeño mestizo de pelaje crema/canela y gato doméstico gris atigrado. No implican que sean mascotas reales de Miaucraft.
 - **Entrega sugerida:** PNG, sRGB, dimensiones exactas del asset. Revisar rostro, ojos, patas, correas, siluetas y recorte a tamaño móvil antes de sustituir un archivo.
+
+## Asset seleccionado y aportado (sin generación)
+
+### Hero actual de la home
+
+- **Archivo:** `public/images/home.png` (copia sin cambios del archivo aportado por el usuario).
+- **Ubicación:** imagen principal del hero en `src/pages/HomePage.tsx`.
+- **Tamaño / proporción:** **1774 × 887 px**, aproximadamente **2:1**.
+- **Estado:** archivo existente proporcionado por el usuario y usado tal cual. **No requiere prompt ni generación.** El hash SHA-256 del original y de la copia es `27b5ec3634aa085e8c70878cc6e6ff7c2eba48a6f76976bd816a17384d44c371`.
+- **Continuidad / composición:** fotografía de un perro pequeño de pelaje claro con bandana rosa y placa, situado a la derecha sobre fondo marfil; el espacio negativo izquierdo funciona con el texto actual del hero. Mantener el archivo original intacto. `IA-HOME-HERO-D.png` permanece en el inventario de assets de referencia, pero ya no es la imagen que muestra el hero actual.
 
 ## Prompts por asset
 

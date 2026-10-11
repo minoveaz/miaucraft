@@ -35,10 +35,10 @@ export default function HomePage() {
           </div>
         </div>
         <img
-          src={ia('IA-HOME-HERO-D.png')}
+          src={`${base}images/home.png`}
           alt=""
-          width={800}
-          height={680}
+          width={1774}
+          height={887}
           className="h-[340px] w-full flex-1 rounded-xl object-cover max-md:h-auto"
         />
       </section>

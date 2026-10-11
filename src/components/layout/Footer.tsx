@@ -1,6 +1,14 @@
 import { Link } from 'react-router-dom';
-import { collectionLinks } from '../../lib/navigation';
+import { collectionLinks, secondaryLinks } from '../../lib/navigation';
 import Logo from './Logo';
+
+const footerLinks = [
+  ...secondaryLinks,
+  { to: '/envios-devoluciones', label: 'Envíos y devoluciones' },
+  { to: '/privacidad', label: 'Privacidad' },
+  { to: '/terminos', label: 'Términos de servicio' },
+  { to: '/cookies', label: 'Cookies' },
+];
 
 export default function Footer() {
   return (
@@ -24,14 +32,16 @@ export default function Footer() {
           </ul>
         </nav>
 
-        <nav aria-label="Tienda">
-          <h2 className="font-display text-sm font-semibold">Miaucraft</h2>
+        <nav aria-label="Ayuda y legal">
+          <h2 className="font-display text-sm font-semibold">Ayuda</h2>
           <ul className="mt-4 space-y-3 text-sm">
-            <li>
-              <Link to="/" className="hover:text-brand-strong">
-                Tienda
-              </Link>
-            </li>
+            {footerLinks.map((item) => (
+              <li key={item.to}>
+                <Link to={item.to} className="hover:text-brand-strong">
+                  {item.label}
+                </Link>
+              </li>
+            ))}
           </ul>
         </nav>
       </div>

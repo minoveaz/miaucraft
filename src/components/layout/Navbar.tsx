@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { collectionLinks } from '../../lib/navigation';
+import { useCart } from '../../lib/cart';
+import { collectionLinks, secondaryLinks } from '../../lib/navigation';
 import Logo from './Logo';
 
 function MenuIcon() {
@@ -38,7 +39,18 @@ function ChevronIcon({ open }: { open: boolean }) {
   );
 }
 
+function CartIcon() {
+  return (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M3 4h2l2.4 11.2a1 1 0 0 0 1 .8h8.8a1 1 0 0 0 1-.8L20 8H6" />
+      <circle cx="9.5" cy="19.5" r="1.5" />
+      <circle cx="17.5" cy="19.5" r="1.5" />
+    </svg>
+  );
+}
+
 export default function Navbar() {
+  const { count } = useCart();
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [collectionsOpen, setCollectionsOpen] = useState(false);
@@ -126,18 +138,37 @@ export default function Navbar() {
               </div>
             )}
           </div>
+          {secondaryLinks.map((item) => (
+            <Link key={item.to} to={item.to} className="text-sm font-medium text-brand-ink hover:text-brand-strong">
+              {item.label}
+            </Link>
+          ))}
         </nav>
 
-        <button
-          type="button"
-          aria-expanded={menuOpen}
-          aria-controls="menu-movil"
-          aria-label={menuOpen ? 'Cerrar menú' : 'Abrir menú'}
-          onClick={() => setMenuOpen((open) => !open)}
-          className="inline-flex h-11 w-11 items-center justify-center rounded-full text-brand-ink hover:bg-brand-cream md:hidden"
-        >
-          {menuOpen ? <CloseIcon /> : <MenuIcon />}
-        </button>
+        <div className="flex items-center gap-1">
+          <Link
+            to="/carrito"
+            aria-label={count > 0 ? `Carrito, ${count} artículos` : 'Carrito'}
+            className="relative inline-flex h-11 w-11 items-center justify-center rounded-full text-brand-ink hover:bg-brand-cream"
+          >
+            <CartIcon />
+            {count > 0 && (
+              <span className="absolute right-1 top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-brand-strong px-1 text-xs font-semibold text-white">
+                {count}
+              </span>
+            )}
+          </Link>
+          <button
+            type="button"
+            aria-expanded={menuOpen}
+            aria-controls="menu-movil"
+            aria-label={menuOpen ? 'Cerrar menú' : 'Abrir menú'}
+            onClick={() => setMenuOpen((open) => !open)}
+            className="inline-flex h-11 w-11 items-center justify-center rounded-full text-brand-ink hover:bg-brand-cream md:hidden"
+          >
+            {menuOpen ? <CloseIcon /> : <MenuIcon />}
+          </button>
+        </div>
       </div>
 
       {menuOpen && (
@@ -154,6 +185,16 @@ export default function Navbar() {
                   className="block rounded-xl px-2 py-3 text-lg font-medium text-brand-ink hover:bg-brand-cream"
                 >
                   {collection.title}
+                </Link>
+              </li>
+            ))}
+            {secondaryLinks.map((item) => (
+              <li key={item.to}>
+                <Link
+                  to={item.to}
+                  className="block rounded-xl px-2 py-3 text-lg font-medium text-brand-ink hover:bg-brand-cream"
+                >
+                  {item.label}
                 </Link>
               </li>
             ))}

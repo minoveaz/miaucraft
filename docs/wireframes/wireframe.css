@@ -1,0 +1,113 @@
+/* Estilo de los wireframes de Miaucraft: paleta y tipografía de la marca, cajas de imagen en gris. */
+:root {
+  --brand: #E52C77;
+  --brand-strong: #C81E63;
+  --soft: #FFE0E4;
+  --cream: #FFF8F1;
+  --ink: #101010;
+  --muted: #6b6b6b;
+  --line: #e6dcd3;
+  --img: #e9e4df;
+  --white: #ffffff;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  width: 1440px; background: var(--cream); color: var(--ink);
+  font-family: Inter, system-ui, sans-serif; font-size: 14px; line-height: 1.45;
+}
+body.mobile { width: 390px; }
+h1, h2, h3, .display { font-family: Poppins, Inter, sans-serif; font-weight: 700; letter-spacing: -0.01em; }
+
+.label {
+  display: inline-block; margin-bottom: 10px; background: var(--ink); color: var(--white);
+  font-size: 11px; padding: 2px 8px; border-radius: 4px; letter-spacing: .04em; text-transform: uppercase;
+}
+.note {
+  font-size: 12px; color: var(--muted); border-left: 3px solid var(--brand); padding: 4px 10px; background: var(--white);
+}
+
+/* Anuncio, header y footer */
+.announce { background: var(--ink); color: var(--white); text-align: center; font-size: 12px; padding: 8px; }
+.header { display: flex; align-items: center; justify-content: space-between; padding: 16px 40px; background: var(--white); border-bottom: 1px solid var(--line); position: relative; }
+.logo { width: 150px; height: 40px; border: 2px dashed var(--brand); border-radius: 6px; display: flex; align-items: center; justify-content: center; color: var(--brand); font-weight: 700; font-family: Poppins; font-size: 13px; }
+.nav { display: flex; gap: 28px; font-weight: 600; font-size: 14px; }
+.nav span.active { color: var(--brand); border-bottom: 2px solid var(--brand); padding-bottom: 2px; }
+.icons { display: flex; gap: 14px; align-items: center; }
+.icon { width: 22px; height: 22px; border: 1.5px solid var(--ink); border-radius: 5px; }
+.cart-count { background: var(--brand); color: var(--white); border-radius: 999px; font-size: 11px; padding: 0 6px; font-weight: 700; }
+.mega { position: absolute; left: 0; right: 0; top: 100%; background: var(--white); border-bottom: 1px solid var(--line); padding: 28px 40px; display: grid; grid-template-columns: 1fr 1fr 1fr 1fr 1.4fr; gap: 24px; box-shadow: 0 16px 30px rgba(16,16,16,.08); z-index: 5; }
+.mega h4 { font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin-bottom: 8px; }
+.mega li { list-style: none; padding: 4px 0; font-size: 14px; }
+.mega .promo { background: var(--soft); border-radius: 10px; padding: 16px; }
+
+.footer { background: var(--ink); color: var(--white); padding: 48px 40px; display: grid; grid-template-columns: 1.4fr 1fr 1fr 1fr; gap: 32px; font-size: 13px; }
+.footer h4 { font-family: Poppins; font-size: 14px; margin-bottom: 10px; }
+.footer li { list-style: none; color: #cfc8c2; padding: 3px 0; }
+.news { display: flex; gap: 8px; margin-top: 10px; }
+.news .input { flex: 1; height: 38px; background: #2a2a2a; border-radius: 6px; }
+.news .btn { width: 100px; height: 38px; background: var(--brand); border-radius: 6px; }
+
+/* Bloques genéricos */
+.wrap { padding: 32px 40px; }
+.btn { display: inline-flex; align-items: center; justify-content: center; height: 46px; padding: 0 24px; border-radius: 999px; background: var(--brand); color: var(--white); font-weight: 700; font-size: 14px; }
+.btn.ghost { background: transparent; color: var(--ink); border: 1.5px solid var(--ink); }
+.btn.dark { background: var(--ink); }
+.btn.wide { width: 100%; }
+.img { background: var(--img); border-radius: 12px; position: relative; display: flex; align-items: center; justify-content: center; color: #8a817a; font-size: 12px; overflow: hidden; }
+.img::after { content: ""; position: absolute; inset: 0; background: linear-gradient(135deg, transparent 49.5%, rgba(16,16,16,.08) 50%, transparent 50.5%); }
+.card { background: var(--white); border-radius: 14px; padding: 14px; border: 1px solid var(--line); }
+.badge { display: inline-block; background: var(--soft); color: var(--brand-strong); font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 999px; }
+.stars { color: var(--brand); letter-spacing: 2px; font-size: 13px; }
+.bar { height: 10px; border-radius: 6px; background: var(--line); }
+.bar.on { background: var(--brand); }
+.pill { border: 1.5px solid var(--line); border-radius: 999px; padding: 6px 14px; font-size: 13px; background: var(--white); display: inline-block; }
+.pill.sel { border-color: var(--brand); color: var(--brand-strong); background: var(--soft); }
+.sq { width: 40px; height: 40px; border: 1.5px solid var(--line); border-radius: 8px; display: inline-flex; align-items: center; justify-content: center; font-weight: 600; background: var(--white); }
+.sq.sel { border-color: var(--brand); background: var(--soft); color: var(--brand-strong); }
+.field { height: 44px; border: 1px solid #cfc4bb; border-radius: 8px; background: var(--white); padding: 12px; color: var(--muted); font-size: 13px; }
+.field-label { font-size: 12px; font-weight: 600; margin-bottom: 6px; }
+.hl { background: var(--brand); color: var(--white); padding: 2px 8px; border-radius: 4px; font-weight: 700; font-size: 12px; }
+.line { height: 8px; background: var(--line); border-radius: 4px; }
+.line.s { width: 60%; }
+.line.m { width: 80%; }
+.line.xs { width: 35%; }
+.row { display: flex; gap: 20px; }
+.col { display: flex; flex-direction: column; gap: 12px; }
+.grow { flex: 1; }
+.between { display: flex; justify-content: space-between; align-items: center; }
+.sec-title { font-size: 26px; margin-bottom: 4px; }
+.sec-sub { color: var(--muted); font-size: 14px; margin-bottom: 20px; }
+.frame { position: relative; margin-top: 14px; }
+.trust { display: flex; gap: 28px; justify-content: center; font-size: 13px; font-weight: 600; padding: 18px; background: var(--white); border-radius: 14px; }
+.trust span::before { content: "✓ "; color: var(--brand); }
+.hero { background: var(--soft); border-radius: 22px; padding: 56px; display: flex; align-items: center; gap: 40px; min-height: 420px; }
+.grid4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+.grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+.grid5 { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; }
+.pcard .img { height: 240px; border-radius: 12px; }
+.pcard .meta { padding: 10px 2px; }
+.pcard .name { font-weight: 600; font-size: 14px; }
+.pcard .price { font-weight: 700; margin-top: 2px; }
+.pcard .price s { color: var(--muted); font-weight: 400; margin-left: 6px; }
+.crumbs { font-size: 12px; color: var(--muted); margin-bottom: 16px; }
+.step { display: flex; gap: 8px; align-items: center; font-size: 13px; font-weight: 600; }
+.step b { width: 26px; height: 26px; border-radius: 999px; display: inline-flex; align-items: center; justify-content: center; background: var(--line); color: var(--ink); font-size: 12px; }
+.step.on b { background: var(--brand); color: var(--white); }
+.step.done b { background: var(--ink); color: var(--white); }
+.summary { background: var(--white); border-radius: 14px; padding: 22px; border: 1px solid var(--line); }
+.sum-line { display: flex; justify-content: space-between; padding: 8px 0; font-size: 14px; }
+.sum-total { border-top: 1px solid var(--line); margin-top: 8px; padding-top: 12px; font-size: 18px; font-weight: 700; }
+.drawer { width: 420px; background: var(--white); border-radius: 18px; padding: 22px; box-shadow: 0 20px 40px rgba(16,16,16,.12); }
+.cart-item { display: flex; gap: 14px; padding: 14px 0; border-bottom: 1px solid var(--line); }
+.cart-item .img { width: 84px; height: 84px; flex-shrink: 0; border-radius: 10px; }
+.progress { height: 8px; background: var(--line); border-radius: 6px; overflow: hidden; }
+.progress i { display: block; height: 100%; width: 72%; background: var(--brand); }
+
+/* Móvil */
+body.mobile .header { padding: 12px 16px; }
+body.mobile .wrap { padding: 20px 16px; }
+body.mobile .grid4, body.mobile .grid3, body.mobile .grid5 { grid-template-columns: repeat(2, 1fr); }
+body.mobile .hero { flex-direction: column; padding: 28px 20px; min-height: 0; text-align: left; }
+body.mobile .footer { grid-template-columns: 1fr 1fr; padding: 32px 16px; }
+body.mobile .mega { display: none; }
+body.mobile .trust { flex-wrap: wrap; gap: 10px 16px; font-size: 12px; }

@@ -8,7 +8,7 @@ Guía para agentes y colaboradores de `miaucraft`.
 
 ## Reglas
 - Mobile-first: sin anchos fijos, usar `flex-wrap` y `grid`. Mantener el meta viewport.
-- Tokens de marca en `tailwind.config.js`: `primary` (#005F73), `accent` (#EE9B00).
+- Tokens de marca en `tailwind.config.js`: `brand` (DEFAULT #E52C77 rosa, strong #C81E63 para botones con texto blanco, soft #FFE0E4, cream #FFF8F1, ink #101010). Fuentes: Poppins (display) e Inter (texto).
 - Fuentes: Poppins (display) e Inter (texto).
 - Nunca usar tokens de Admin API en el frontend; solo tokens públicos de Storefront.
 - Flujo de ramas: trabajar en `feature/*` → PR a `develop`. Solo `develop` puede abrir PR a `main`.

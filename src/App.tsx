@@ -1,42 +1,35 @@
-import { Link, Route, Routes } from 'react-router-dom';
-import { products } from './lib/products';
-
-function Home() {
-  return (
-    <main className="mx-auto max-w-6xl px-4 py-12">
-      <h1 className="font-display text-4xl font-semibold text-primary">Miaucraft</h1>
-      <p className="mt-3 max-w-2xl text-gray-700">
-        Accesorios para mascotas con diseño propio. Demo de la nueva web.
-      </p>
-      <ul className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {products.map((p) => (
-          <li key={p.id} className="rounded-xl border border-gray-200 p-5">
-            <h2 className="font-semibold text-gray-900">{p.title}</h2>
-            <p className="mt-1 text-sm text-gray-600">{p.price}</p>
-            <Link to={`/producto/${p.handle}`} className="mt-4 inline-block text-accent underline">
-              Ver producto
-            </Link>
-          </li>
-        ))}
-      </ul>
-    </main>
-  );
-}
-
-function ProductPage() {
-  return (
-    <main className="mx-auto max-w-3xl px-4 py-12">
-      <Link to="/" className="text-primary underline">Volver al catálogo</Link>
-    </main>
-  );
-}
+import { Route, Routes } from 'react-router-dom';
+import PublicLayout from './components/layout/PublicLayout';
+import CollectionPage from './pages/CollectionPage';
+import HomePage from './pages/HomePage';
+import AboutPage from './pages/AboutPage';
+import CartPage from './pages/CartPage';
+import CheckoutPage from './pages/CheckoutPage';
+import ProductPage from './pages/ProductPage';
+import StaticPage from './pages/StaticPage';
+import { BlogPage, NotFoundPage } from './pages/StaticPages';
 
 export default function App() {
   return (
     <Routes>
-      <Route path="/" element={<Home />} />
-      <Route path="/producto/:handle" element={<ProductPage />} />
-      <Route path="*" element={<main className="p-12">Página no encontrada</main>} />
+      <Route element={<PublicLayout />}>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/blog" element={<BlogPage />} />
+        <Route path="/nosotros" element={<AboutPage />} />
+        <Route path="/carrito" element={<CartPage />} />
+        <Route path="/checkout" element={<CheckoutPage />} />
+        <Route path="/coleccion/:handle" element={<CollectionPage />} />
+        <Route path="/producto/:handle" element={<ProductPage />} />
+        <Route
+          path="/preguntas-frecuentes"
+          element={<StaticPage title="Preguntas frecuentes" body="La información sobre pedidos, envíos, tallas y devoluciones todavía no está configurada en esta vista previa." />}
+        />
+        <Route
+          path="/contacto"
+          element={<StaticPage title="Contacto" body="Los canales de atención todavía no están configurados en esta vista previa." />}
+        />
+        <Route path="*" element={<NotFoundPage />} />
+      </Route>
     </Routes>
   );
 }

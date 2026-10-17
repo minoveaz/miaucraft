@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1254 1254" width="100%" height="100%">
+  <!-- Code: DSA073 | Status: BORRADOR | Confidence: Media | Name: Frontal -->
+  <g id="DSA073" fill="currentColor" stroke="currentColor">
+    <g id="ears" fill="none" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M 310 425 Q 340 345 368 308 Q 402 342 436 398" stroke-width="18" />
+      <path d="M 944 415 Q 914 345 886 308 Q 858 336 835 372" stroke-width="18" />
+    </g>
+    <g id="crown-accessory" stroke="none" transform="translate(835, 438) rotate(18)">
+      <path d="M -52 28 L -62 -22 L -25 4 L 0 -30 L 25 4 L 62 -22 L 52 28 Z" />
+      <circle cx="-64" cy="-32" r="8" />
+      <circle cx="0" cy="-42" r="8" />
+      <circle cx="64" cy="-32" r="8" />
+    </g>
+    <g id="nose-heart" stroke="none">
+      <path d="M 626 942 C 626 942 592 918 592 900 C 592 886 608 880 626 896 C 644 880 660 886 660 900 C 660 918 626 942 626 942 Z" />
+    </g>
+    <g id="whiskers" fill="none" stroke-linecap="round" stroke-width="12">
+      <path d="M 562 902 Q 475 886 388 898" />
+      <path d="M 556 918 Q 465 912 368 928" />
+      <path d="M 564 934 Q 478 938 392 958" />
+      <path d="M 690 902 Q 779 886 866 898" />
+      <path d="M 696 918 Q 789 912 886 928" />
+      <path d="M 688 934 Q 776 938 862 958" />
+    </g>
+  </g>
+</svg>

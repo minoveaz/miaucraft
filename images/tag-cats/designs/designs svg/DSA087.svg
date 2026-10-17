@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1254 1254" width="100%" height="100%">
+  <!-- Code: DSA087 | Status: BORRADOR | Confidence: Media-Alta | Name: Reverso -->
+  <g id="DSA087" fill="currentColor" stroke="none">
+    <!-- Gafas pixeladas con brillos blancos en reserva (fill-rule="evenodd") -->
+    <g id="pixel-glasses" fill-rule="evenodd">
+      <path d="M 320 555 H 932 V 585 H 902 V 615 H 872 V 645 H 842 V 675 H 702 V 645 H 672 V 615 H 642 V 585 H 610 V 615 H 580 V 645 H 550 V 675 H 410 V 645 H 380 V 615 H 350 V 585 H 320 Z
+               M 365 578 H 390 V 603 H 365 Z
+               M 390 603 H 415 V 628 H 390 Z
+               M 415 628 H 440 V 653 H 415 Z
+               M 425 578 H 450 V 603 H 425 Z
+               M 450 603 H 475 V 628 H 450 Z
+               M 715 578 H 740 V 603 H 715 Z
+               M 740 603 H 765 V 628 H 740 Z
+               M 765 628 H 790 V 653 H 765 Z
+               M 775 578 H 800 V 603 H 775 Z
+               M 800 603 H 825 V 628 H 800 Z" />
+    </g>
+    <g id="nose-mouth" stroke="currentColor">
+      <path d="M 602 688 Q 626 682 650 688 L 626 714 Z" stroke="none" />
+      <path d="M 626 712 L 626 742 M 602 738 Q 626 765 650 738" fill="none" stroke-width="14" stroke-linecap="round" />
+      <path d="M 608 742 Q 626 785 644 742 Z" stroke="none" />
+    </g>
+  </g>
+</svg>

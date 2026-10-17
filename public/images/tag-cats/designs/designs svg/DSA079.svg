@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1254 1254" width="100%" height="100%">
+  <!-- Code: DSA079 | Status: BORRADOR | Confidence: Baja-Media (requiere vector original de patrón) | Name: Reverso -->
+  <g id="DSA079" fill="none" stroke="currentColor" stroke-width="14" stroke-linecap="round">
+    <!-- Líneas finas atigradas respetando el agujero (625, 433, r=76) -->
+    <path d="M 325 340 Q 410 375 495 395" />
+    <path d="M 300 385 Q 415 420 515 435" />
+    <path d="M 280 430 Q 410 465 525 475" />
+    <path d="M 755 395 Q 840 375 925 340" />
+    <path d="M 735 435 Q 835 420 950 385" />
+    <path d="M 725 475 Q 840 465 970 430" />
+    <path d="M 260 480 Q 420 525 545 515" />
+    <path d="M 705 515 Q 830 525 990 480" />
+    <path d="M 240 530 Q 626 605 1010 530" />
+    <path d="M 228 575 Q 626 650 1022 575" />
+    <path d="M 220 620 Q 626 695 1030 620" />
+    <path d="M 216 665 Q 626 740 1034 665" />
+    <path d="M 220 710 Q 626 785 1030 710" />
+    <path d="M 228 755 Q 626 830 1022 755" />
+    <path d="M 242 800 Q 626 875 1008 800" />
+    <path d="M 262 845 Q 626 920 988 845" />
+    <path d="M 290 890 Q 626 965 960 890" />
+    <path d="M 328 935 Q 626 1010 922 935" />
+    <path d="M 380 980 Q 626 1045 870 980" />
+    <path d="M 455 1025 Q 626 1075 795 1025" />
+  </g>
+</svg>

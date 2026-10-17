@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1254 1254" width="100%" height="100%">
+  <!-- Code: DSA078 | Status: BORRADOR | Confidence: Baja-Media (requiere vector original de patrón) | Name: Reverso -->
+  <g id="DSA078" fill="currentColor" stroke="none">
+    <!-- Bandas orgánicas respetando el margen del agujero central (625, 433, r=76) -->
+    <path d="M 320 340 Q 375 410 420 490 L 385 510 Q 340 425 290 375 Z" />
+    <path d="M 885 315 Q 925 365 965 425 L 925 445 Q 885 385 845 345 Z" />
+    <path d="M 255 445 Q 345 535 515 555 L 495 595 Q 325 575 235 485 Z" />
+    <path d="M 725 465 Q 845 485 990 475 L 1005 515 Q 845 525 715 500 Z" />
+    <path d="M 220 565 Q 385 645 625 615 Q 845 585 1025 575 L 1032 620 Q 845 630 625 660 Q 385 690 212 615 Z" />
+    <path d="M 212 675 Q 415 735 615 705 Q 815 675 1035 685 L 1030 730 Q 815 720 615 750 Q 415 780 218 725 Z" />
+    <path d="M 230 785 Q 445 825 655 785 Q 845 750 1018 780 L 1005 825 Q 845 795 655 830 Q 445 870 245 830 Z" />
+    <path d="M 275 885 Q 475 915 675 875 Q 835 845 975 875 L 955 918 Q 835 890 675 920 Q 475 960 298 928 Z" />
+    <path d="M 355 975 Q 535 995 715 960 Q 825 940 905 960 L 875 998 Q 815 982 715 1002 Q 535 1035 395 1012 Z" />
+    <path d="M 485 1040 Q 625 1055 765 1035 L 725 1062 Q 625 1072 525 1060 Z" />
+  </g>
+</svg>

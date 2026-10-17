@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1254 1254" width="100%" height="100%">
+  <!-- Code: DSA088 | Status: BORRADOR | Confidence: Media | Name: Reverso -->
+  <g id="DSA088" fill="currentColor" stroke="currentColor">
+    <!-- Montura aviador -->
+    <g id="aviator-frame" fill="none" stroke-width="14">
+      <path d="M 320 565 Q 450 550 580 570" />
+      <path d="M 672 570 Q 802 550 932 565" />
+      <path d="M 575 595 Q 626 580 677 595" />
+      <!-- Lente derecho con franjas horizontales -->
+      <path d="M 675 570 C 745 555 885 555 925 585 C 950 615 925 710 835 725 C 735 735 675 670 675 595 Z" />
+      <path d="M 682 602 H 932 M 680 632 H 932 M 692 662 H 918 M 718 692 H 892" stroke-width="18" />
+    </g>
+    <!-- Lente izquierdo relleno con estrellas en reserva (evenodd) -->
+    <path fill-rule="evenodd" stroke="none" d="M 577 570 C 507 555 367 555 327 585 C 302 615 327 710 417 725 C 517 735 577 670 577 595 Z
+      M 385 582 L 391 598 L 408 598 L 394 608 L 399 624 L 385 614 L 371 624 L 376 608 L 362 598 L 379 598 Z
+      M 455 582 L 461 598 L 478 598 L 464 608 L 469 624 L 455 614 L 441 624 L 446 608 L 432 598 L 449 598 Z
+      M 525 582 L 531 598 L 548 598 L 534 608 L 539 624 L 525 614 L 511 624 L 516 608 L 502 598 L 519 598 Z
+      M 355 632 L 361 648 L 378 648 L 364 658 L 369 674 L 355 664 L 341 674 L 346 658 L 332 648 L 349 648 Z
+      M 420 632 L 426 648 L 443 648 L 429 658 L 434 674 L 420 664 L 406 674 L 411 658 L 397 648 L 414 648 Z
+      M 490 632 L 496 648 L 513 648 L 499 658 L 504 674 L 490 664 L 476 674 L 481 658 L 467 648 L 484 648 Z
+      M 390 675 L 396 691 L 413 691 L 399 701 L 404 717 L 390 707 L 376 717 L 381 701 L 367 691 L 384 691 Z
+      M 460 675 L 466 691 L 483 691 L 469 701 L 474 717 L 460 707 L 446 717 L 451 701 L 437 691 L 454 691 Z" />
+  </g>
+</svg>

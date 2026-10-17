@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1254 1254" width="100%" height="100%">
+  <!-- Code: DSA067 | Status: BORRADOR | Confidence: Media-Alta | Name: Frontal -->
+  <g id="DSA067" fill="currentColor" stroke="currentColor">
+    <g id="ears" stroke="none">
+      <path d="M 312 420 Q 340 345 368 308 Q 402 342 436 398 Q 374 412 312 420 Z" />
+      <path d="M 942 420 Q 914 345 886 308 Q 852 342 818 398 Q 880 412 942 420 Z" />
+    </g>
+    <g id="nose" stroke="none">
+      <ellipse cx="626" cy="918" rx="34" ry="22" />
+    </g>
+    <g id="whiskers" fill="none" stroke-linecap="round" stroke-width="12">
+      <path d="M 562 902 Q 475 886 388 898" />
+      <path d="M 556 918 Q 465 912 368 928" />
+      <path d="M 564 934 Q 478 938 392 958" />
+      <path d="M 690 902 Q 779 886 866 898" />
+      <path d="M 696 918 Q 789 912 886 928" />
+      <path d="M 688 934 Q 776 938 862 958" />
+    </g>
+  </g>
+</svg>

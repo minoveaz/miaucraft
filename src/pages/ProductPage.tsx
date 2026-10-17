@@ -1,72 +1,318 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { Minus, Plus } from 'lucide-react';
+import { BadgeCheck, Clock, Minus, Plus, RotateCcw, Truck, type LucideIcon } from 'lucide-react';
 import { collectionLinks } from '../lib/navigation';
 import { formatPrice, productImage, products, type Product } from '../lib/products';
 import { useCart } from '../lib/cart';
 import TagStudio, { type TagStudioValue } from '../components/shop/TagStudio';
+import { FaceToggle, ProductViewer, ViewToggle, type Layer, type ProductFace, type ViewMode } from '@minoveaz/product-viewer';
+import type { TagStudioConfig } from '../lib/products';
+import { tagDimensionsMm, tagHole, tagOutline } from '../lib/tag-outlines';
 import StaticPage from './StaticPage';
 
 const base = import.meta.env.BASE_URL;
 const image = (file: string) => `${base}images/${encodeURI(file)}`;
 
-function ProductGallery({ product }: { product: Product }) {
-  const media = product.media ?? [{ image: productImage(product), alt: product.title }];
+type GallerySlot = { kind: 'tag' } | { kind: 'image'; image: string; alt: string };
+
+// Name size relative to the tag's image height; shrinks for longer names.
+const nameFontSize = (name: string) => Math.max(0.07, Math.min(0.11, 0.11 - Math.max(0, name.length - 6) * 0.004));
+
+function TagViewer({
+  config,
+  value,
+  view,
+  side,
+  className,
+}: {
+  config: TagStudioConfig;
+  value: TagStudioValue;
+  view: ViewMode;
+  side: ProductFace;
+  className?: string;
+}) {
+  const design = config.designs.find((item) => item.value === value.design) ?? config.designs[0];
+  const font = config.fonts.find((item) => item.value === value.font) ?? config.fonts[0];
+  const name = value.name.trim();
+  const finish = config.finishes.find((item) => item.value === value.finish);
+  const engravingColor = '#292622';
+  const nameLayer: Layer = {
+    id: 'name',
+    type: 'text',
+    text: name || 'Text here',
+    x: 0.5,
+    y: 0.6,
+    fontSize: nameFontSize(name || 'Text here'),
+    fontFamily: font.previewFontFamily,
+    fontWeight: font.previewFontWeight,
+    fontStyle: font.previewFontStyle,
+    color: name ? engravingColor : 'rgba(41, 38, 34, 0.35)',
+  };
+  const frontLayers: Layer[] = [
+    {
+      id: 'design',
+      type: 'image',
+      src: image(design.artwork),
+      x: 0,
+      y: 0,
+      width: 1,
+      height: 1,
+    },
+    ...(design.nameSide === 'front' ? [nameLayer] : []),
+  ];
+  const backLayers: Layer[] = design.nameSide === 'back' ? [nameLayer] : [];
+
+  return (
+    <ProductViewer
+      view={view}
+      source={{
+        baseImage: image(finish?.baseImage ?? 'tag-cats/base/tag-golden.png'),
+        sideColor: finish?.sideColor,
+        outline: tagOutline.map(([x, y]) => ({ x, y })),
+        hole: tagHole,
+        widthMm: tagDimensionsMm.width,
+        heightMm: tagDimensionsMm.height,
+        thicknessMm: tagDimensionsMm.thickness,
+      }}
+      frontLayers={frontLayers}
+      backLayers={backLayers}
+      side={side}
+      className={className}
+      label={`Tag ${design.label}, ${side === 'front' ? 'frontal' : 'reverso'}${name ? `, nombre ${name}` : ''}`}
+    />
+  );
+}
+
+function ProductGallery({ product, tagValue }: { product: Product; tagValue: TagStudioValue }) {
+  const photos = product.media ?? [{ image: productImage(product), alt: product.title }];
+  const tagConfig = product.tagStudio;
+  const slots: GallerySlot[] = [
+    ...(tagConfig ? [{ kind: 'tag' as const }] : []),
+    ...photos.map((item) => ({ kind: 'image' as const, image: item.image, alt: item.alt })),
+  ];
   const [selectedIndex, setSelectedIndex] = useState(0);
-  const selected = media[selectedIndex] ?? media[0];
+  const [tagView, setTagView] = useState<ViewMode>('2d');
+  const [tagSide, setTagSide] = useState<ProductFace>('front');
+  useEffect(() => setSelectedIndex(0), [tagValue.finish]);
+  const selected = slots[selectedIndex] ?? slots[0];
+  const slotKey = (slot: GallerySlot) => (slot.kind === 'tag' ? 'tag' : slot.image);
+  const slotLabel = (slot: GallerySlot) => (slot.kind === 'tag' ? 'Mi tag personalizado' : slot.alt);
 
   return (
     <section aria-label={`Imágenes de ${product.title}`}>
       <div className="grid gap-3 md:grid-cols-[72px_minmax(0,1fr)] lg:grid-cols-[84px_minmax(0,1fr)]">
-        <div className="order-2 flex gap-2 overflow-x-auto md:order-1 md:flex-col">
-          {media.map((item, index) => (
+        <div className="order-2 flex gap-2 overflow-x-auto md:order-1 md:h-[632px] md:flex-col md:overflow-y-auto lg:h-[728px]">
+          {slots.map((slot, index) => (
             <button
-              key={item.image}
+              key={slotKey(slot)}
               type="button"
-              aria-label={`Ver imagen ${index + 1}: ${item.alt}`}
+              aria-label={`Ver ${slot.kind === 'tag' ? 'vista previa de tu tag' : `imagen ${index}`}: ${slotLabel(slot)}`}
               aria-pressed={selectedIndex === index}
               onClick={() => setSelectedIndex(index)}
               className={`h-16 w-16 shrink-0 overflow-hidden rounded-lg border-2 bg-brand-cream focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand md:h-[72px] md:w-[72px] lg:h-[84px] lg:w-[84px] ${
                 selectedIndex === index ? 'border-brand' : 'border-transparent'
               }`}
             >
-              <img src={image(item.image)} alt="" className="h-full w-full object-cover" />
+              {slot.kind === 'tag' && tagConfig ? (
+                <span className="block h-full w-full p-1">
+                  <TagViewer config={tagConfig} value={tagValue} view="2d" side="front" className="h-full w-full" />
+                </span>
+              ) : (
+                slot.kind === 'image' && <img src={image(slot.image)} alt="" className="h-full w-full object-cover" />
+              )}
             </button>
           ))}
         </div>
-        <div className="order-1 aspect-square overflow-hidden rounded-2xl bg-brand-cream md:order-2 md:aspect-[1.2/1]">
-          <img
-            key={selected.image}
-            src={image(selected.image)}
-            alt={selected.alt}
-            width={1200}
-            height={1000}
-            fetchPriority="high"
-            className="h-full w-full object-contain"
-          />
+        <div className="relative order-1 aspect-square overflow-hidden rounded-2xl bg-brand-cream md:order-2 md:aspect-auto md:h-[632px] lg:h-[728px]">
+          {selected.kind === 'tag' && tagConfig ? (
+            <div className="flex h-full flex-col p-4 sm:p-6">
+              <div className="flex shrink-0 justify-end">
+                <ViewToggle
+                  value={tagView}
+                  onChange={setTagView}
+                  className="flex overflow-hidden rounded-full border-2 border-brand-strong/20 bg-white text-sm font-bold shadow-sm"
+                  buttonClassName="px-5 py-2.5 text-brand-ink transition-colors"
+                  activeClassName="bg-brand-strong text-white"
+                />
+              </div>
+              <div className="min-h-0 w-full flex-1">
+                <TagViewer config={tagConfig} value={tagValue} view={tagView} side={tagSide} className="h-full w-full" />
+              </div>
+              <div className="flex shrink-0 flex-col items-end gap-2">
+                {tagView === '2d' && (
+                  <FaceToggle
+                    value={tagSide}
+                    onChange={setTagSide}
+                    className="flex overflow-hidden rounded-full border border-[#e6dcd3] bg-white/90 text-xs font-medium"
+                    buttonClassName="px-3.5 py-1.5 text-brand-ink/75 transition-colors"
+                    activeClassName="bg-brand-soft text-brand-strong"
+                  />
+                )}
+                <p className="mt-1 text-center text-xs text-brand-ink/70">
+                  Vista previa orientativa; el grabado final puede variar.
+                </p>
+              </div>
+            </div>
+          ) : (
+            selected.kind === 'image' && (
+              <img
+                key={selected.image}
+                src={image(selected.image)}
+                alt={selected.alt}
+                width={1200}
+                height={1000}
+                fetchPriority="high"
+                className="h-full w-full object-contain"
+              />
+            )
+          )}
         </div>
       </div>
     </section>
   );
 }
 
-function ProductDetails({ product }: { product: Product }) {
+function ProductOptions({
+  product,
+  selectedOptions,
+  onSelect,
+}: {
+  product: Product;
+  selectedOptions: Record<string, string>;
+  onSelect: (name: string, value: string) => void;
+}) {
+  if (!product.options?.length) return null;
+
+  return (
+    <div className="mt-6 space-y-5">
+      {product.options.map((option) => (
+        <fieldset key={option.name}>
+          <legend className="mb-2 text-sm font-semibold text-brand-ink">{option.label}</legend>
+          <div className="flex flex-wrap gap-2">
+            {option.values.map((value) => {
+              const selected = selectedOptions[option.name] === value.value;
+              return (
+                <button
+                  key={value.value}
+                  type="button"
+                  disabled={value.available === false}
+                  aria-pressed={selected}
+                  onClick={() => onSelect(option.name, value.value)}
+                  className={`min-h-11 rounded-lg border px-3 text-sm font-semibold focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand disabled:cursor-not-allowed disabled:opacity-40 ${
+                    selected
+                      ? 'border-brand bg-brand-soft text-brand-strong'
+                      : 'border-[#e6dcd3] bg-white text-brand-ink hover:border-brand'
+                  }`}
+                >
+                  {value.label}
+                </button>
+              );
+            })}
+          </div>
+        </fieldset>
+      ))}
+    </div>
+  );
+}
+
+function highlightIcon(text: string): { Icon: LucideIcon; title: string } {
+  const lower = text.toLowerCase();
+  if (lower.includes('entrega')) return { Icon: Clock, title: 'Entrega' };
+  if (lower.includes('devoluci')) return { Icon: RotateCcw, title: 'Devolución' };
+  if (lower.includes('envío') || lower.includes('envio')) return { Icon: Truck, title: 'Envío' };
+  return { Icon: BadgeCheck, title: 'Compra' };
+}
+
+function ProductInfoBlocks({ product }: { product: Product }) {
+  const purchaseHighlights = product.purchaseHighlights ?? [
+    'Envío gratis en pedidos superiores a $50',
+    'Política de devolución de 14 días',
+  ];
+  const details = product.details ?? [
+    { title: 'Descripción', content: product.description ?? `Detalles de ${product.title}.` },
+    { title: 'Medidas y ajuste', content: 'Consulta las opciones disponibles de este producto.' },
+    { title: 'Materiales y cuidado', content: 'Consulta los detalles del producto antes de comprar.' },
+    { title: 'Envíos y devoluciones', content: 'Envío gratis en pedidos superiores a $50. Devoluciones durante los 14 días posteriores a la compra.' },
+  ];
+
+  return (
+    <div className="mt-6 space-y-6">
+      <ul className="grid gap-3 sm:grid-cols-3">
+        {purchaseHighlights.map((highlight) => {
+          const { Icon, title } = highlightIcon(highlight);
+          return (
+            <li key={highlight} className="flex items-start gap-3 rounded-xl border border-[#e6dcd3] bg-white p-4">
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand-soft text-brand-strong">
+                <Icon aria-hidden="true" className="h-5 w-5" strokeWidth={1.8} />
+              </span>
+              <span>
+                <span className="block text-sm font-semibold text-brand-ink">{title}</span>
+                <span className="mt-1 block text-sm leading-6 text-brand-ink/70">{highlight}</span>
+              </span>
+            </li>
+          );
+        })}
+      </ul>
+
+      {product.tagStudio?.specs && (
+        <section aria-labelledby="tag-specs-title" className="rounded-xl border border-[#e6dcd3] bg-white p-5">
+          <h3 id="tag-specs-title" className="font-display text-lg font-semibold text-brand-ink">
+            Detalles del tag
+          </h3>
+          <dl className="mt-4 grid gap-4 sm:grid-cols-2">
+            {product.tagStudio.specs.map((spec) => (
+              <div key={spec.label} className="flex items-start gap-3">
+                <BadgeCheck aria-hidden="true" className="mt-0.5 h-5 w-5 shrink-0 text-brand" strokeWidth={1.8} />
+                <div>
+                  <dt className="text-sm font-semibold text-brand-ink">{spec.label}</dt>
+                  <dd className="text-sm leading-6 text-brand-ink/70">{spec.value}</dd>
+                </div>
+              </div>
+            ))}
+          </dl>
+        </section>
+      )}
+
+      <div className="space-y-5">
+        {details.map((detail) => (
+          <section key={detail.title} aria-labelledby={`detail-${detail.title.replace(/\s+/g, '-')}`} className="border-t border-[#e6dcd3] pt-5">
+            <h3 id={`detail-${detail.title.replace(/\s+/g, '-')}`} className="font-display text-lg font-semibold text-brand-ink">
+              {detail.title}
+            </h3>
+            {detail.content.split('\n\n').map((paragraph) => (
+              <p key={paragraph} className="mt-3 text-sm leading-7 text-brand-ink/75 first:mt-2">
+                {paragraph}
+              </p>
+            ))}
+          </section>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function ProductDetails({
+  product,
+  tagStudioValue,
+  setTagStudioValue,
+  selectedOptions,
+  setSelectedOptions,
+  added,
+  setAdded,
+}: {
+  product: Product;
+  tagStudioValue: TagStudioValue;
+  setTagStudioValue: (value: TagStudioValue) => void;
+  selectedOptions: Record<string, string>;
+  setSelectedOptions: (value: Record<string, string>) => void;
+  added: boolean;
+  setAdded: (value: boolean) => void;
+}) {
   const { addLine } = useCart();
   const navigate = useNavigate();
   const [quantity, setQuantity] = useState(1);
-  const [added, setAdded] = useState(false);
   const [personalization, setPersonalization] = useState('');
   const [personalizationStyle, setPersonalizationStyle] = useState('');
-  const [tagStudioValue, setTagStudioValue] = useState<TagStudioValue>(() => ({
-    design: product.tagStudio?.defaultDesign ?? product.tagStudio?.designs[0]?.value ?? '',
-    finish: '',
-    name: '',
-    font: product.tagStudio?.defaultFont ?? product.tagStudio?.fonts[0]?.value ?? '',
-    phone: '',
-  }));
-  const [selectedOptions, setSelectedOptions] = useState<Record<string, string>>(() =>
-    Object.fromEntries((product.options ?? []).map((option) => [option.name, option.values[0]?.value ?? ''])),
-  );
   const tagStudioReady = Boolean(
     product.tagStudio
       && tagStudioValue.design
@@ -78,7 +324,7 @@ function ProductDetails({ product }: { product: Product }) {
   const tagStudioOptions = product.tagStudio
     ? {
         'Diseño del tag': tagStudioValue.design,
-        Acabado: tagStudioValue.finish,
+        Color: product.tagStudio.finishes.find((finish) => finish.value === tagStudioValue.finish)?.label ?? tagStudioValue.finish,
         'Nombre grabado': tagStudioValue.name.trim(),
         Tipografía: tagStudioValue.font,
         ...(product.tagStudio.phoneEnabled && tagStudioValue.phone.trim()
@@ -97,11 +343,6 @@ function ProductDetails({ product }: { product: Product }) {
         }
       : {}),
   };
-  const purchaseHighlights = product.purchaseHighlights ?? [
-    'Envío gratis en pedidos superiores a $50',
-    'Política de devolución de 14 días',
-  ];
-
   const addConfiguredProduct = () => {
     if (!canPurchase) return;
     addLine({
@@ -144,36 +385,6 @@ function ProductDetails({ product }: { product: Product }) {
       </h1>
       {product.description && <p className="mt-3 text-sm leading-6 text-brand-ink/70">{product.description}</p>}
       <p className="mt-5 text-2xl font-bold text-brand-ink">{formatPrice(product.priceFrom)}</p>
-
-      {product.options?.map((option) => (
-        <fieldset key={option.name} className="mt-5">
-          <legend className="mb-2 text-sm font-semibold text-brand-ink">{option.label}</legend>
-          <div className="flex flex-wrap gap-2">
-            {option.values.map((value) => {
-              const selected = selectedOptions[option.name] === value.value;
-              return (
-                <button
-                  key={value.value}
-                  type="button"
-                  disabled={value.available === false}
-                  aria-pressed={selected}
-                  onClick={() => {
-                    setSelectedOptions((current) => ({ ...current, [option.name]: value.value }));
-                    setAdded(false);
-                  }}
-                  className={`min-h-11 rounded-lg border px-3 text-sm font-semibold focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand disabled:cursor-not-allowed disabled:opacity-40 ${
-                    selected
-                      ? 'border-brand bg-brand-soft text-brand-strong'
-                      : 'border-[#e6dcd3] bg-white text-brand-ink hover:border-brand'
-                  }`}
-                >
-                  {value.label}
-                </button>
-              );
-            })}
-          </div>
-        </fieldset>
-      ))}
 
       {product.tagStudio ? (
         <TagStudio
@@ -303,31 +514,6 @@ function ProductDetails({ product }: { product: Product }) {
           Añadido al carrito. <Link to="/carrito" className="underline">Ver carrito</Link>
         </p>
       )}
-
-      <ul className="mt-4 grid gap-2 text-xs leading-5 text-brand-ink/70 sm:grid-cols-3">
-        {purchaseHighlights.map((highlight) => (
-          <li key={highlight} className="rounded-lg border border-[#e6dcd3] bg-white px-3 py-2">
-            {highlight}
-          </li>
-        ))}
-      </ul>
-
-      <div className="mt-6 overflow-hidden rounded-xl border border-[#e6dcd3] bg-white">
-        {(product.details ?? [
-          { title: 'Descripción', content: product.description ?? `Detalles de ${product.title}.` },
-          { title: 'Medidas y ajuste', content: 'Consulta las opciones disponibles de este producto.' },
-          { title: 'Materiales y cuidado', content: 'Consulta los detalles del producto antes de comprar.' },
-          { title: 'Envíos y devoluciones', content: 'Envío gratis en pedidos superiores a $50. Devoluciones durante los 14 días posteriores a la compra.' },
-        ]).map((detail) => (
-          <details key={detail.title} className="group border-b border-[#e6dcd3] last:border-b-0">
-            <summary className="flex min-h-12 cursor-pointer list-none items-center justify-between gap-3 px-4 py-3 text-sm font-semibold text-brand-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-inset focus-visible:outline-brand [&::-webkit-details-marker]:hidden">
-              {detail.title}
-              <Plus aria-hidden="true" className="h-4 w-4 shrink-0 text-brand-ink transition-transform group-open:rotate-45" />
-            </summary>
-            <p className="px-4 pb-4 text-sm leading-6 text-brand-ink/70">{detail.content}</p>
-          </details>
-        ))}
-      </div>
     </section>
   );
 }
@@ -415,6 +601,17 @@ function RelatedProducts({ product }: { product: Product }) {
 
 function ProductDetail({ product }: { product: Product }) {
   const collection = collectionLinks.find((item) => product.collections.includes(item.handle));
+  const [tagStudioValue, setTagStudioValue] = useState<TagStudioValue>(() => ({
+    design: product.tagStudio?.defaultDesign ?? product.tagStudio?.designs[0]?.value ?? '',
+    finish: product.tagStudio?.defaultFinish ?? '',
+    name: '',
+    font: product.tagStudio?.defaultFont ?? product.tagStudio?.fonts[0]?.value ?? '',
+    phone: '',
+  }));
+  const [selectedOptions, setSelectedOptions] = useState<Record<string, string>>(() =>
+    Object.fromEntries((product.options ?? []).map((option) => [option.name, option.values[0]?.value ?? ''])),
+  );
+  const [added, setAdded] = useState(false);
 
   return (
     <div className="mx-auto max-w-[1440px] px-4 py-6 sm:px-6 sm:py-8 lg:px-10">
@@ -433,8 +630,28 @@ function ProductDetail({ product }: { product: Product }) {
       </nav>
 
       <div className="grid items-start gap-7 md:gap-10 lg:grid-cols-[minmax(0,1fr)_440px] xl:gap-12">
-        <ProductGallery product={product} />
-        <ProductDetails key={product.handle} product={product} />
+        <div>
+          <ProductGallery product={product} tagValue={tagStudioValue} />
+          <ProductOptions
+            product={product}
+            selectedOptions={selectedOptions}
+            onSelect={(name, value) => {
+              setSelectedOptions((current) => ({ ...current, [name]: value }));
+              setAdded(false);
+            }}
+          />
+          <ProductInfoBlocks product={product} />
+        </div>
+        <ProductDetails
+          key={product.handle}
+          product={product}
+          tagStudioValue={tagStudioValue}
+          setTagStudioValue={setTagStudioValue}
+          selectedOptions={selectedOptions}
+          setSelectedOptions={setSelectedOptions}
+          added={added}
+          setAdded={setAdded}
+        />
       </div>
 
       <ProductReviews product={product} />

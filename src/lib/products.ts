@@ -1,4 +1,6 @@
 // Catálogo de demo extraído de Shopify (products.json); sustituir por Storefront API al conectar Shopify.
+import { tagDimensionsMm } from './tag-outlines';
+
 export interface Product {
   handle: string;
   title: string;
@@ -33,8 +35,16 @@ export interface ProductOption {
 }
 
 export interface TagStudioConfig {
-  designs: { value: string; label: string; shape: 'cat-head' | 'round' | 'bone' | 'paw'; image: string }[];
-  finishes: { value: string; label: string }[];
+  designs: {
+    value: string;
+    label: string;
+    shape: 'cat-head' | 'round' | 'bone' | 'paw';
+    image: string;
+    artwork: string;
+    nameSide: 'front' | 'back';
+  }[];
+  specs?: { label: string; value: string }[];
+  finishes: { value: string; label: string; baseImage?: string; sideColor?: string }[];
   fonts: {
     value: string;
     label: string;
@@ -43,6 +53,7 @@ export interface TagStudioConfig {
     previewFontStyle?: 'normal' | 'italic';
   }[];
   defaultDesign?: string;
+  defaultFinish?: string;
   defaultFont?: string;
   maxNameLength?: number;
   phoneEnabled?: boolean;
@@ -71,6 +82,13 @@ const goldenCatFonts: TagStudioConfig['fonts'] = [
 ];
 
 const goldenCatTagStudio: TagStudioConfig = {
+  specs: [
+    { label: 'Material', value: 'Acero inoxidable' },
+    { label: 'Tamaño', value: `${tagDimensionsMm.width} × ${tagDimensionsMm.height} mm` },
+    { label: 'Grosor', value: `${tagDimensionsMm.thickness} mm` },
+    { label: 'Grabado', value: 'Grabado en una cara con tinta negra' },
+    { label: 'Texto', value: 'Hasta 4 líneas, legible y fácil de leer' },
+  ],
   designs: Array.from({ length: 23 }, (_, index) => {
     const value = `DSA${String(66 + index).padStart(3, '0')}`;
     return {
@@ -78,22 +96,38 @@ const goldenCatTagStudio: TagStudioConfig = {
       label: value,
       shape: 'cat-head' as const,
       image: `tag-cats/designs/${value}.png`,
+      artwork: `tag-cats/designs/designs svg/${value}.svg`,
+      nameSide: index <= 10 ? 'front' : 'back',
     };
   }),
   finishes: [
-    { value: 'Custom Silver', label: 'Silver' },
-    { value: 'Custom Gold', label: 'Gold' },
-    { value: 'Custom Champagne', label: 'Champagne' },
-    { value: 'Custom Black', label: 'Black' },
+    {
+      value: 'Custom Gold',
+      label: 'Gold',
+      baseImage: 'tag-cats/base/tag-golden.png',
+      sideColor: '#e3c27c',
+    },
+    {
+      value: 'Custom Rose Gold',
+      label: 'Rose Gold',
+      baseImage: 'tag-cats/base/tag-rose-gold.png',
+      sideColor: '#c98d8a',
+    },
+    {
+      value: 'Custom Silver',
+      label: 'Silver',
+      baseImage: 'tag-cats/base/tag-silver.png',
+      sideColor: '#c1c7ce',
+    },
   ],
   fonts: goldenCatFonts,
   defaultDesign: 'DSA066',
+  defaultFinish: 'Custom Gold',
   defaultFont: 'FT12',
   finishSwatches: {
-    'Custom Silver': '#aeb3bb',
     'Custom Gold': '#c89537',
-    'Custom Champagne': '#cba982',
-    'Custom Black': '#292622',
+    'Custom Rose Gold': '#c98d8a',
+    'Custom Silver': '#aeb3bb',
   },
 };
 
@@ -137,19 +171,20 @@ export const products: Product[] = [
   { handle: 'cat-product', title: 'Silver Cat', priceFrom: 9.99, collections: ['id-tags-anderson', 'tag-cat'] },
   {
     handle: 'golden-cat',
-    title: 'Golden cat',
+    title: 'Cat Tag',
     priceFrom: 0.99,
     collections: ['id-tags-anderson', 'tag-cat'],
-    description: 'Placa dorada con diseño de gato y opciones de personalización.',
+    description: 'Placa identificativa de acero inoxidable con diseño de gato, acabados metálicos y opciones de personalización.',
     tagStudio: goldenCatTagStudio,
     media: [
-      { image: 'tag-cats/tag-Cat-Gold-1.png', alt: 'Placa Golden cat dorada con el nombre Amber grabado' },
-      { image: 'tag-cats/tag-Cat-Gold-7.png', alt: 'Gato con collar y placa Golden cat personalizada' },
-      { image: 'tag-cats/tag-Cat-Gold-2.jpeg', alt: 'Placa Golden cat dorada, vista de cerca para mostrar su calidad' },
-      { image: 'tag-cats/tag-Cat-Gold-5.jpeg', alt: 'Gato con placa Golden cat y anilla de unión incluida' },
-      { image: 'tag-cats/tag-Cat-Gold-3.jpeg', alt: 'Opciones de diseño para personalizar la placa Golden cat' },
-      { image: 'tag-cats/tag-Cat-Gold-4.jpeg', alt: 'Gato con una placa Golden cat personalizada con el nombre Daisy' },
-      { image: 'tag-cats/tag-Cat-Gold-6.jpeg', alt: 'Gato con placa Golden cat personalizada y opciones de diseño disponibles' },
+      { image: 'tag-cats/base/tag view.png', alt: 'Vistas del tag: frontal, perspectiva, lateral, trasera e inferior, con medidas' },
+      { image: 'tag-cats/tag-Cat-Gold-1.png', alt: 'Placa Cat Tag dorada con el nombre Amber grabado' },
+      { image: 'tag-cats/tag-Cat-Gold-7.png', alt: 'Gato con collar y placa Cat Tag dorada personalizada' },
+      { image: 'tag-cats/tag-Cat-Gold-2.jpeg', alt: 'Placa Cat Tag dorada, vista de cerca para mostrar su calidad' },
+      { image: 'tag-cats/tag-Cat-Gold-5.jpeg', alt: 'Gato con placa Cat Tag dorada y anilla de unión incluida' },
+      { image: 'tag-cats/tag-Cat-Gold-3.jpeg', alt: 'Opciones de diseño para personalizar la placa Cat Tag' },
+      { image: 'tag-cats/tag-Cat-Gold-4.jpeg', alt: 'Gato con una placa Cat Tag dorada personalizada con el nombre Daisy' },
+      { image: 'tag-cats/tag-Cat-Gold-6.jpeg', alt: 'Gato con placa Cat Tag dorada personalizada y opciones de diseño' },
     ],
     options: [
       {
@@ -161,11 +196,6 @@ export const products: Product[] = [
           { value: 'Large', label: 'Large' },
           { value: 'Extra-large', label: 'Extra-large' },
         ],
-      },
-      {
-        name: 'Color',
-        label: 'Color (Gold)',
-        values: [{ value: 'Gold', label: 'Gold' }],
       },
     ],
     personalization: {
@@ -181,7 +211,11 @@ export const products: Product[] = [
     details: [
       {
         title: 'Descripción',
-        content: 'Tags Cat Collection',
+        content: [
+          'Placa identificativa de acero inoxidable con forma de gato, disponible en acabados Gold, Rose Gold y Silver. Está pensada para que tu mascota sea fácil de identificar gracias a su nombre grabado y a la anilla de unión incluida.',
+          'Personalízala en pocos pasos: elige uno de los 23 diseños de gato, el color y la tipografía. La vista previa 2D y 3D se actualiza mientras configuras, para que veas el resultado antes de comprar. Solo es obligatorio escribir el nombre para añadirla al carrito.',
+          'Acero inoxidable de 35 × 32 mm y 2.5 mm de grosor, con grabado en una cara con tinta negra. Usa nombres cortos y en letras grandes para que se lean bien a distancia; el grabado final puede variar ligeramente respecto a la vista previa.',
+        ].join('\n\n'),
       },
       {
         title: 'Envíos y devoluciones',

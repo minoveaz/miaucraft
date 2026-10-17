@@ -5,4 +5,11 @@ import react from '@vitejs/plugin-react';
 export default defineConfig({
   plugins: [react()],
   base: process.env.VITE_BASE_PATH ?? '/miaucraft/',
+  resolve: {
+    // Linked packages resolve their own copies; one React and one three.js instance must be shared.
+    dedupe: ['react', 'react-dom', 'three', '@react-three/fiber', '@react-three/drei'],
+  },
+  optimizeDeps: {
+    force: true,
+  },
 });

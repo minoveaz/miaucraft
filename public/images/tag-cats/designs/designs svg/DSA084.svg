@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1254 1254" width="100%" height="100%">
+  <!-- Code: DSA084 | Status: BORRADOR | Confidence: Media | Name: Reverso -->
+  <g id="DSA084" fill="currentColor" stroke="currentColor">
+    <g id="ears" fill="none" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M 310 425 Q 340 345 368 308 Q 402 342 436 398" stroke-width="18" />
+      <path d="M 944 425 Q 914 345 886 308 Q 852 342 818 398" stroke-width="18" />
+    </g>
+    <g id="eyes-sleepy" fill="none" stroke-width="15" stroke-linecap="round">
+      <path d="M 425 640 Q 485 685 545 640" />
+      <path d="M 440 658 L 420 682 M 485 668 L 485 696 M 530 658 L 550 682" stroke-width="12" />
+      <path d="M 707 640 Q 767 685 827 640" />
+      <path d="M 722 658 L 702 682 M 767 668 L 767 696 M 812 658 L 832 682" stroke-width="12" />
+    </g>
+    <g id="nose-mouth-tongue">
+      <path d="M 626 735 C 626 735 602 718 602 705 C 602 694 614 690 626 702 C 638 690 650 694 650 705 C 650 718 626 735 626 735 Z" stroke="none" />
+      <path d="M 626 732 L 626 758 M 626 758 Q 598 778 578 752 Q 572 738 588 735 M 626 758 Q 654 778 674 752 Q 680 738 664 735" fill="none" stroke-width="13" stroke-linecap="round" />
+      <path d="M 610 765 Q 626 795 642 765" fill="none" stroke-width="11" stroke-linecap="round" />
+    </g>
+  </g>
+</svg>

@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1254 1254" width="100%" height="100%">
+  <!-- Code: DSA085 | Status: BORRADOR | Confidence: Media (tipografía interior trazada desde miniatura) | Name: Reverso -->
+  <g id="DSA085" fill="currentColor" stroke="currentColor">
+    <g id="ears" stroke="none">
+      <path d="M 312 420 Q 340 345 368 308 Q 402 342 436 398 Q 374 412 312 420 Z" />
+      <path d="M 942 420 Q 914 345 886 308 Q 852 342 818 398 Q 880 412 942 420 Z" />
+    </g>
+    <!-- Lentes de corazón con texto LOVE / YOU en reserva mediante fill-rule evenodd -->
+    <g id="heart-glasses" stroke="none" fill-rule="evenodd">
+      <path d="M 465 765 C 465 765 320 675 320 585 C 320 525 395 505 465 568 C 535 505 610 525 610 585 C 610 675 465 765 465 765 Z
+               M 378 602 L 378 648 L 405 648 L 405 638 L 388 638 L 388 602 Z
+               M 432 602 C 416 602 412 615 412 625 C 412 635 416 648 432 648 C 448 648 452 635 452 625 C 452 615 448 602 432 602 Z M 432 612 C 440 612 442 618 442 625 C 442 632 440 638 432 638 C 424 638 422 632 422 625 C 422 618 424 612 432 612 Z
+               M 460 602 L 476 648 L 486 648 L 502 602 L 492 602 L 481 635 L 470 602 Z
+               M 512 602 L 512 648 L 542 648 L 542 638 L 522 638 L 522 629 L 538 629 L 538 620 L 522 620 L 522 612 L 542 612 L 542 602 Z" />
+      <path d="M 787 765 C 787 765 642 675 642 585 C 642 525 717 505 787 568 C 857 505 932 525 932 585 C 932 675 787 765 787 765 Z
+               M 712 602 L 728 628 L 728 648 L 738 648 L 738 628 L 754 602 L 743 602 L 733 619 L 723 602 Z
+               M 784 602 C 768 602 764 615 764 625 C 764 635 768 648 784 648 C 800 648 804 635 804 625 C 804 615 800 602 784 602 Z M 784 612 C 792 612 794 618 794 625 C 794 632 792 638 784 638 C 776 638 774 632 774 625 C 774 618 776 612 784 612 Z
+               M 818 602 L 818 632 C 818 644 826 648 838 648 C 850 648 858 644 858 632 L 858 602 L 848 602 L 848 631 C 848 637 844 639 838 639 C 832 639 828 637 828 631 L 828 602 Z" />
+    </g>
+    <path d="M 595 605 Q 626 592 657 605" fill="none" stroke-width="16" stroke-linecap="round" />
+    <g id="whiskers-short" fill="none" stroke-linecap="round" stroke-width="11">
+      <path d="M 335 692 Q 285 688 242 698" />
+      <path d="M 332 714 Q 280 714 235 726" />
+      <path d="M 338 736 Q 288 740 245 754" />
+      <path d="M 917 692 Q 967 688 1010 698" />
+      <path d="M 920 714 Q 972 714 1017 726" />
+      <path d="M 914 736 Q 964 740 1007 754" />
+    </g>
+  </g>
+</svg>

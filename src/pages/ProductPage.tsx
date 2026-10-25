@@ -85,7 +85,7 @@ function TagViewer({
 }
 
 function ProductGallery({ product, tagValue }: { product: Product; tagValue: TagStudioValue }) {
-  const { t } = useTranslation();
+  const { t, isEn } = useTranslation();
   const photos = product.media ?? [{ image: productImage(product), alt: product.title }];
   const tagConfig = product.tagStudio;
   const slots: GallerySlot[] = [
@@ -100,10 +100,17 @@ function ProductGallery({ product, tagValue }: { product: Product; tagValue: Tag
   const slotKey = (slot: GallerySlot) => (slot.kind === 'tag' ? 'tag' : slot.image);
   const slotLabel = (slot: GallerySlot) => (slot.kind === 'tag' ? t.product.myCustomTag : slot.alt);
 
+  const petPhotoIndex = slots.findIndex(
+    (s) => s.kind === 'image' && (s.image.includes('tag-Cat-Gold-7') || s.image.includes('tag-Cat-Gold-5') || s.image.includes('Cat-Gold-4')),
+  );
+  const specsPhotoIndex = slots.findIndex(
+    (s) => s.kind === 'image' && (s.image.includes('tag view') || s.image.includes('tag-Cat-Gold-2')),
+  );
+
   return (
     <section aria-label={`Media for ${product.title}`}>
-      <div className="grid gap-3 md:grid-cols-[72px_minmax(0,1fr)] lg:grid-cols-[84px_minmax(0,1fr)]">
-        <div className="order-2 flex gap-2 overflow-x-auto md:order-1 md:h-[632px] md:flex-col md:overflow-y-auto lg:h-[728px]">
+      <div className="grid gap-3 md:grid-cols-[68px_minmax(0,1fr)] lg:grid-cols-[76px_minmax(0,1fr)]">
+        <div className="order-2 flex gap-2 overflow-x-auto md:order-1 md:h-[460px] md:flex-col md:overflow-y-auto lg:h-[490px]">
           {slots.map((slot, index) => (
             <button
               key={slotKey(slot)}
@@ -111,8 +118,8 @@ function ProductGallery({ product, tagValue }: { product: Product; tagValue: Tag
               aria-label={`View ${slot.kind === 'tag' ? t.product.myCustomTag : `image ${index}`}: ${slotLabel(slot)}`}
               aria-pressed={selectedIndex === index}
               onClick={() => setSelectedIndex(index)}
-              className={`h-16 w-16 shrink-0 overflow-hidden rounded-lg border-2 bg-brand-cream focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand md:h-[72px] md:w-[72px] lg:h-[84px] lg:w-[84px] ${
-                selectedIndex === index ? 'border-brand' : 'border-transparent'
+              className={`h-16 w-16 shrink-0 overflow-hidden rounded-lg border-2 bg-brand-cream focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand md:h-[68px] md:w-[68px] lg:h-[76px] lg:w-[76px] ${
+                selectedIndex === index ? 'border-brand shadow-xs' : 'border-transparent opacity-80 hover:opacity-100'
               }`}
             >
               {slot.kind === 'tag' && tagConfig ? (
@@ -125,15 +132,15 @@ function ProductGallery({ product, tagValue }: { product: Product; tagValue: Tag
             </button>
           ))}
         </div>
-        <div className="relative order-1 aspect-square overflow-hidden rounded-2xl bg-brand-cream md:order-2 md:aspect-auto md:h-[632px] lg:h-[728px]">
+        <div className="relative order-1 aspect-square overflow-hidden rounded-2xl bg-brand-cream md:order-2 md:aspect-auto md:h-[460px] lg:h-[490px]">
           {selected.kind === 'tag' && tagConfig ? (
-            <div className="flex h-full flex-col p-4 sm:p-6">
+            <div className="flex h-full flex-col p-4 sm:p-5">
               <div className="flex shrink-0 justify-end">
                 <ViewToggle
                   value={tagView}
                   onChange={setTagView}
-                  className="flex overflow-hidden rounded-full border-2 border-brand-strong/20 bg-white text-sm font-bold shadow-sm"
-                  buttonClassName="px-5 py-2.5 text-brand-ink transition-colors"
+                  className="flex overflow-hidden rounded-full border-2 border-brand-strong/20 bg-white text-xs sm:text-sm font-bold shadow-sm"
+                  buttonClassName="px-4 py-2 sm:px-5 sm:py-2 text-brand-ink transition-colors"
                   activeClassName="bg-brand-strong text-white"
                 />
               </div>
@@ -164,12 +171,65 @@ function ProductGallery({ product, tagValue }: { product: Product; tagValue: Tag
                 width={1200}
                 height={1000}
                 fetchPriority="high"
-                className="h-full w-full object-contain"
+                className="h-full w-full object-contain p-3 sm:p-4"
               />
             )
           )}
         </div>
       </div>
+
+      {/* Escala real y accesos rápidos en mano / en mascota */}
+      {tagConfig && (
+        <div className="mt-3 flex flex-wrap items-center justify-between gap-2 rounded-xl border border-[#e6dcd3] bg-brand-cream/60 p-2.5 px-3 text-xs">
+          <div className="flex items-center gap-1.5 font-medium text-brand-ink/80">
+            <span className="text-sm">📏</span>
+            <span>
+              {isEn
+                ? 'Real size: 35 × 32 mm · ~12g (coin size in palm)'
+                : 'Escala real: 35 × 32 mm · ~12g (tamaño moneda en mano)'}
+            </span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <button
+              type="button"
+              onClick={() => setSelectedIndex(0)}
+              className={`rounded-full px-2.5 py-1 text-xs font-semibold transition-all ${
+                selectedIndex === 0
+                  ? 'bg-brand text-white shadow-xs'
+                  : 'border border-[#cfc4bb] bg-white text-brand-ink hover:bg-brand-soft'
+              }`}
+            >
+              {isEn ? 'Custom Tag' : 'Personalizar'}
+            </button>
+            {petPhotoIndex !== -1 && (
+              <button
+                type="button"
+                onClick={() => setSelectedIndex(petPhotoIndex)}
+                className={`rounded-full px-2.5 py-1 text-xs font-semibold transition-all ${
+                  selectedIndex === petPhotoIndex
+                    ? 'bg-brand text-white shadow-xs'
+                    : 'border border-[#cfc4bb] bg-white text-brand-ink hover:bg-brand-soft'
+                }`}
+              >
+                {isEn ? 'On Pet' : 'En mascota'}
+              </button>
+            )}
+            {specsPhotoIndex !== -1 && (
+              <button
+                type="button"
+                onClick={() => setSelectedIndex(specsPhotoIndex)}
+                className={`rounded-full px-2.5 py-1 text-xs font-semibold transition-all ${
+                  selectedIndex === specsPhotoIndex
+                    ? 'bg-brand text-white shadow-xs'
+                    : 'border border-[#cfc4bb] bg-white text-brand-ink hover:bg-brand-soft'
+                }`}
+              >
+                {isEn ? 'Measures' : 'Medidas'}
+              </button>
+            )}
+          </div>
+        </div>
+      )}
     </section>
   );
 }
@@ -398,6 +458,15 @@ function ProductDetails({
       </h1>
       {localizedDescription && <p className="mt-3 text-sm leading-6 text-brand-ink/70">{localizedDescription}</p>}
       <p className="mt-5 text-2xl font-bold text-brand-ink">{formatPrice(product.priceFrom)}</p>
+
+      <ProductOptions
+        product={product}
+        selectedOptions={selectedOptions}
+        onSelect={(name, value) => {
+          setSelectedOptions({ ...selectedOptions, [name]: value });
+          setAdded(false);
+        }}
+      />
 
       {product.tagStudio ? (
         <TagStudio
@@ -654,29 +723,23 @@ function ProductDetail({ product }: { product: Product }) {
         <span aria-current="page">{product.title}</span>
       </nav>
 
-      <div className="grid items-start gap-7 md:gap-10 lg:grid-cols-[minmax(0,1fr)_440px] xl:gap-12">
+      <div className="grid items-start gap-7 md:gap-9 lg:grid-cols-[minmax(0,490px)_minmax(0,1fr)] xl:grid-cols-[minmax(0,530px)_minmax(0,1fr)] xl:gap-12">
         <div className="lg:sticky lg:top-24">
           <ProductGallery product={product} tagValue={tagStudioValue} />
-          <ProductOptions
+        </div>
+        <div className="min-w-0">
+          <ProductDetails
+            key={product.handle}
             product={product}
+            tagStudioValue={tagStudioValue}
+            setTagStudioValue={setTagStudioValue}
             selectedOptions={selectedOptions}
-            onSelect={(name, value) => {
-              setSelectedOptions((current) => ({ ...current, [name]: value }));
-              setAdded(false);
-            }}
+            setSelectedOptions={setSelectedOptions}
+            added={added}
+            setAdded={setAdded}
           />
           <ProductInfoBlocks product={product} />
         </div>
-        <ProductDetails
-          key={product.handle}
-          product={product}
-          tagStudioValue={tagStudioValue}
-          setTagStudioValue={setTagStudioValue}
-          selectedOptions={selectedOptions}
-          setSelectedOptions={setSelectedOptions}
-          added={added}
-          setAdded={setAdded}
-        />
       </div>
 
       <ProductReviews product={product} />

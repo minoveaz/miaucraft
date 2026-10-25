@@ -6,7 +6,7 @@ import * as THREE from 'three';
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
 import { composeArtwork, composeEngravingMask } from './compose';
 import type { Layer, ProductSource } from '@minoveaz/product-viewer';
-import { Minus, Plus, RotateCcw } from 'lucide-react';
+import { Minus, Plus, Rotate3d, RotateCcw } from 'lucide-react';
 import { useTranslation } from '../../hooks/useTranslation';
 
 export type Model3D = { kind: 'extrude' } | { kind: 'glb'; url: string };
@@ -250,7 +250,7 @@ export function Product3D({
   className,
   label = 'Vista 3D del producto',
 }: Product3DProps) {
-  const { isEn } = useTranslation();
+  const { isEn, t } = useTranslation();
   const { width, height, thickness } = sizeOf(source);
   const radius = Math.sqrt(width * width + height * height + thickness * thickness) / 2;
   const resolvedFrontLayers = frontLayers ?? layers ?? [];
@@ -344,8 +344,9 @@ export function Product3D({
 
       {/* Subtle interaction guidance badge */}
       <div className="pointer-events-none absolute top-2 left-2 z-10">
-        <span className="rounded-full bg-black/40 px-2 py-0.5 text-[9px] font-semibold text-white backdrop-blur-xs">
-          {isEn ? '🔄 Drag to rotate · Pinch to zoom' : '🔄 Gira 360° · Usa zoom'}
+        <span className="flex items-center gap-1.5 rounded-full border border-[#e6dcd3] bg-white/95 px-2.5 py-1 text-[11px] font-semibold text-brand-ink shadow-xs backdrop-blur-xs">
+          <Rotate3d className="h-3.5 w-3.5 text-brand" strokeWidth={2} />
+          <span>{t.product.dragToRotate}</span>
         </span>
       </div>
     </div>

@@ -13,14 +13,14 @@ export const localeConfigs: Record<SupportedLocale, LocaleConfig> = {
     currency: 'USD',
     currencySymbol: '$',
     name: 'Español',
-    flag: '🇪🇸',
+    flag: 'ES',
   },
   en: {
     locale: 'en',
     currency: 'USD',
     currencySymbol: '$',
     name: 'English',
-    flag: '🇺🇸',
+    flag: 'EN',
   },
 };
 

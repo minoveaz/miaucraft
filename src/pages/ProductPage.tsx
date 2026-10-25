@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { BadgeCheck, Clock, Minus, Plus, RotateCcw, Truck, type LucideIcon } from 'lucide-react';
+import { BadgeCheck, Clock, Minus, Plus, RotateCcw, Ruler, Truck, type LucideIcon } from 'lucide-react';
 import { collectionLinks } from '../lib/navigation';
 import { productImage, products, type Product } from '../lib/products';
 import { useCart } from '../lib/cart';
@@ -186,7 +186,7 @@ function ProductGallery({ product, tagValue }: { product: Product; tagValue: Tag
       {tagConfig && (
         <div className="hidden sm:flex mt-3 flex-wrap items-center justify-between gap-2 rounded-xl border border-[#e6dcd3] bg-brand-cream/60 p-2.5 px-3 text-xs">
           <div className="flex items-center gap-1.5 font-medium text-brand-ink/80">
-            <span className="text-sm">📏</span>
+            <Ruler className="h-3.5 w-3.5 text-brand" strokeWidth={2} />
             <span>
               {isEn
                 ? 'Real size: 35 × 32 mm · ~12g (coin size in palm)'

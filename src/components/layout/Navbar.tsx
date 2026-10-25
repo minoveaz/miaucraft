@@ -135,7 +135,7 @@ export default function Navbar() {
           </div>
 
           {/* Right Actions Cluster */}
-          <div className="flex shrink-0 items-center gap-2 sm:gap-3">
+          <div className="flex shrink-0 items-center gap-1 sm:gap-2.5 md:gap-3">
             {/* Mobile Search Icon Toggle */}
             <button
               type="button"
@@ -155,11 +155,11 @@ export default function Navbar() {
               to="/cuenta"
               aria-label={user ? `${t.nav.account} (${user.firstName})` : t.nav.account}
               onClick={() => setSearchOpen(false)}
-              className="relative hidden sm:flex h-9 w-9 items-center justify-center text-brand-ink hover:text-brand transition-colors"
+              className="relative flex h-9 w-9 items-center justify-center rounded-lg text-brand-ink hover:text-brand transition-colors"
             >
               <UserRound aria-hidden="true" className="h-5 w-5" strokeWidth={1.8} />
               {user && (
-                <span className="absolute 1 top-1 right-1 h-2 w-2 rounded-full bg-brand ring-2 ring-white" />
+                <span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-brand ring-2 ring-white" />
               )}
             </Link>
 
@@ -170,7 +170,7 @@ export default function Navbar() {
                 setSearchOpen(false);
                 openDrawer();
               }}
-              className="relative flex h-9 w-9 items-center justify-center text-brand-ink hover:text-brand transition-colors"
+              className="relative flex h-9 w-9 items-center justify-center rounded-lg text-brand-ink hover:text-brand transition-colors"
             >
               <ShoppingBag aria-hidden="true" className="h-5 w-5" strokeWidth={1.8} />
               <span className="absolute -right-1 -top-1 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-brand px-1 text-[10px] font-bold leading-none text-white">

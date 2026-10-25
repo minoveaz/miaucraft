@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import {
   ShoppingBag,
@@ -24,9 +24,15 @@ export default function CartPage() {
     remainingForFreeShipping,
     freeShippingProgressPct,
     hasFreeShipping,
+    closeDrawer,
   } = useCart();
   const { t, formatPrice, isEn } = useTranslation();
   const [orderNotes, setOrderNotes] = useState('');
+
+  // Asegura que el drawer esté cerrado al estar en la página detallada
+  useEffect(() => {
+    closeDrawer();
+  }, [closeDrawer]);
 
   return (
     <div className="min-h-[70vh] bg-[#fbf9f6] py-8 sm:py-12">

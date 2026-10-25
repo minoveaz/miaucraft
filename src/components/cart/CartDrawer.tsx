@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { X, ShoppingBag, Truck, Lock, ArrowRight, ShieldCheck } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { X, ShoppingBag, Truck, ArrowRight, ShieldCheck } from 'lucide-react';
 import { cartLineKey, useCart } from '../../lib/cart';
 import { useTranslation } from '../../hooks/useTranslation';
 import { CartItem } from './CartItem';
@@ -41,9 +41,9 @@ export function CartDrawer() {
 
   if (!isDrawerOpen) return null;
 
-  const handleCheckout = () => {
+  const handleViewCart = () => {
     closeDrawer();
-    navigate('/checkout');
+    navigate('/carrito');
   };
 
   return (
@@ -185,32 +185,21 @@ export function CartDrawer() {
               </p>
             </div>
 
-            {/* Botón principal de checkout */}
+            {/* Botón principal: Ver carrito */}
             <button
               type="button"
-              onClick={handleCheckout}
+              onClick={handleViewCart}
               className="group flex min-h-12 w-full items-center justify-between rounded-full bg-brand-strong px-5 text-sm font-bold text-white shadow-xs hover:bg-brand-ink transition-all"
             >
-              <span className="flex items-center gap-1.5">
-                <Lock className="h-4 w-4" />
-                {t.cart.proceedToCheckout}
+              <span className="flex items-center gap-2">
+                <ShoppingBag className="h-4 w-4" />
+                <span>{t.common.viewCart}</span>
               </span>
-              <span className="flex items-center gap-1">
+              <span className="flex items-center gap-1.5 font-display">
                 <span>{formatPrice(subtotal)}</span>
                 <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
               </span>
             </button>
-
-            {/* Enlace secundario al carrito completo */}
-            <div className="text-center pt-0.5">
-              <Link
-                to="/carrito"
-                onClick={closeDrawer}
-                className="text-xs font-semibold text-brand hover:text-brand-strong underline"
-              >
-                {t.cart.viewCartPage}
-              </Link>
-            </div>
 
             {/* Insignia de seguridad PCI / Shopify */}
             <div className="flex items-center justify-center gap-1.5 text-[11px] text-brand-ink/60 pt-1 text-center">

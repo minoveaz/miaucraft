@@ -65,6 +65,7 @@ export interface I18nDictionary {
     nameRequiredHelp: string;
     step4Phone: string;
     phonePlaceholder: string;
+    phoneHelp: string;
     step5Font: string;
     fontHelp: string;
     yourDesign: string;

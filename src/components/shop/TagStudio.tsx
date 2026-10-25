@@ -20,7 +20,7 @@ interface TagStudioProps {
 }
 
 export default function TagStudio({ config, value, onChange }: TagStudioProps) {
-  const { t } = useTranslation();
+  const { t, isEn } = useTranslation();
   const instanceId = useId().replace(/:/g, '');
   const design = config.designs.find((item) => item.value === value.design) ?? config.designs[0];
   const font = config.fonts.find((item) => item.value === value.font) ?? config.fonts[0];
@@ -149,18 +149,30 @@ export default function TagStudio({ config, value, onChange }: TagStudioProps) {
 
         {config.phoneEnabled && (
           <div>
-            <label htmlFor={`${instanceId}-phone`} className="mb-2 block text-sm font-semibold text-brand-ink">
-              {t.product.step4Phone}
-            </label>
+            <div className="mb-2 flex items-center justify-between">
+              <label htmlFor={`${instanceId}-phone`} className="block text-sm font-semibold text-brand-ink">
+                {t.product.step4Phone}
+              </label>
+              <span className="rounded-full bg-brand-soft px-2 py-0.5 text-[11px] font-semibold text-brand-strong">
+                {isEn ? 'Back side' : 'Reverso'}
+              </span>
+            </div>
             <input
               id={`${instanceId}-phone`}
-              type="tel"
+              type="text"
               value={value.phone}
               maxLength={config.phoneMaxLength}
               onChange={(event) => update({ phone: event.target.value })}
               placeholder={t.product.phonePlaceholder}
+              aria-describedby={`${instanceId}-phone-help`}
               className="h-11 w-full rounded-lg border border-[#cfc4bb] bg-white px-3 text-sm text-brand-ink outline-none placeholder:text-[#6b6b6b] focus:border-brand focus:ring-2 focus:ring-brand/20"
             />
+            <p id={`${instanceId}-phone-help`} className="mt-1.5 flex justify-between gap-2 text-xs text-brand-ink/70">
+              <span>{t.product.phoneHelp}</span>
+              <span className="shrink-0">
+                {value.phone.length}{config.phoneMaxLength ? ` / ${config.phoneMaxLength}` : ''}
+              </span>
+            </p>
           </div>
         )}
 

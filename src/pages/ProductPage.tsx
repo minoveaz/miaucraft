@@ -19,6 +19,8 @@ type GallerySlot = { kind: 'tag' } | { kind: 'image'; image: string; alt: string
 
 // Name size relative to the tag's image height; shrinks for longer names.
 const nameFontSize = (name: string) => Math.max(0.07, Math.min(0.11, 0.11 - Math.max(0, name.length - 6) * 0.004));
+const phoneFontSize = (phoneText: string) =>
+  Math.max(0.046, Math.min(0.068, 0.068 - Math.max(0, phoneText.length - 10) * 0.0018));
 
 function TagViewer({
   config,
@@ -36,6 +38,7 @@ function TagViewer({
   const design = config.designs.find((item) => item.value === value.design) ?? config.designs[0];
   const font = config.fonts.find((item) => item.value === value.font) ?? config.fonts[0];
   const name = value.name.trim();
+  const phone = value.phone.trim();
   const finish = config.finishes.find((item) => item.value === value.finish);
   const engravingColor = '#292622';
   const nameLayer: Layer = {
@@ -62,7 +65,66 @@ function TagViewer({
     },
     ...(design.nameSide === 'front' ? [nameLayer] : []),
   ];
-  const backLayers: Layer[] = design.nameSide === 'back' ? [nameLayer] : [];
+
+  // Reverso: si el diseño lleva el nombre atrás, lo mantiene; en caso estándar, graba nombre y teléfono de emergencia
+  const backLayers: Layer[] = [];
+  if (design.nameSide === 'back') {
+    backLayers.push(nameLayer);
+    if (phone) {
+      backLayers.push({
+        id: 'phone',
+        type: 'text',
+        text: phone,
+        x: 0.5,
+        y: 0.74,
+        fontSize: phoneFontSize(phone),
+        fontFamily: font.previewFontFamily,
+        fontWeight: font.previewFontWeight ?? 'normal',
+        fontStyle: font.previewFontStyle,
+        color: engravingColor,
+      });
+    }
+  } else {
+    if (name) {
+      backLayers.push({
+        id: 'back-name',
+        type: 'text',
+        text: name,
+        x: 0.5,
+        y: phone ? 0.46 : 0.56,
+        fontSize: phone ? nameFontSize(name) * 0.88 : nameFontSize(name),
+        fontFamily: font.previewFontFamily,
+        fontWeight: font.previewFontWeight,
+        fontStyle: font.previewFontStyle,
+        color: engravingColor,
+      });
+    }
+    if (phone) {
+      backLayers.push({
+        id: 'back-phone',
+        type: 'text',
+        text: phone,
+        x: 0.5,
+        y: name ? 0.66 : 0.56,
+        fontSize: phoneFontSize(phone),
+        fontFamily: font.previewFontFamily,
+        fontWeight: font.previewFontWeight ?? 'normal',
+        fontStyle: font.previewFontStyle,
+        color: engravingColor,
+      });
+    } else if (!name) {
+      backLayers.push({
+        id: 'back-placeholder',
+        type: 'text',
+        text: 'Tel / Contact Info',
+        x: 0.5,
+        y: 0.56,
+        fontSize: 0.058,
+        fontFamily: font.previewFontFamily,
+        color: 'rgba(41, 38, 34, 0.28)',
+      });
+    }
+  }
 
   return (
     <ProductViewer

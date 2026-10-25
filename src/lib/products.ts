@@ -89,6 +89,9 @@ const goldenCatTagStudio: TagStudioConfig = {
   defaultDesign: 'DSA066',
   defaultFinish: 'Custom Gold',
   defaultFont: 'FT12',
+  phoneEnabled: true,
+  phoneMaxLength: 25,
+  maxNameLength: 15,
   finishSwatches: {
     'Custom Gold': '#c89537',
     'Custom Rose Gold': '#c98d8a',

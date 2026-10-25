@@ -714,6 +714,22 @@ export default function TagStudio({
                         <span>AA</span>
                       </button>
 
+                      {/* Selector de tipografía al mismo nivel de la barra */}
+                      <button
+                        type="button"
+                        onClick={() => setOpenFontPickerId(isFontPickerOpen ? null : item.id)}
+                        className={`flex h-7 items-center gap-1 rounded-md border px-2.5 text-[11px] font-bold transition-all ${
+                          isFontPickerOpen
+                            ? 'border-brand bg-brand text-white shadow-xs'
+                            : 'border-brand/40 bg-brand-soft text-brand-strong hover:bg-brand-soft/80'
+                        }`}
+                        title={t.product.fontForThisText}
+                      >
+                        <Type className="h-3 w-3" />
+                        <span>{itemFont.label}</span>
+                        <span className="text-[9px]">{isFontPickerOpen ? '▲' : '▼'}</span>
+                      </button>
+
                       {/* Restablecer posición y tamaño original */}
                       <button
                         type="button"
@@ -731,67 +747,46 @@ export default function TagStudio({
                       </button>
                     </div>
 
-                    {/* Selector de tipografía independiente para esta zona */}
-                    <div className="border-t border-[#f0eae4] pt-2">
-                      <div className="flex items-center justify-between">
-                        <span className="text-[11px] font-medium text-brand-ink/75">
-                          {t.product.fontForThisText}:
-                        </span>
-                        <button
-                          type="button"
-                          onClick={() => setOpenFontPickerId(isFontPickerOpen ? null : item.id)}
-                          className={`flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-[11px] font-bold transition-all ${
-                            isFontPickerOpen
-                              ? 'border-brand bg-brand text-white shadow-xs'
-                              : 'border-brand/40 bg-brand-soft text-brand-strong hover:bg-brand-soft/80'
-                          }`}
-                        >
-                          <Type className="h-3 w-3" />
-                          <span>{itemFont.label}</span>
-                          <span className="text-[9px]">{isFontPickerOpen ? '▲' : '▼'}</span>
-                        </button>
-                      </div>
-
-                      {isFontPickerOpen && (
-                        <div className="mt-2 max-h-[175px] overflow-y-auto rounded-lg border border-[#e6dcd3] bg-[#faf7f2]/80 p-2">
-                          <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-3">
-                            {config.fonts.map((f) => {
-                              const isSelected = item.font === f.value;
-                              return (
-                                <button
-                                  key={f.value}
-                                  type="button"
-                                  onClick={() => {
-                                    updateZoneFont(item.id, f.value);
-                                    setOpenFontPickerId(null);
+                    {/* Desplegable de tipografías si está abierto */}
+                    {isFontPickerOpen && (
+                      <div className="mt-1.5 max-h-[175px] overflow-y-auto rounded-lg border border-[#e6dcd3] bg-[#faf7f2]/80 p-2">
+                        <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-3">
+                          {config.fonts.map((f) => {
+                            const isSelected = item.font === f.value;
+                            return (
+                              <button
+                                key={f.value}
+                                type="button"
+                                onClick={() => {
+                                  updateZoneFont(item.id, f.value);
+                                  setOpenFontPickerId(null);
+                                }}
+                                className={`flex flex-col items-center justify-center rounded-lg border p-1.5 text-center transition-all ${
+                                  isSelected
+                                    ? 'border-brand bg-white ring-1.5 ring-brand shadow-xs'
+                                    : 'border-[#e6dcd3] bg-white/80 hover:border-brand/40 hover:bg-white'
+                                }`}
+                              >
+                                <span
+                                  className="block w-full truncate text-sm leading-tight text-brand-ink"
+                                  style={{
+                                    fontFamily: f.previewFontFamily,
+                                    fontWeight: f.previewFontWeight ?? 'normal',
+                                    fontStyle: f.previewFontStyle ?? 'normal',
+                                    textTransform: item.uppercase ? 'uppercase' : 'none',
                                   }}
-                                  className={`flex flex-col items-center justify-center rounded-lg border p-1.5 text-center transition-all ${
-                                    isSelected
-                                      ? 'border-brand bg-white ring-1.5 ring-brand shadow-xs'
-                                      : 'border-[#e6dcd3] bg-white/80 hover:border-brand/40 hover:bg-white'
-                                  }`}
                                 >
-                                  <span
-                                    className="block w-full truncate text-sm leading-tight text-brand-ink"
-                                    style={{
-                                      fontFamily: f.previewFontFamily,
-                                      fontWeight: f.previewFontWeight ?? 'normal',
-                                      fontStyle: f.previewFontStyle ?? 'normal',
-                                      textTransform: item.uppercase ? 'uppercase' : 'none',
-                                    }}
-                                  >
-                                    {item.text.trim() || 'Texto'}
-                                  </span>
-                                  <span className={`mt-0.5 text-[9px] uppercase tracking-wider ${isSelected ? 'font-bold text-brand-strong' : 'text-brand-ink/60'}`}>
-                                    {f.label}
-                                  </span>
-                                </button>
-                              );
-                            })}
-                          </div>
+                                  {item.text.trim() || 'Texto'}
+                                </span>
+                                <span className={`mt-0.5 text-[9px] uppercase tracking-wider ${isSelected ? 'font-bold text-brand-strong' : 'text-brand-ink/60'}`}>
+                                  {f.label}
+                                </span>
+                              </button>
+                            );
+                          })}
                         </div>
-                      )}
-                    </div>
+                      </div>
+                    )}
                   </div>
                 );
               })}

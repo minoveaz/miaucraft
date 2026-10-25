@@ -23,16 +23,18 @@ export interface CartTotals {
   currency: string;
   freeShippingThreshold: number;
   remainingForFreeShipping: number;
+  freeShippingProgressPct: number;
   hasFreeShipping: boolean;
 }
 
 export interface CartContextValue extends CartTotals {
   lines: CartLine[];
-  addLine: (line: Omit<CartLine, 'quantity'>, quantity?: number) => void;
+  addLine: (line: Omit<CartLine, 'quantity'>, quantity?: number, openDrawerOnAdd?: boolean) => void;
   setQuantity: (lineKey: string, quantity: number) => void;
   removeLine: (lineKey: string) => void;
   clear: () => void;
-  isDrawerOpen?: boolean;
-  openDrawer?: () => void;
-  closeDrawer?: () => void;
+  isDrawerOpen: boolean;
+  openDrawer: () => void;
+  closeDrawer: () => void;
+  toggleDrawer: () => void;
 }

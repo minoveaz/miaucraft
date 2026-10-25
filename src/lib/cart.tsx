@@ -39,6 +39,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     const subtotal = lines.reduce((total, line) => total + line.unitPrice * line.quantity, 0);
     const remainingForFreeShipping = Math.max(0, FREE_SHIPPING_THRESHOLD - subtotal);
     const hasFreeShipping = subtotal >= FREE_SHIPPING_THRESHOLD;
+    const freeShippingProgressPct = Math.min(100, Math.round((subtotal / FREE_SHIPPING_THRESHOLD) * 100));
 
     return {
       lines,
@@ -47,11 +48,13 @@ export function CartProvider({ children }: { children: ReactNode }) {
       currency: 'USD',
       freeShippingThreshold: FREE_SHIPPING_THRESHOLD,
       remainingForFreeShipping,
+      freeShippingProgressPct,
       hasFreeShipping,
       isDrawerOpen,
       openDrawer: () => setIsDrawerOpen(true),
       closeDrawer: () => setIsDrawerOpen(false),
-      addLine: (line, quantity = 1) =>
+      toggleDrawer: () => setIsDrawerOpen((prev) => !prev),
+      addLine: (line, quantity = 1, openDrawerOnAdd = true) => {
         setLines((current) => {
           const key = cartLineKey(line);
           const existing = current.find((item) => cartLineKey(item) === key);
@@ -63,7 +66,11 @@ export function CartProvider({ children }: { children: ReactNode }) {
             );
           }
           return [...current, { ...line, quantity: clampQuantity(quantity) }];
-        }),
+        });
+        if (openDrawerOnAdd) {
+          setIsDrawerOpen(true);
+        }
+      },
       setQuantity: (lineKey, quantity) =>
         setLines((current) =>
           current.map((item) => (cartLineKey(item) === lineKey ? { ...item, quantity: clampQuantity(quantity) } : item)),

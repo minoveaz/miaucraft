@@ -164,6 +164,30 @@ export interface I18nDictionary {
     addPet: string;
     quickPersonalize: string;
   };
+  cart: {
+    title: string;
+    itemsCount: string;
+    itemCountSingle: string;
+    freeShippingRemainingPrefix: string;
+    freeShippingRemainingSuffix: string;
+    freeShippingUnlocked: string;
+    freeShippingProgressLabel: string;
+    subtotal: string;
+    shipping: string;
+    shippingFree: string;
+    taxIncludedNote: string;
+    proceedToCheckout: string;
+    pciSecurityBadge: string;
+    emptyTitle: string;
+    emptyDesc: string;
+    exploreCatalog: string;
+    viewCartPage: string;
+    remove: string;
+    each: string;
+    orderSummary: string;
+    orderNotesTitle: string;
+    orderNotesPlaceholder: string;
+  };
   footer: {
     tagline: string;
     shop: string;

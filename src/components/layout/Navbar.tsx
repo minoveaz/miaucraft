@@ -27,7 +27,7 @@ function NavigationLink({ label, to, onNavigate }: { label: string; to: string; 
 }
 
 export default function Navbar() {
-  const { count } = useCart();
+  const { count, openDrawer } = useCart();
   const { t, formatPrice } = useTranslation();
   const [query, setQuery] = useState('');
   const [searchOpen, setSearchOpen] = useState(false);
@@ -158,17 +158,20 @@ export default function Navbar() {
               <UserRound aria-hidden="true" className="h-5 w-5" strokeWidth={1.8} />
             </Link>
 
-            <Link
-              to="/carrito"
+            <button
+              type="button"
               aria-label={`${t.nav.cart}, ${count} items`}
-              onClick={() => setSearchOpen(false)}
-              className="relative flex h-9 w-9 items-center justify-center text-brand-ink hover:text-brand"
+              onClick={() => {
+                setSearchOpen(false);
+                openDrawer();
+              }}
+              className="relative flex h-9 w-9 items-center justify-center text-brand-ink hover:text-brand transition-colors"
             >
               <ShoppingBag aria-hidden="true" className="h-5 w-5" strokeWidth={1.8} />
               <span className="absolute -right-1 -top-1 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-brand px-1 text-[10px] font-bold leading-none text-white">
                 {count}
               </span>
-            </Link>
+            </button>
           </div>
         </div>
 

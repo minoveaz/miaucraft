@@ -3,6 +3,7 @@ import { CartProvider } from '../../lib/cart';
 import { useTranslation } from '../../hooks/useTranslation';
 import Footer from './Footer';
 import Navbar from './Navbar';
+import { CartDrawer } from '../cart/CartDrawer';
 
 // Shell público: cabecera sticky, contenido de la ruta y pie.
 export default function PublicLayout() {
@@ -19,6 +20,7 @@ export default function PublicLayout() {
           <Outlet />
         </main>
         <Footer />
+        <CartDrawer />
       </div>
     </CartProvider>
   );

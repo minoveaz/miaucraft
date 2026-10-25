@@ -723,7 +723,7 @@ function ProductDetail({ product }: { product: Product }) {
         <span aria-current="page">{product.title}</span>
       </nav>
 
-      <div className="grid items-start gap-7 md:gap-9 lg:grid-cols-[minmax(0,490px)_minmax(0,1fr)] xl:grid-cols-[minmax(0,530px)_minmax(0,1fr)] xl:gap-12">
+      <div className="grid items-start gap-8 lg:grid-cols-2 xl:gap-12">
         <div className="lg:sticky lg:top-24">
           <ProductGallery product={product} tagValue={tagStudioValue} />
         </div>

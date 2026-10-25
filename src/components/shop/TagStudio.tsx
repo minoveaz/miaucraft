@@ -41,32 +41,47 @@ export default function TagStudio({ config, value, onChange }: TagStudioProps) {
       <div className="mt-5 space-y-5">
         {config.designs.length > 1 ? (
           <fieldset>
-            <legend className="mb-2 text-sm font-semibold text-brand-ink">{t.product.step1Design}</legend>
-            <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
-              {config.designs.map((option) => (
-                <button
-                  key={option.value}
-                  type="button"
-                  aria-label={`${t.product.step1Design}: ${option.value}`}
-                  aria-pressed={value.design === option.value}
-                  onClick={() => update({ design: option.value })}
-                  className={`overflow-hidden rounded-lg border text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand ${
-                    value.design === option.value
-                      ? 'border-brand ring-1 ring-brand'
-                      : 'border-[#e6dcd3] hover:border-brand'
-                  }`}
-                >
-                  <img
-                    src={designImage(option.image)}
-                    alt=""
-                    loading="lazy"
-                    className="aspect-square w-full bg-brand-cream object-contain"
-                  />
-                  <span className="block px-2 py-1.5 text-center text-xs font-semibold text-brand-ink">
-                    {option.label}
-                  </span>
-                </button>
-              ))}
+            <div className="mb-2 flex items-center justify-between">
+              <legend className="text-sm font-semibold text-brand-ink">
+                {t.product.step1Design}
+              </legend>
+              <span className="rounded-full bg-brand-soft px-2.5 py-0.5 text-xs font-bold text-brand-strong">
+                {design.label}
+              </span>
+            </div>
+            <div className="max-h-[220px] overflow-y-auto rounded-xl border border-[#e6dcd3] bg-[#faf7f2]/50 p-2 pr-1.5">
+              <div className="grid grid-cols-4 gap-2 sm:grid-cols-5 md:grid-cols-6">
+                {config.designs.map((option) => (
+                  <button
+                    key={option.value}
+                    type="button"
+                    aria-label={`${t.product.step1Design}: ${option.value}`}
+                    aria-pressed={value.design === option.value}
+                    onClick={() => update({ design: option.value })}
+                    className={`group relative flex flex-col items-center rounded-lg border p-1 text-center transition-all focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand ${
+                      value.design === option.value
+                        ? 'border-brand bg-white shadow-xs ring-1 ring-brand'
+                        : 'border-transparent bg-white/70 hover:border-brand/40 hover:bg-white'
+                    }`}
+                  >
+                    <div className="relative aspect-square w-full overflow-hidden rounded bg-brand-cream/60 p-0.5">
+                      <img
+                        src={designImage(option.image)}
+                        alt=""
+                        loading="lazy"
+                        className="h-full w-full object-contain transition-transform group-hover:scale-105"
+                      />
+                    </div>
+                    <span
+                      className={`mt-1 block truncate text-[10px] font-semibold ${
+                        value.design === option.value ? 'text-brand-strong' : 'text-brand-ink/80'
+                      }`}
+                    >
+                      {option.label}
+                    </span>
+                  </button>
+                ))}
+              </div>
             </div>
           </fieldset>
         ) : (

@@ -1,5 +1,15 @@
 import { useState, useEffect, useId } from 'react';
-import { ShieldCheck, RotateCcw, Plus, Trash2, Type } from 'lucide-react';
+import {
+  ShieldCheck,
+  RotateCcw,
+  Plus,
+  Trash2,
+  Type,
+  ArrowUp,
+  ArrowDown,
+  ArrowLeft,
+  ArrowRight,
+} from 'lucide-react';
 import type { TagStudioConfig } from '../../lib/products';
 import { useTranslation } from '../../hooks/useTranslation';
 
@@ -15,6 +25,10 @@ export interface TagEngravingItem {
   zone: TagZone;
   text: string;
   font: string;
+  scale?: number; // relative size: 0.75 to 1.35 (default 1.0)
+  yOffset?: number; // vertical nudge: -0.05 to +0.05 (default 0)
+  xOffset?: number; // horizontal nudge: -0.07 to +0.07 (default 0)
+  uppercase?: boolean; // uppercase transform
 }
 
 export interface TagStudioValue {
@@ -49,6 +63,10 @@ export function getInitialEngravings(
       zone: 'center',
       text: name || 'Amber',
       font: mainFont,
+      scale: 1.0,
+      yOffset: 0,
+      xOffset: 0,
+      uppercase: false,
     });
     if (phone) {
       items.push({
@@ -57,6 +75,10 @@ export function getInitialEngravings(
         zone: 'center',
         text: phone,
         font: 'FT18',
+        scale: 1.0,
+        yOffset: 0,
+        xOffset: 0,
+        uppercase: false,
       });
     }
     if (contact2) {
@@ -66,6 +88,10 @@ export function getInitialEngravings(
         zone: 'bottom',
         text: contact2,
         font: 'FT18',
+        scale: 1.0,
+        yOffset: 0,
+        xOffset: 0,
+        uppercase: false,
       });
     }
   } else {
@@ -75,6 +101,10 @@ export function getInitialEngravings(
       zone: 'top',
       text: name || 'Amber',
       font: mainFont,
+      scale: 1.0,
+      yOffset: 0,
+      xOffset: 0,
+      uppercase: false,
     });
     if (phone) {
       items.push({
@@ -83,6 +113,10 @@ export function getInitialEngravings(
         zone: 'center',
         text: phone,
         font: 'FT18',
+        scale: 1.0,
+        yOffset: 0,
+        xOffset: 0,
+        uppercase: false,
       });
     }
     if (contact2) {
@@ -92,6 +126,10 @@ export function getInitialEngravings(
         zone: 'bottom',
         text: contact2,
         font: 'FT18',
+        scale: 1.0,
+        yOffset: 0,
+        xOffset: 0,
+        uppercase: false,
       });
     }
   }
@@ -212,6 +250,10 @@ export default function TagStudio({
       zone,
       text: '',
       font: defaultZoneFont,
+      scale: 1.0,
+      yOffset: 0,
+      xOffset: 0,
+      uppercase: false,
     };
     updateEngravings([...currentEngravings, newItem]);
     onSideChange?.(side);
@@ -228,6 +270,62 @@ export default function TagStudio({
 
   const updateZoneFont = (id: string, font: string) => {
     updateEngravings(currentEngravings.map((e) => (e.id === id ? { ...e, font } : e)));
+  };
+
+  // Fine-tuning position & formatting controls
+  const adjustSize = (id: string, delta: number) => {
+    updateEngravings(
+      currentEngravings.map((e) => {
+        if (e.id !== id) return e;
+        const current = e.scale ?? 1.0;
+        const next = Math.max(0.75, Math.min(1.35, Math.round((current + delta) * 10) / 10));
+        return { ...e, scale: next };
+      }),
+    );
+  };
+
+  const adjustY = (id: string, delta: number) => {
+    updateEngravings(
+      currentEngravings.map((e) => {
+        if (e.id !== id) return e;
+        const current = e.yOffset ?? 0;
+        const next = Math.max(-0.05, Math.min(0.05, Math.round((current + delta) * 1000) / 1000));
+        return { ...e, yOffset: next };
+      }),
+    );
+  };
+
+  const adjustX = (id: string, delta: number) => {
+    updateEngravings(
+      currentEngravings.map((e) => {
+        if (e.id !== id) return e;
+        const current = e.xOffset ?? 0;
+        const next = Math.max(-0.07, Math.min(0.07, Math.round((current + delta) * 1000) / 1000));
+        return { ...e, xOffset: next };
+      }),
+    );
+  };
+
+  const setXOffset = (id: string, value: number) => {
+    updateEngravings(
+      currentEngravings.map((e) => (e.id === id ? { ...e, xOffset: value } : e)),
+    );
+  };
+
+  const toggleUppercase = (id: string) => {
+    updateEngravings(
+      currentEngravings.map((e) => (e.id === id ? { ...e, uppercase: !e.uppercase } : e)),
+    );
+  };
+
+  const resetItemTransform = (id: string) => {
+    updateEngravings(
+      currentEngravings.map((e) =>
+        e.id === id
+          ? { ...e, scale: 1.0, yOffset: 0, xOffset: 0, uppercase: false }
+          : e,
+      ),
+    );
   };
 
   const frontItems = currentEngravings.filter((e) => e.side === 'front' && e.text.trim());
@@ -512,12 +610,125 @@ export default function TagStudio({
                           fontFamily: itemFont.previewFontFamily,
                           fontWeight: itemFont.previewFontWeight ?? 'normal',
                           fontStyle: itemFont.previewFontStyle ?? 'normal',
+                          textTransform: item.uppercase ? 'uppercase' : 'none',
                         }}
                       />
                       <div className="mt-1 flex items-center justify-between text-[11px] text-brand-ink/60">
                         <span>{zoneSuggestion(selectedFace, zone)}</span>
                         <span>{item.text.length} / 32</span>
                       </div>
+                    </div>
+
+                    {/* Barra de herramientas: Tamaño, Micro-ajuste de Posición y Estilo */}
+                    <div className="flex flex-wrap items-center gap-1.5 rounded-lg border border-[#e6dcd3] bg-[#faf7f2]/90 p-1.5 text-xs text-brand-ink">
+                      {/* Tamaño del texto: A- / A+ */}
+                      <div className="flex items-center rounded-md border border-[#cfc4bb] bg-white shadow-2xs">
+                        <button
+                          type="button"
+                          onClick={() => adjustSize(item.id, -0.1)}
+                          disabled={(item.scale ?? 1.0) <= 0.75}
+                          className="flex h-7 w-7 items-center justify-center font-bold text-brand-ink hover:bg-brand-soft disabled:opacity-40 transition-colors"
+                          title={isEn ? 'Decrease size' : 'Reducir tamaño'}
+                        >
+                          A-
+                        </button>
+                        <span className="px-1 text-[11px] font-semibold text-brand-ink/75 tabular-nums">
+                          {Math.round((item.scale ?? 1.0) * 100)}%
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => adjustSize(item.id, +0.1)}
+                          disabled={(item.scale ?? 1.0) >= 1.35}
+                          className="flex h-7 w-7 items-center justify-center font-bold text-brand-ink hover:bg-brand-soft disabled:opacity-40 transition-colors"
+                          title={isEn ? 'Increase size' : 'Aumentar tamaño'}
+                        >
+                          A+
+                        </button>
+                      </div>
+
+                      {/* Desplazamiento Vertical: Subir / Bajar */}
+                      <div className="flex items-center rounded-md border border-[#cfc4bb] bg-white shadow-2xs">
+                        <button
+                          type="button"
+                          onClick={() => adjustY(item.id, -0.015)}
+                          disabled={(item.yOffset ?? 0) <= -0.05}
+                          className="flex h-7 w-7 items-center justify-center text-brand-ink hover:bg-brand-soft disabled:opacity-40 transition-colors"
+                          title={isEn ? 'Move up' : 'Mover arriba'}
+                        >
+                          <ArrowUp className="h-3.5 w-3.5" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => adjustY(item.id, +0.015)}
+                          disabled={(item.yOffset ?? 0) >= 0.05}
+                          className="flex h-7 w-7 items-center justify-center text-brand-ink hover:bg-brand-soft disabled:opacity-40 transition-colors"
+                          title={isEn ? 'Move down' : 'Mover abajo'}
+                        >
+                          <ArrowDown className="h-3.5 w-3.5" />
+                        </button>
+                      </div>
+
+                      {/* Desplazamiento Horizontal / Alineación: Izquierda / Centro / Derecha */}
+                      <div className="flex items-center rounded-md border border-[#cfc4bb] bg-white shadow-2xs">
+                        <button
+                          type="button"
+                          onClick={() => adjustX(item.id, -0.02)}
+                          disabled={(item.xOffset ?? 0) <= -0.07}
+                          className="flex h-7 w-7 items-center justify-center text-brand-ink hover:bg-brand-soft disabled:opacity-40 transition-colors"
+                          title={isEn ? 'Nudge left' : 'Mover a la izquierda'}
+                        >
+                          <ArrowLeft className="h-3.5 w-3.5" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setXOffset(item.id, 0)}
+                          className={`flex h-7 w-6 items-center justify-center text-[10px] font-bold transition-colors ${
+                            (item.xOffset ?? 0) === 0 ? 'bg-brand-soft text-brand-strong' : 'text-brand-ink/75 hover:bg-brand-soft'
+                          }`}
+                          title={isEn ? 'Center horizontally' : 'Centrar'}
+                        >
+                          •
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => adjustX(item.id, +0.02)}
+                          disabled={(item.xOffset ?? 0) >= 0.07}
+                          className="flex h-7 w-7 items-center justify-center text-brand-ink hover:bg-brand-soft disabled:opacity-40 transition-colors"
+                          title={isEn ? 'Nudge right' : 'Mover a la derecha'}
+                        >
+                          <ArrowRight className="h-3.5 w-3.5" />
+                        </button>
+                      </div>
+
+                      {/* Mayúsculas: AA */}
+                      <button
+                        type="button"
+                        onClick={() => toggleUppercase(item.id)}
+                        className={`flex h-7 items-center gap-1 rounded-md border px-2 text-[11px] font-bold transition-colors ${
+                          item.uppercase
+                            ? 'border-brand bg-brand-soft text-brand-strong ring-1 ring-brand'
+                            : 'border-[#cfc4bb] bg-white text-brand-ink hover:bg-brand-soft'
+                        }`}
+                        title={isEn ? 'Toggle uppercase' : 'Convertir a mayúsculas'}
+                      >
+                        <span>AA</span>
+                      </button>
+
+                      {/* Restablecer posición y tamaño original */}
+                      <button
+                        type="button"
+                        onClick={() => resetItemTransform(item.id)}
+                        disabled={
+                          (item.scale ?? 1.0) === 1.0 &&
+                          (item.yOffset ?? 0) === 0 &&
+                          (item.xOffset ?? 0) === 0 &&
+                          !item.uppercase
+                        }
+                        className="flex h-7 w-7 items-center justify-center rounded-md border border-[#cfc4bb] bg-white text-brand-ink/60 hover:text-brand-strong hover:bg-brand-soft disabled:opacity-30 transition-colors ml-auto"
+                        title={isEn ? 'Reset position and size' : 'Restablecer posición y tamaño'}
+                      >
+                        <RotateCcw className="h-3 w-3" />
+                      </button>
                     </div>
 
                     {/* Selector de tipografía independiente para esta zona */}
@@ -566,6 +777,7 @@ export default function TagStudio({
                                       fontFamily: f.previewFontFamily,
                                       fontWeight: f.previewFontWeight ?? 'normal',
                                       fontStyle: f.previewFontStyle ?? 'normal',
+                                      textTransform: item.uppercase ? 'uppercase' : 'none',
                                     }}
                                   >
                                     {item.text.trim() || 'Texto'}

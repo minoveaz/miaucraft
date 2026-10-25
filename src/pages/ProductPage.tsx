@@ -112,34 +112,46 @@ function buildFaceLayers(
     bottomSize = 0.062;
   }
 
-  const renderItem = (item: TagEngravingItem, y: number, baseSize: number) => {
+  const renderItem = (item: TagEngravingItem, baseY: number, baseSize: number) => {
     const fontConfig = fonts.find((f) => f.value === item.font) ?? fonts[0];
-    const wrapped = wrapTextToLines(item.text, 19);
+    const rawText = item.text.trim();
+    const displayText = item.uppercase ? rawText.toUpperCase() : rawText;
+
+    const scale = item.scale ?? 1.0;
+    const finalSize = clampFontSize(baseSize * scale, displayText);
+
+    const yNudge = item.yOffset ?? 0;
+    const finalY = Math.max(0.39, Math.min(0.74, baseY + yNudge));
+
+    const xNudge = item.xOffset ?? 0;
+    const finalX = Math.max(0.24, Math.min(0.76, 0.5 + xNudge));
+
+    const wrapped = wrapTextToLines(displayText, 19);
 
     if (wrapped.length <= 1) {
       layers.push({
         id: `${face}-${item.zone}-0`,
         type: 'text',
-        text: item.text,
-        x: 0.5,
-        y,
-        fontSize: clampFontSize(baseSize, item.text),
+        text: displayText,
+        x: finalX,
+        y: finalY,
+        fontSize: finalSize,
         fontFamily: fontConfig.previewFontFamily,
         fontWeight: fontConfig.previewFontWeight,
         fontStyle: fontConfig.previewFontStyle,
         color: engravingColor,
       });
     } else {
-      const lineStep = 0.054;
-      const startY = y - ((wrapped.length - 1) * lineStep) / 2;
+      const lineStep = 0.054 * scale;
+      const startY = finalY - ((wrapped.length - 1) * lineStep) / 2;
       wrapped.forEach((line, idx) => {
         layers.push({
           id: `${face}-${item.zone}-${idx}`,
           type: 'text',
           text: line,
-          x: 0.5,
-          y: startY + idx * lineStep,
-          fontSize: clampFontSize(baseSize * 0.88, line),
+          x: finalX,
+          y: Math.max(0.38, Math.min(0.75, startY + idx * lineStep)),
+          fontSize: clampFontSize(finalSize * 0.88, line),
           fontFamily: fontConfig.previewFontFamily,
           fontWeight: fontConfig.previewFontWeight ?? 'normal',
           fontStyle: fontConfig.previewFontStyle,
@@ -620,8 +632,11 @@ function ProductDetails({
             : e.zone === 'center'
             ? (isEn ? 'Center' : 'Centro')
             : (isEn ? 'Bottom' : 'Inferior');
+        const rawText = e.text.trim();
+        const textToSave = e.uppercase ? rawText.toUpperCase() : rawText;
         const fontName = product.tagStudio?.fonts.find((f) => f.value === e.font)?.label ?? e.font;
-        tagStudioOptions[`${sideLabel} (${zoneLabel})`] = `${e.text.trim()} [${fontName}]`;
+        const scaleLabel = e.scale && e.scale !== 1.0 ? `, ${Math.round(e.scale * 100)}%` : '';
+        tagStudioOptions[`${sideLabel} (${zoneLabel})`] = `${textToSave} [${fontName}${scaleLabel}]`;
       });
     } else if (tagStudioValue.name.trim()) {
       tagStudioOptions[isEn ? 'Engraved Name' : 'Nombre grabado'] = tagStudioValue.name.trim();

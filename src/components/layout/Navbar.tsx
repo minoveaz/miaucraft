@@ -4,6 +4,7 @@ import { Menu, Search, ShoppingBag, UserRound, X } from 'lucide-react';
 import Logo from './Logo';
 import LanguageSwitcher from './LanguageSwitcher';
 import { useCart } from '../../lib/cart';
+import { useAuth } from '../../lib/auth';
 import { productImage, products } from '../../lib/products';
 import { useTranslation } from '../../hooks/useTranslation';
 
@@ -28,6 +29,7 @@ function NavigationLink({ label, to, onNavigate }: { label: string; to: string; 
 
 export default function Navbar() {
   const { count, openDrawer } = useCart();
+  const { user } = useAuth();
   const { t, formatPrice } = useTranslation();
   const [query, setQuery] = useState('');
   const [searchOpen, setSearchOpen] = useState(false);
@@ -151,11 +153,14 @@ export default function Navbar() {
 
             <Link
               to="/cuenta"
-              aria-label={t.nav.account}
+              aria-label={user ? `${t.nav.account} (${user.firstName})` : t.nav.account}
               onClick={() => setSearchOpen(false)}
-              className="hidden sm:flex h-9 w-9 items-center justify-center text-brand-ink hover:text-brand"
+              className="relative hidden sm:flex h-9 w-9 items-center justify-center text-brand-ink hover:text-brand transition-colors"
             >
               <UserRound aria-hidden="true" className="h-5 w-5" strokeWidth={1.8} />
+              {user && (
+                <span className="absolute 1 top-1 right-1 h-2 w-2 rounded-full bg-brand ring-2 ring-white" />
+              )}
             </Link>
 
             <button
@@ -243,10 +248,17 @@ export default function Navbar() {
               <Link
                 to="/cuenta"
                 onClick={() => setMobileMenuOpen(false)}
-                className="pt-2 border-t border-[#f0eae4] text-brand-ink hover:text-brand flex items-center gap-2"
+                className="pt-2 border-t border-[#f0eae4] text-brand-ink hover:text-brand flex items-center justify-between"
               >
-                <UserRound className="h-4 w-4" />
-                {t.nav.account}
+                <span className="flex items-center gap-2">
+                  <UserRound className="h-4 w-4" />
+                  {t.nav.account}
+                </span>
+                {user && (
+                  <span className="text-xs font-bold text-brand-strong bg-brand-soft px-2.5 py-0.5 rounded-full">
+                    {user.firstName}
+                  </span>
+                )}
               </Link>
             </div>
           </nav>

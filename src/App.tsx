@@ -6,6 +6,8 @@ import AboutPage from './pages/AboutPage';
 import CartPage from './pages/CartPage';
 import CheckoutPage from './pages/CheckoutPage';
 import ProductPage from './pages/ProductPage';
+import AccountPage from './pages/AccountPage';
+import LoginPage from './pages/LoginPage';
 import { BlogPage, ContactPage, FaqPage, NotFoundPage } from './pages/StaticPages';
 
 export default function App() {
@@ -17,6 +19,8 @@ export default function App() {
         <Route path="/nosotros" element={<AboutPage />} />
         <Route path="/carrito" element={<CartPage />} />
         <Route path="/checkout" element={<CheckoutPage />} />
+        <Route path="/cuenta" element={<AccountPage />} />
+        <Route path="/cuenta/login" element={<LoginPage />} />
         <Route path="/coleccion/:handle" element={<CollectionPage />} />
         <Route path="/producto/:handle" element={<ProductPage />} />
         <Route path="/preguntas-frecuentes" element={<FaqPage />} />

@@ -88,24 +88,28 @@ export default function Navbar() {
         ref={headerRef}
         className="sticky top-0 z-50 border-b border-[#e6dcd3] bg-white shadow-[0_1px_4px_rgba(16,16,16,0.04)]"
       >
-        <div className="relative flex h-14 items-center gap-2 px-3 sm:gap-3 sm:px-5 md:h-[76px] md:justify-between md:gap-6 md:px-10">
-          <button
-            type="button"
-            aria-label={mobileMenuOpen ? 'Cerrar menú' : 'Abrir menú'}
-            aria-expanded={mobileMenuOpen}
-            onClick={() => {
-              setMobileMenuOpen((open) => !open);
-              setSearchOpen(false);
-            }}
-            className="flex h-9 w-6 shrink-0 items-center justify-center text-brand-ink hover:text-brand md:hidden"
-          >
-            {mobileMenuOpen
-              ? <X aria-hidden="true" className="h-5 w-5" strokeWidth={1.8} />
-              : <Menu aria-hidden="true" className="h-5 w-5" strokeWidth={1.8} />}
-          </button>
-          <Logo />
-          <div className="relative min-w-0 flex-1 md:max-w-[360px] lg:max-w-[420px]">
-            <Search aria-hidden="true" className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#6b6b6b]" />
+        <div className="flex h-14 items-center justify-between gap-2 px-3 sm:px-5 md:h-[76px] md:gap-6 md:px-10">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <button
+              type="button"
+              aria-label={mobileMenuOpen ? 'Cerrar menú' : 'Abrir menú'}
+              aria-expanded={mobileMenuOpen}
+              onClick={() => {
+                setMobileMenuOpen((open) => !open);
+                setSearchOpen(false);
+              }}
+              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-brand-ink hover:text-brand md:hidden"
+            >
+              {mobileMenuOpen
+                ? <X aria-hidden="true" className="h-5 w-5" strokeWidth={1.8} />
+                : <Menu aria-hidden="true" className="h-5 w-5" strokeWidth={1.8} />}
+            </button>
+            <Logo />
+          </div>
+
+          {/* Desktop Search Bar */}
+          <div className="relative hidden md:block min-w-0 flex-1 max-w-[360px] lg:max-w-[420px]">
+            <Search aria-hidden="true" className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[#6b6b6b]" />
             <input
               type="search"
               value={query}
@@ -124,34 +128,70 @@ export default function Navbar() {
               placeholder={t.nav.searchPlaceholder}
               aria-label={t.nav.search}
               aria-expanded={searchOpen && query.trim().length > 0}
-              className="h-9 w-full rounded-full border border-[#cfc4bb] bg-white pl-9 pr-2 text-xs text-brand-ink outline-none placeholder:text-[#6b6b6b] focus:border-brand sm:pr-3 sm:text-sm md:h-10 md:pl-10"
+              className="h-10 w-full rounded-full border border-[#cfc4bb] bg-white pl-10 pr-3 text-sm text-brand-ink outline-none placeholder:text-[#6b6b6b] focus:border-brand"
             />
           </div>
-          <div className="flex shrink-0 items-center gap-2 sm:gap-3 md:gap-4">
+
+          {/* Right Actions Cluster */}
+          <div className="flex shrink-0 items-center gap-2 sm:gap-3">
+            {/* Mobile Search Icon Toggle */}
+            <button
+              type="button"
+              aria-label={t.nav.search}
+              onClick={() => {
+                setSearchOpen((prev) => !prev);
+                setMobileMenuOpen(false);
+              }}
+              className="flex h-9 w-9 items-center justify-center rounded-lg text-brand-ink hover:text-brand md:hidden"
+            >
+              <Search aria-hidden="true" className="h-5 w-5" strokeWidth={1.8} />
+            </button>
+
             <LanguageSwitcher />
+
             <Link
               to="/cuenta"
               aria-label={t.nav.account}
               onClick={() => setSearchOpen(false)}
-              className="text-brand-ink hover:text-brand"
+              className="hidden sm:flex h-9 w-9 items-center justify-center text-brand-ink hover:text-brand"
             >
               <UserRound aria-hidden="true" className="h-5 w-5" strokeWidth={1.8} />
             </Link>
+
             <Link
               to="/carrito"
               aria-label={`${t.nav.cart}, ${count} items`}
               onClick={() => setSearchOpen(false)}
-              className="relative text-brand-ink hover:text-brand"
+              className="relative flex h-9 w-9 items-center justify-center text-brand-ink hover:text-brand"
             >
               <ShoppingBag aria-hidden="true" className="h-5 w-5" strokeWidth={1.8} />
-              <span className="absolute -right-2 -top-2 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-brand px-1 text-[10px] font-bold leading-none text-white">
+              <span className="absolute -right-1 -top-1 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-brand px-1 text-[10px] font-bold leading-none text-white">
                 {count}
               </span>
             </Link>
           </div>
         </div>
+
+        {/* Mobile Search Overlay Bar when toggled */}
+        {searchOpen && (
+          <div className="border-t border-[#e6dcd3] bg-white p-3 md:hidden">
+            <div className="relative">
+              <Search aria-hidden="true" className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#6b6b6b]" />
+              <input
+                type="search"
+                autoFocus
+                value={query}
+                onChange={(event) => setQuery(event.target.value)}
+                placeholder={t.nav.searchPlaceholder}
+                className="h-10 w-full rounded-full border border-[#cfc4bb] bg-white pl-9 pr-3 text-sm text-brand-ink outline-none placeholder:text-[#6b6b6b] focus:border-brand"
+              />
+            </div>
+          </div>
+        )}
+
+        {/* Search Results Dropdown */}
         {searchOpen && query.trim() && (
-          <div className="absolute inset-x-3 top-full z-[70] max-h-[min(60vh,420px)] overflow-y-auto rounded-b-xl border border-t-0 border-[#e6dcd3] bg-white p-2 shadow-xl sm:inset-x-5 md:left-1/2 md:right-auto md:mt-10 md:w-[400px] md:-translate-x-1/2">
+          <div className="absolute inset-x-3 top-full z-[70] max-h-[min(60vh,420px)] overflow-y-auto rounded-b-xl border border-t-0 border-[#e6dcd3] bg-white p-2 shadow-xl sm:inset-x-5 md:left-1/2 md:right-auto md:w-[420px] md:-translate-x-1/2">
             {matches.length ? (
               matches.map((product) => (
                 <Link
@@ -179,10 +219,12 @@ export default function Navbar() {
             )}
           </div>
         )}
+
+        {/* Mobile Navigation Drawer */}
         {mobileMenuOpen && (
           <nav
             aria-label="Principal móvil"
-            className="absolute inset-x-0 top-full z-[60] border-t border-[#e6dcd3] bg-white px-5 py-4 shadow-lg md:hidden"
+            className="border-t border-[#e6dcd3] bg-white px-5 py-4 shadow-lg md:hidden"
           >
             <div className="flex flex-col gap-4 text-sm font-semibold">
               {navItems.map((item) => (
@@ -195,10 +237,20 @@ export default function Navbar() {
                   }}
                 />
               ))}
+              <Link
+                to="/cuenta"
+                onClick={() => setMobileMenuOpen(false)}
+                className="pt-2 border-t border-[#f0eae4] text-brand-ink hover:text-brand flex items-center gap-2"
+              >
+                <UserRound className="h-4 w-4" />
+                {t.nav.account}
+              </Link>
             </div>
           </nav>
         )}
       </header>
+
+      {/* Desktop Category Navigation */}
       <nav
         aria-label="Principal"
         className="hidden justify-center gap-7 border-b border-[#e6dcd3] bg-white py-3 text-sm font-semibold md:flex"

@@ -1,20 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import {
-  BadgeCheck,
-  Check,
-  ChevronDown,
-  Clock,
-  Heart,
-  Minus,
-  Plus,
-  RotateCcw,
-  ShieldCheck,
-  ShoppingBag,
-  Sparkles,
-  Truck,
-  type LucideIcon,
-} from 'lucide-react';
+import { BadgeCheck, Clock, Minus, Plus, RotateCcw, Truck, type LucideIcon } from 'lucide-react';
 import { collectionLinks } from '../lib/navigation';
 import { productImage, products, type Product } from '../lib/products';
 import { useCart } from '../lib/cart';
@@ -30,8 +16,8 @@ const image = (file: string) => `${base}images/${encodeURI(file)}`;
 
 type GallerySlot = { kind: 'tag' } | { kind: 'image'; image: string; alt: string };
 
-const nameFontSize = (name: string) =>
-  Math.max(0.07, Math.min(0.11, 0.11 - Math.max(0, name.length - 6) * 0.004));
+// Name size relative to the tag's image height; shrinks for longer names.
+const nameFontSize = (name: string) => Math.max(0.07, Math.min(0.11, 0.11 - Math.max(0, name.length - 6) * 0.004));
 
 function TagViewer({
   config,
@@ -51,7 +37,6 @@ function TagViewer({
   const name = value.name.trim();
   const finish = config.finishes.find((item) => item.value === value.finish);
   const engravingColor = '#292622';
-
   const nameLayer: Layer = {
     id: 'name',
     type: 'text',
@@ -64,7 +49,6 @@ function TagViewer({
     fontStyle: font.previewFontStyle,
     color: name ? engravingColor : 'rgba(41, 38, 34, 0.35)',
   };
-
   const frontLayers: Layer[] = [
     {
       id: 'design',
@@ -77,7 +61,6 @@ function TagViewer({
     },
     ...(design.nameSide === 'front' ? [nameLayer] : []),
   ];
-
   const backLayers: Layer[] = design.nameSide === 'back' ? [nameLayer] : [];
 
   return (
@@ -101,80 +84,141 @@ function TagViewer({
   );
 }
 
-export default function ProductPage() {
-  const { isEn, t, formatPrice } = useTranslation();
-  const { handle } = useParams();
-  const navigate = useNavigate();
-  const { addLine, openDrawer } = useCart();
-
-  const product = products.find((item) => item.handle === handle);
-
-  const [tagStudioValue, setTagStudioValue] = useState<TagStudioValue>(() => ({
-    design: product?.tagStudio?.defaultDesign ?? product?.tagStudio?.designs[0]?.value ?? '',
-    finish: product?.tagStudio?.defaultFinish ?? '',
-    name: '',
-    font: product?.tagStudio?.defaultFont ?? product?.tagStudio?.fonts[0]?.value ?? '',
-    phone: '',
-  }));
-
-  const [tagView, setTagView] = useState<ViewMode>('3d');
-  const [tagSide, setTagSide] = useState<ProductFace>('front');
-  const [selectedPhotoIndex, setSelectedPhotoIndex] = useState<number | null>(null);
-  const [quantity, setQuantity] = useState(1);
-  const [addedToast, setAddedToast] = useState(false);
-  const [openAccordion, setOpenAccordion] = useState<string | null>('desc');
-
-  useEffect(() => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }, [handle]);
-
-  if (!product) {
-    return (
-      <StaticPage
-        title={isEn ? 'Product Not Found' : 'Producto no encontrado'}
-        body={isEn ? 'This product is no longer available in the store.' : 'Este producto ya no está disponible.'}
-      />
-    );
-  }
-
-  const collection = collectionLinks.find((item) => product.collections.includes(item.handle));
+function ProductGallery({ product, tagValue }: { product: Product; tagValue: TagStudioValue }) {
+  const { t } = useTranslation();
+  const photos = product.media ?? [{ image: productImage(product), alt: product.title }];
   const tagConfig = product.tagStudio;
-  const lifestylePhotos = product.media ?? [{ image: productImage(product), alt: product.title }];
+  const slots: GallerySlot[] = [
+    ...(tagConfig ? [{ kind: 'tag' as const }] : []),
+    ...photos.map((item) => ({ kind: 'image' as const, image: item.image, alt: item.alt })),
+  ];
+  const [selectedIndex, setSelectedIndex] = useState(0);
+  const [tagView, setTagView] = useState<ViewMode>('2d');
+  const [tagSide, setTagSide] = useState<ProductFace>('front');
+  useEffect(() => setSelectedIndex(0), [tagValue.finish]);
+  const selected = slots[selectedIndex] ?? slots[0];
+  const slotKey = (slot: GallerySlot) => (slot.kind === 'tag' ? 'tag' : slot.image);
+  const slotLabel = (slot: GallerySlot) => (slot.kind === 'tag' ? t.product.myCustomTag : slot.alt);
 
-  const canPurchase = !tagConfig || Boolean(tagStudioValue.name.trim().length > 0);
+  return (
+    <section aria-label={`Media for ${product.title}`}>
+      <div className="grid gap-3 md:grid-cols-[72px_minmax(0,1fr)] lg:grid-cols-[84px_minmax(0,1fr)]">
+        <div className="order-2 flex gap-2 overflow-x-auto md:order-1 md:h-[632px] md:flex-col md:overflow-y-auto lg:h-[728px]">
+          {slots.map((slot, index) => (
+            <button
+              key={slotKey(slot)}
+              type="button"
+              aria-label={`View ${slot.kind === 'tag' ? t.product.myCustomTag : `image ${index}`}: ${slotLabel(slot)}`}
+              aria-pressed={selectedIndex === index}
+              onClick={() => setSelectedIndex(index)}
+              className={`h-16 w-16 shrink-0 overflow-hidden rounded-lg border-2 bg-brand-cream focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand md:h-[72px] md:w-[72px] lg:h-[84px] lg:w-[84px] ${
+                selectedIndex === index ? 'border-brand' : 'border-transparent'
+              }`}
+            >
+              {slot.kind === 'tag' && tagConfig ? (
+                <span className="block h-full w-full p-1">
+                  <TagViewer config={tagConfig} value={tagValue} view="2d" side="front" className="h-full w-full" />
+                </span>
+              ) : (
+                slot.kind === 'image' && <img src={image(slot.image)} alt="" className="h-full w-full object-cover" />
+              )}
+            </button>
+          ))}
+        </div>
+        <div className="relative order-1 aspect-square overflow-hidden rounded-2xl bg-brand-cream md:order-2 md:aspect-auto md:h-[632px] lg:h-[728px]">
+          {selected.kind === 'tag' && tagConfig ? (
+            <div className="flex h-full flex-col p-4 sm:p-6">
+              <div className="flex shrink-0 justify-end">
+                <ViewToggle
+                  value={tagView}
+                  onChange={setTagView}
+                  className="flex overflow-hidden rounded-full border-2 border-brand-strong/20 bg-white text-sm font-bold shadow-sm"
+                  buttonClassName="px-5 py-2.5 text-brand-ink transition-colors"
+                  activeClassName="bg-brand-strong text-white"
+                />
+              </div>
+              <div className="min-h-0 w-full flex-1">
+                <TagViewer config={tagConfig} value={tagValue} view={tagView} side={tagSide} className="h-full w-full" />
+              </div>
+              <div className="flex shrink-0 flex-col items-end gap-2">
+                {tagView === '2d' && (
+                  <FaceToggle
+                    value={tagSide}
+                    onChange={setTagSide}
+                    className="flex overflow-hidden rounded-full border border-[#e6dcd3] bg-white/90 text-xs font-medium"
+                    buttonClassName="px-3.5 py-1.5 text-brand-ink/75 transition-colors"
+                    activeClassName="bg-brand-soft text-brand-strong"
+                  />
+                )}
+                <p className="mt-1 text-center text-xs text-brand-ink/70">
+                  {t.product.livePreviewBadge}
+                </p>
+              </div>
+            </div>
+          ) : (
+            selected.kind === 'image' && (
+              <img
+                key={selected.image}
+                src={image(selected.image)}
+                alt={selected.alt}
+                width={1200}
+                height={1000}
+                fetchPriority="high"
+                className="h-full w-full object-contain"
+              />
+            )
+          )}
+        </div>
+      </div>
+    </section>
+  );
+}
 
-  const tagStudioOptions = tagConfig
-    ? {
-        [isEn ? 'Tag Shape' : 'Diseño del tag']: tagStudioValue.design,
-        [isEn ? 'Metallic Finish' : 'Color']: tagConfig.finishes.find((f) => f.value === tagStudioValue.finish)?.label ?? tagStudioValue.finish,
-        [isEn ? 'Pet Name' : 'Nombre grabado']: tagStudioValue.name.trim(),
-        [isEn ? 'Font' : 'Tipografía']: tagStudioValue.font,
-        ...(tagConfig.phoneEnabled && tagStudioValue.phone.trim()
-          ? { [isEn ? 'Emergency Phone' : 'Teléfono']: tagStudioValue.phone.trim() }
-          : {}),
-      }
-    : {};
+function ProductOptions({
+  product,
+  selectedOptions,
+  onSelect,
+}: {
+  product: Product;
+  selectedOptions: Record<string, string>;
+  onSelect: (name: string, value: string) => void;
+}) {
+  if (!product.options?.length) return null;
 
-  const handleAddToCart = () => {
-    if (!canPurchase) return;
-    addLine({
-      handle: product.handle,
-      title: product.title,
-      unitPrice: product.priceFrom,
-      image: productImage(product),
-      options: tagStudioOptions,
-    }, quantity);
+  return (
+    <div className="mt-6 space-y-5">
+      {product.options.map((option) => (
+        <fieldset key={option.name}>
+          <legend className="mb-2 text-sm font-semibold text-brand-ink">{option.label}</legend>
+          <div className="flex flex-wrap gap-2">
+            {option.values.map((value) => {
+              const selected = selectedOptions[option.name] === value.value;
+              return (
+                <button
+                  key={value.value}
+                  type="button"
+                  disabled={value.available === false}
+                  aria-pressed={selected}
+                  onClick={() => onSelect(option.name, value.value)}
+                  className={`min-h-11 rounded-lg border px-3 text-sm font-semibold focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand disabled:cursor-not-allowed disabled:opacity-40 ${
+                    selected
+                      ? 'border-brand bg-brand-soft text-brand-strong'
+                      : 'border-[#e6dcd3] bg-white text-brand-ink hover:border-brand'
+                  }`}
+                >
+                  {value.label}
+                </button>
+              );
+            })}
+          </div>
+        </fieldset>
+      ))}
+    </div>
+  );
+}
 
-    setAddedToast(true);
-    setTimeout(() => setAddedToast(false), 5000);
-    if (openDrawer) openDrawer();
-  };
-
-  const handleBuyNow = () => {
-    if (!canPurchase) return;
-    handleAddToCart();
-    navigate('/carrito');
-  };
+function ProductInfoBlocks({ product }: { product: Product }) {
+  const { t, isEn } = useTranslation();
 
   const purchaseHighlights = [
     { Icon: Clock, title: t.product.highlights.deliveryTitle, desc: t.product.highlights.deliveryDesc },
@@ -182,513 +226,478 @@ export default function ProductPage() {
     { Icon: Truck, title: t.product.highlights.shippingTitle, desc: t.product.highlights.shippingDesc },
   ];
 
-  const specsList = [
+  const specsList = product.tagStudio ? [
     { label: t.product.specs.material, value: t.product.specs.materialVal },
     { label: t.product.specs.size, value: t.product.specs.sizeVal },
     { label: t.product.specs.thickness, value: t.product.specs.thicknessVal },
     { label: t.product.specs.engraving, value: t.product.specs.engravingVal },
     { label: t.product.specs.text, value: t.product.specs.textVal },
-  ];
+  ] : [];
 
-  const accordionSections = [
-    { id: 'desc', title: t.product.description, content: t.product.details.descriptionContent },
-    { id: 'shipping', title: t.product.shippingReturns, content: t.product.details.shippingContent },
-    { id: 'sizing', title: t.product.sizingFit, content: t.product.details.sizingContent },
-    { id: 'care', title: t.product.materialsCare, content: t.product.details.materialsContent },
+  const details = [
+    { title: t.product.description, content: t.product.details.descriptionContent },
+    { title: t.product.shippingReturns, content: t.product.details.shippingContent },
+    { title: t.product.sizingFit, content: t.product.details.sizingContent },
+    { title: t.product.materialsCare, content: t.product.details.materialsContent },
   ];
-
-  const localizedDescription = product.handle === 'golden-cat'
-    ? (isEn
-        ? 'Deeply laser-engraved 316L surgical stainless steel pet ID tag. Includes reinforced split ring for immediate attachment.'
-        : 'Placa identificativa grabada con láser en acero quirúrgico 316L con acabados de alta gama y anilla de unión reforzada.')
-    : product.description;
 
   return (
-    <div className="mx-auto max-w-[1440px] px-4 py-5 sm:px-6 sm:py-8 lg:px-10">
-      {/* Breadcrumb Navigation */}
-      <nav aria-label="Breadcrumb navigation" className="mb-5 flex items-center gap-1.5 text-xs text-brand-ink/65 sm:text-sm">
-        <Link to="/" className="hover:text-brand-strong hover:underline transition-colors">{t.nav.home}</Link>
-        <span aria-hidden="true" className="text-brand-ink/40">/</span>
-        {collection && (
-          <>
-            <Link to={`/coleccion/${collection.handle}`} className="hover:text-brand-strong hover:underline transition-colors">
-              {collection.title}
-            </Link>
-            <span aria-hidden="true" className="text-brand-ink/40">/</span>
-          </>
-        )}
-        <span aria-current="page" className="font-semibold text-brand-ink">{product.title}</span>
-      </nav>
-
-      {/* SPLIT LAYOUT (Sticky Viewer on Left / Continuous Customizer on Right) */}
-      <div className="grid items-start gap-8 lg:grid-cols-[1.1fr_490px] xl:grid-cols-[1.15fr_530px] xl:gap-14">
-        
-        {/* COLUMNA IZQUIERDA: VISOR 3D & GALERÍA (STICKY DESKTOP) */}
-        <div className="lg:sticky lg:top-24 space-y-5">
-          {/* Main Visualizer Container */}
-          <div className="relative overflow-hidden rounded-3xl border border-[#e6dcd3] bg-gradient-to-b from-[#FBF8F5] to-[#F1EBE3] shadow-sm">
-            {/* Top Bar Badges & Controls */}
-            <div className="absolute inset-x-0 top-0 z-20 flex items-center justify-between p-3.5 sm:p-5 pointer-events-none">
-              <span className="pointer-events-auto inline-flex items-center gap-1.5 rounded-full border border-brand-ink/10 bg-white/90 px-3 py-1 text-xs font-bold text-brand-ink shadow-xs backdrop-blur-xs">
-                <ShieldCheck className="h-4 w-4 text-brand" />
-                {t.product.surgicalSteelBadge}
+    <div className="mt-6 space-y-6">
+      <ul className="grid gap-3 sm:grid-cols-3">
+        {purchaseHighlights.map((highlight) => {
+          const Icon = highlight.Icon;
+          return (
+            <li key={highlight.title} className="flex items-start gap-3 rounded-xl border border-[#e6dcd3] bg-white p-4">
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand-soft text-brand-strong">
+                <Icon aria-hidden="true" className="h-5 w-5" strokeWidth={1.8} />
               </span>
-
-              {selectedPhotoIndex === null && (
-                <div className="pointer-events-auto">
-                  <ViewToggle
-                    value={tagView}
-                    onChange={setTagView}
-                    className="flex overflow-hidden rounded-full border border-[#cfc4bb] bg-white text-xs font-bold shadow-xs"
-                    buttonClassName="px-3.5 py-1.5 text-brand-ink transition-colors"
-                    activeClassName="bg-brand text-white"
-                  />
-                </div>
-              )}
-            </div>
-
-            {/* Viewer Screen (Height controlled for responsive ergonomics) */}
-            <div className="h-[380px] sm:h-[480px] md:h-[540px] lg:h-[560px] xl:h-[600px] w-full flex items-center justify-center">
-              {selectedPhotoIndex !== null ? (
-                /* Foto seleccionada de la galería */
-                <img
-                  src={image(lifestylePhotos[selectedPhotoIndex].image)}
-                  alt={lifestylePhotos[selectedPhotoIndex].alt}
-                  className="h-full w-full object-contain p-4 transition-all duration-300"
-                />
-              ) : tagConfig ? (
-                /* Visor interactivo 3D / 2D */
-                <TagViewer
-                  config={tagConfig}
-                  value={tagStudioValue}
-                  view={tagView}
-                  side={tagSide}
-                  className="h-full w-full"
-                />
-              ) : (
-                <img
-                  src={image(productImage(product))}
-                  alt={product.title}
-                  className="h-full w-full object-contain p-6"
-                />
-              )}
-            </div>
-
-            {/* Bottom Bar: Face Toggle & Interactive Rotate Hint */}
-            {selectedPhotoIndex === null && tagConfig && (
-              <div className="absolute inset-x-0 bottom-0 z-20 flex items-center justify-between p-3.5 sm:p-5 pointer-events-none">
-                <span className="hidden sm:inline-flex items-center gap-1.5 text-[11px] font-medium text-brand-ink/60">
-                  <Sparkles className="h-3.5 w-3.5 text-brand" />
-                  {t.product.dragToRotate}
-                </span>
-
-                <div className="pointer-events-auto ml-auto flex items-center gap-2">
-                  <FaceToggle
-                    value={tagSide}
-                    onChange={setTagSide}
-                    className="flex overflow-hidden rounded-full border border-[#cfc4bb] bg-white text-xs font-semibold shadow-xs"
-                    buttonClassName="px-3.5 py-1.5 text-brand-ink transition-colors"
-                    activeClassName="bg-brand-soft text-brand-strong font-bold"
-                  />
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* Micro aviso de grabado */}
-          <p className="text-center text-xs text-brand-ink/65">
-            {t.product.livePreviewBadge}
-          </p>
-
-          {/* Galería de miniaturas y fotos de estilo de vida */}
-          <div className="flex items-center gap-2.5 overflow-x-auto py-1">
-            {/* Botón de acceso al visor 3D activo */}
-            {tagConfig && (
-              <button
-                type="button"
-                onClick={() => setSelectedPhotoIndex(null)}
-                className={`flex-none h-16 w-16 sm:h-20 sm:w-20 rounded-2xl border-2 p-1 text-center transition-all overflow-hidden ${
-                  selectedPhotoIndex === null
-                    ? 'border-brand ring-2 ring-brand/30 shadow-xs'
-                    : 'border-[#cfc4bb] hover:border-brand/50 bg-[#FAF7F2]'
-                }`}
-              >
-                <div className="h-full w-full rounded-xl bg-brand-cream/80 flex flex-col items-center justify-center p-1">
-                  <span className="text-[10px] font-bold text-brand uppercase tracking-wider">3D Live</span>
-                  <span className="text-[10px] text-brand-ink font-medium truncate w-full text-center">
-                    {tagStudioValue.name || 'Amber'}
-                  </span>
-                </div>
-              </button>
-            )}
-
-            {/* Fotos de mascotas reales */}
-            {lifestylePhotos.map((photo, index) => {
-              const active = selectedPhotoIndex === index;
-              return (
-                <button
-                  key={photo.image}
-                  type="button"
-                  onClick={() => setSelectedPhotoIndex(index)}
-                  className={`flex-none h-16 w-16 sm:h-20 sm:w-20 rounded-2xl border-2 transition-all overflow-hidden bg-brand-cream/50 ${
-                    active
-                      ? 'border-brand ring-2 ring-brand/30 shadow-xs'
-                      : 'border-[#cfc4bb] hover:border-brand/50'
-                  }`}
-                >
-                  <img
-                    src={image(photo.image)}
-                    alt={photo.alt}
-                    className="h-full w-full object-cover"
-                  />
-                </button>
-              );
-            })}
-          </div>
-
-          {/* ESPECIFICACIONES TÉCNICAS (Desktop Column) */}
-          <div className="hidden lg:block space-y-4 pt-4">
-            <div className="rounded-2xl border border-[#e6dcd3] bg-white p-5 shadow-xs">
-              <h3 className="font-display text-base font-bold text-brand-ink mb-4">
-                {t.product.tagSpecsTitle}
-              </h3>
-              <dl className="grid grid-cols-2 gap-4">
-                {specsList.map((spec) => (
-                  <div key={spec.label} className="flex items-start gap-2.5">
-                    <BadgeCheck className="h-4 w-4 text-brand shrink-0 mt-0.5" />
-                    <div>
-                      <dt className="text-xs font-semibold text-brand-ink/80">{spec.label}</dt>
-                      <dd className="text-xs text-brand-ink font-bold mt-0.5 leading-snug">{spec.value}</dd>
-                    </div>
-                  </div>
-                ))}
-              </dl>
-            </div>
-
-            {/* Acordeones informativos (Materiales, Envíos, Cuidados) */}
-            <div className="rounded-2xl border border-[#e6dcd3] bg-white divide-y divide-[#f0eae4] overflow-hidden shadow-xs">
-              {accordionSections.map((acc) => {
-                const isOpen = openAccordion === acc.id;
-                return (
-                  <div key={acc.id} className="p-4 sm:p-5">
-                    <button
-                      type="button"
-                      onClick={() => setOpenAccordion(isOpen ? null : acc.id)}
-                      className="flex w-full items-center justify-between text-left font-display text-sm font-bold text-brand-ink hover:text-brand transition-colors"
-                    >
-                      <span>{acc.title}</span>
-                      <ChevronDown
-                        className={`h-4 w-4 text-brand-ink/60 transition-transform duration-200 ${
-                          isOpen ? 'rotate-180 text-brand' : ''
-                        }`}
-                      />
-                    </button>
-                    {isOpen && (
-                      <div className="mt-3 text-xs leading-6 text-brand-ink/75 whitespace-pre-line">
-                        {acc.content}
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        </div>
-
-        {/* COLUMNA DERECHA: CONFIGURACIÓN CONTINUA & COMPRA */}
-        <div className="space-y-6">
-          {/* Cabecera del producto */}
-          <div>
-            <div className="flex flex-wrap items-center gap-2.5">
-              <span className="rounded-full bg-brand-cream border border-[#e6dcd3] px-3 py-1 text-xs font-bold text-brand-strong">
-                {isEn ? 'Top Pick' : 'Más Vendido'}
+              <span>
+                <span className="block text-sm font-semibold text-brand-ink">{highlight.title}</span>
+                <span className="mt-1 block text-sm leading-6 text-brand-ink/70">{highlight.desc}</span>
               </span>
-              <div className="flex items-center gap-1.5 text-xs text-brand-ink/70">
-                <span className="text-amber-500 font-bold tracking-wider">★★★★★</span>
-                <a href="#reviews" className="underline font-semibold hover:text-brand">
-                  4.9 (128 {t.product.reviews})
-                </a>
-              </div>
-            </div>
+            </li>
+          );
+        })}
+      </ul>
 
-            <h1 className="mt-3 font-display text-3xl sm:text-4xl font-bold leading-tight text-brand-ink">
-              {product.title}
-            </h1>
-
-            {localizedDescription && (
-              <p className="mt-2 text-sm leading-6 text-brand-ink/75">
-                {localizedDescription}
-              </p>
-            )}
-
-            {/* Precio & Envío Gratis */}
-            <div className="mt-4 flex flex-wrap items-baseline gap-3">
-              <span className="font-display text-3xl font-bold text-brand-ink">
-                {formatPrice(product.priceFrom)}
-              </span>
-              <span className="text-xs font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-full">
-                {t.common.freeShippingNotice}
-              </span>
-            </div>
-          </div>
-
-          {/* CONFIGURADOR CONTINUO DE TAGS */}
-          {tagConfig && (
-            <TagStudio
-              config={tagConfig}
-              value={tagStudioValue}
-              onChange={setTagStudioValue}
-              onSideChange={(side) => setTagSide(side)}
-            />
-          )}
-
-          {/* BLOQUE DE COMPRA Y CANTIDAD */}
-          <div className="rounded-2xl border border-[#e6dcd3] bg-white p-4 sm:p-5 shadow-xs space-y-4">
-            <div className="flex items-center gap-3">
-              {/* Selector de cantidad */}
-              <div className="flex h-12 w-32 shrink-0 items-center justify-between rounded-xl border border-[#cfc4bb] bg-white px-2">
-                <button
-                  type="button"
-                  aria-label={t.product.decreaseQuantity}
-                  disabled={quantity <= 1}
-                  onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-                  className="flex h-8 w-8 items-center justify-center rounded-lg text-brand-ink hover:bg-brand-cream disabled:opacity-30 transition-colors"
-                >
-                  <Minus className="h-4 w-4" />
-                </button>
-                <span className="font-bold text-sm text-brand-ink">{quantity}</span>
-                <button
-                  type="button"
-                  aria-label={t.product.increaseQuantity}
-                  disabled={quantity >= 10}
-                  onClick={() => setQuantity((q) => Math.min(10, q + 1))}
-                  className="flex h-8 w-8 items-center justify-center rounded-lg text-brand-ink hover:bg-brand-cream disabled:opacity-30 transition-colors"
-                >
-                  <Plus className="h-4 w-4" />
-                </button>
-              </div>
-
-              {/* Botón principal: Añadir al carrito */}
-              <button
-                type="button"
-                onClick={handleAddToCart}
-                disabled={!canPurchase}
-                className="flex-1 h-12 inline-flex items-center justify-center gap-2 rounded-xl bg-brand px-6 text-sm sm:text-base font-bold text-white shadow-md hover:bg-brand-strong transition-all disabled:opacity-40 disabled:cursor-not-allowed"
-              >
-                <ShoppingBag className="h-5 w-5" />
-                <span>
-                  {t.product.addToCart} · {formatPrice(product.priceFrom * quantity)}
-                </span>
-              </button>
-            </div>
-
-            {/* Botón secundario: Comprar ahora */}
-            <button
-              type="button"
-              onClick={handleBuyNow}
-              disabled={!canPurchase}
-              className="w-full h-11 inline-flex items-center justify-center rounded-xl border-2 border-brand-ink/90 text-sm font-bold text-brand-ink hover:bg-brand-cream transition-colors disabled:opacity-40"
-            >
-              {isEn ? 'Buy Now with 1-Click' : 'Comprar ahora en 1 paso'}
-            </button>
-
-            {/* Feedback Toast de añadido */}
-            {addedToast && (
-              <div className="flex items-center justify-between rounded-xl bg-emerald-50 border border-emerald-200 p-3 text-xs text-emerald-800 animate-fade-in">
-                <span className="flex items-center gap-1.5 font-bold">
-                  <Check className="h-4 w-4 text-emerald-600" />
-                  {t.product.addedToCart}
-                </span>
-                <Link to="/carrito" className="font-bold underline hover:text-emerald-950">
-                  {t.common.viewCart} →
-                </Link>
-              </div>
-            )}
-          </div>
-
-          {/* BENEFICIOS DESTACADOS EN PÍLDORAS */}
-          <div className="grid grid-cols-3 gap-2 text-center">
-            {purchaseHighlights.map((item) => {
-              const Icon = item.Icon;
-              return (
-                <div key={item.title} className="rounded-xl border border-[#e6dcd3] bg-white p-3">
-                  <Icon className="h-5 w-5 text-brand mx-auto mb-1" />
-                  <span className="block text-[11px] font-bold text-brand-ink">{item.title}</span>
-                  <span className="mt-0.5 block text-[10px] text-brand-ink/65 leading-tight">{item.desc}</span>
-                </div>
-              );
-            })}
-          </div>
-
-          {/* ESPECIFICACIONES (Móvil / Tablet solamente) */}
-          <div className="block lg:hidden space-y-4 pt-2">
-            <div className="rounded-2xl border border-[#e6dcd3] bg-white p-4 shadow-xs">
-              <h3 className="font-display text-base font-bold text-brand-ink mb-3">
-                {t.product.tagSpecsTitle}
-              </h3>
-              <dl className="grid grid-cols-2 gap-3">
-                {specsList.map((spec) => (
-                  <div key={spec.label} className="flex items-start gap-2">
-                    <BadgeCheck className="h-4 w-4 text-brand shrink-0 mt-0.5" />
-                    <div>
-                      <dt className="text-xs font-semibold text-brand-ink/70">{spec.label}</dt>
-                      <dd className="text-xs text-brand-ink font-bold mt-0.5">{spec.value}</dd>
-                    </div>
-                  </div>
-                ))}
-              </dl>
-            </div>
-
-            <div className="rounded-2xl border border-[#e6dcd3] bg-white divide-y divide-[#f0eae4] overflow-hidden shadow-xs">
-              {accordionSections.map((acc) => {
-                const isOpen = openAccordion === acc.id;
-                return (
-                  <div key={acc.id} className="p-4">
-                    <button
-                      type="button"
-                      onClick={() => setOpenAccordion(isOpen ? null : acc.id)}
-                      className="flex w-full items-center justify-between text-left font-display text-sm font-bold text-brand-ink"
-                    >
-                      <span>{acc.title}</span>
-                      <ChevronDown
-                        className={`h-4 w-4 text-brand-ink/60 transition-transform ${isOpen ? 'rotate-180 text-brand' : ''}`}
-                      />
-                    </button>
-                    {isOpen && (
-                      <div className="mt-3 text-xs leading-6 text-brand-ink/75 whitespace-pre-line">
-                        {acc.content}
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* SECCIÓN INFERIOR 1: RESEÑAS VERIFICADAS */}
-      <section id="reviews" aria-labelledby="reviews-title" className="mt-16 pt-10 border-t border-[#e6dcd3]">
-        <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
-          <div>
-            <h2 id="reviews-title" className="font-display text-2xl sm:text-3xl font-bold text-brand-ink">
-              {t.product.customerReviews}
-            </h2>
-            <p className="mt-1 text-sm text-brand-ink/70">
-              {isEn ? '100% verified pet parent reviews and experiences.' : 'Opiniones de dueños de mascotas que ya disfrutan su placa Miaucraft.'}
-            </p>
-          </div>
-          <div className="flex items-center gap-2 rounded-2xl bg-brand-cream border border-[#e6dcd3] px-4 py-2">
-            <span className="text-2xl font-bold text-brand-ink">4.9</span>
-            <div>
-              <span className="text-amber-500 font-bold tracking-wider text-sm">★★★★★</span>
-              <p className="text-[11px] font-semibold text-brand-ink/70">128 {t.product.reviews}</p>
-            </div>
-          </div>
-        </div>
-
-        {/* Muro de Reseñas de muestra de clientes reales */}
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {[
-            {
-              author: 'Elena R. & Thor',
-              pet: 'Golden Retriever',
-              text: isEn
-                ? 'The gold finish looks even better in person than in the 3D viewer! The engraving is deep and sharp, Thor has been running in the mud and it remains shiny.'
-                : '¡El acabado dorado se ve aún más bonito en persona que en el visor 3D! El grabado es nítido y profundo, Thor se mete en charcos y sigue impecable.',
-              rating: 5,
-              date: 'Hace 3 días',
-            },
-            {
-              author: 'Carlos M. & Milo',
-              pet: 'Gato Siamés',
-              text: isEn
-                ? 'Super lightweight for my cat, does not bother his neck at all. The phone number on the back gives us total peace of mind.'
-                : 'Muy ligera para el cuello de mi gato, no le molesta nada. Tener nuestro teléfono grabado detrás nos da total tranquilidad.',
-              rating: 5,
-              date: 'Hace 1 semana',
-            },
-            {
-              author: 'Sarah W. & Luna',
-              pet: 'French Bulldog',
-              text: isEn
-                ? 'Rose gold matches her pink collar perfectly. Fast delivery and the split ring feels very solid and secure.'
-                : 'El oro rosa combina perfecto con su collar. Envío rápido y la anilla de unión es súper resistente, no se abre.',
-              rating: 5,
-              date: 'Hace 2 semanas',
-            },
-          ].map((rev) => (
-            <div key={rev.author} className="rounded-2xl border border-[#e6dcd3] bg-white p-5 shadow-xs">
-              <div className="flex items-center justify-between">
-                <span className="text-amber-500 font-bold text-sm tracking-wider">{'★'.repeat(rev.rating)}</span>
-                <span className="text-xs text-brand-ink/50">{rev.date}</span>
-              </div>
-              <p className="mt-3 text-xs leading-5 text-brand-ink/80 italic">"{rev.text}"</p>
-              <div className="mt-4 border-t border-[#f0eae4] pt-3 flex items-center justify-between text-xs">
-                <span className="font-bold text-brand-ink">{rev.author}</span>
-                <span className="text-brand-strong font-medium text-[11px] bg-brand-soft/50 px-2 py-0.5 rounded-full">{rev.pet}</span>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* SECCIÓN INFERIOR 2: PRODUCTOS RELACIONADOS */}
-      <section aria-labelledby="related-title" className="mt-16 pt-10 border-t border-[#e6dcd3]">
-        <h2 id="related-title" className="font-display text-2xl sm:text-3xl font-bold text-brand-ink">
-          {t.product.relatedProducts}
-        </h2>
-        <p className="mt-1 text-sm text-brand-ink/70">
-          {isEn ? 'Other handcrafted pet tags you might love.' : 'Otras siluetas y acabados que le encantarán a tu mascota.'}
-        </p>
-
-        <div className="mt-6 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-          {products
-            .filter((p) => p.handle !== product.handle && p.collections.includes('tag-cat'))
-            .slice(0, 4)
-            .map((item) => (
-              <div key={item.handle} className="rounded-2xl border border-[#e6dcd3] bg-white p-3 shadow-xs hover:border-brand transition-colors">
-                <Link to={`/producto/${item.handle}`} className="block aspect-square overflow-hidden rounded-xl bg-brand-cream/60">
-                  <img
-                    src={image(productImage(item))}
-                    alt={item.title}
-                    className="h-full w-full object-cover"
-                  />
-                </Link>
-                <div className="mt-3">
-                  <h3 className="font-bold text-sm text-brand-ink truncate">
-                    <Link to={`/producto/${item.handle}`} className="hover:text-brand transition-colors">
-                      {item.title}
-                    </Link>
-                  </h3>
-                  <p className="mt-1 text-sm font-bold text-brand-ink">{formatPrice(item.priceFrom)}</p>
+      {specsList.length > 0 && (
+        <section aria-labelledby="tag-specs-title" className="rounded-xl border border-[#e6dcd3] bg-white p-5">
+          <h3 id="tag-specs-title" className="font-display text-lg font-semibold text-brand-ink">
+            {t.product.tagSpecsTitle}
+          </h3>
+          <dl className="mt-4 grid gap-4 sm:grid-cols-2">
+            {specsList.map((spec) => (
+              <div key={spec.label} className="flex items-start gap-3">
+                <BadgeCheck aria-hidden="true" className="mt-0.5 h-5 w-5 shrink-0 text-brand" strokeWidth={1.8} />
+                <div>
+                  <dt className="text-sm font-semibold text-brand-ink">{spec.label}</dt>
+                  <dd className="text-sm leading-6 text-brand-ink/70">{spec.value}</dd>
                 </div>
               </div>
             ))}
-        </div>
-      </section>
+          </dl>
+        </section>
+      )}
 
-      {/* MOBILE STICKY ACTION BAR (Aparece fijo abajo en móviles) */}
-      <div className="fixed inset-x-0 bottom-0 z-40 lg:hidden border-t border-[#e6dcd3] bg-white/95 backdrop-blur-md px-4 py-3 shadow-xl">
-        <div className="flex items-center justify-between gap-3 max-w-md mx-auto">
-          <div className="min-w-0 flex-1">
-            <p className="truncate text-xs font-bold text-brand-ink">
-              {tagStudioValue.name.trim() || product.title} · {tagStudioValue.finish.replace('Custom ', '')}
-            </p>
-            <p className="text-sm font-bold text-brand-strong">
-              {formatPrice(product.priceFrom * quantity)}
-            </p>
-          </div>
-          <button
-            type="button"
-            onClick={handleAddToCart}
-            disabled={!canPurchase}
-            className="h-11 px-6 inline-flex items-center justify-center rounded-xl bg-brand text-sm font-bold text-white shadow-md hover:bg-brand-strong transition-all disabled:opacity-40"
-          >
-            {t.product.addToCartShort}
-          </button>
-        </div>
+      <div className="space-y-5">
+        {details.map((detail) => (
+          <section key={detail.title} aria-labelledby={`detail-${detail.title.replace(/\s+/g, '-')}`} className="border-t border-[#e6dcd3] pt-5">
+            <h3 id={`detail-${detail.title.replace(/\s+/g, '-')}`} className="font-display text-lg font-semibold text-brand-ink">
+              {detail.title}
+            </h3>
+            {detail.content.split('\n\n').map((paragraph) => (
+              <p key={paragraph} className="mt-3 text-sm leading-7 text-brand-ink/75 first:mt-2">
+                {paragraph}
+              </p>
+            ))}
+          </section>
+        ))}
       </div>
     </div>
   );
+}
+
+function ProductDetails({
+  product,
+  tagStudioValue,
+  setTagStudioValue,
+  selectedOptions,
+  setSelectedOptions,
+  added,
+  setAdded,
+}: {
+  product: Product;
+  tagStudioValue: TagStudioValue;
+  setTagStudioValue: (value: TagStudioValue) => void;
+  selectedOptions: Record<string, string>;
+  setSelectedOptions: (value: Record<string, string>) => void;
+  added: boolean;
+  setAdded: (value: boolean) => void;
+}) {
+  const { t, formatPrice, isEn } = useTranslation();
+  const { addLine } = useCart();
+  const navigate = useNavigate();
+  const [quantity, setQuantity] = useState(1);
+  const [personalization, setPersonalization] = useState('');
+  const [personalizationStyle, setPersonalizationStyle] = useState('');
+  const tagStudioReady = Boolean(
+    product.tagStudio
+      && tagStudioValue.design
+      && tagStudioValue.finish
+      && tagStudioValue.name.trim()
+      && tagStudioValue.font,
+  );
+  const canPurchase = !product.tagStudio || tagStudioReady;
+  const tagStudioOptions = product.tagStudio
+    ? {
+        [isEn ? 'Tag Design' : 'Diseño del tag']: tagStudioValue.design,
+        [isEn ? 'Finish' : 'Color']: product.tagStudio.finishes.find((finish) => finish.value === tagStudioValue.finish)?.label ?? tagStudioValue.finish,
+        [isEn ? 'Engraved Name' : 'Nombre grabado']: tagStudioValue.name.trim(),
+        [isEn ? 'Typography' : 'Tipografía']: tagStudioValue.font,
+        ...(product.tagStudio.phoneEnabled && tagStudioValue.phone.trim()
+          ? { [isEn ? 'Phone' : 'Teléfono']: tagStudioValue.phone.trim() }
+          : {}),
+      }
+    : {};
+  const cartOptions = {
+    ...selectedOptions,
+    ...(product.tagStudio
+      ? tagStudioOptions
+      : product.personalization && personalizationStyle
+      ? {
+          [product.personalization.label]: personalizationStyle,
+          ...(personalization.trim() ? { [t.product.engravedText]: personalization.trim() } : {}),
+        }
+      : {}),
+  };
+  const addConfiguredProduct = () => {
+    if (!canPurchase) return;
+    addLine({
+      handle: product.handle,
+      title: product.title,
+      unitPrice: product.priceFrom,
+      ...(Object.keys(cartOptions).length > 0 ? { options: cartOptions } : {}),
+    }, quantity);
+    setAdded(true);
+  };
+
+  const localizedDescription = product.handle === 'golden-cat'
+    ? (isEn
+        ? 'Surgical grade stainless steel cat ID tag with custom metallic finishes and personalized engraved text.'
+        : product.description)
+    : product.description;
+
+  return (
+    <section aria-labelledby="product-title">
+      <div className="flex flex-wrap items-center gap-2">
+        {product.badge && (
+          <span className="rounded-full bg-brand-soft px-2 py-1 text-[11px] font-bold text-brand-strong">
+            {product.badge}
+          </span>
+        )}
+        {product.rating !== undefined && product.reviewCount !== undefined && (
+          <div className="flex items-center gap-2 text-sm">
+            <span className="tracking-[2px] text-brand" aria-label={`${product.rating} de 5 estrellas`}>
+              {'★'.repeat(Math.round(product.rating))}
+              {'☆'.repeat(5 - Math.round(product.rating))}
+            </span>
+            <a href="#reviews" className="text-brand-ink/70 underline-offset-2 hover:underline">
+              {product.rating.toFixed(1)} ({product.reviewCount} {t.product.reviews})
+            </a>
+          </div>
+        )}
+        {product.personalization && !product.badge && (
+          <span className="rounded-full bg-brand-soft px-2 py-1 text-[11px] font-bold text-brand-strong">
+            {t.product.customizable}
+          </span>
+        )}
+      </div>
+
+      <h1 id="product-title" className="mt-3 font-display text-3xl font-bold leading-tight text-brand-ink sm:text-4xl">
+        {product.title}
+      </h1>
+      {localizedDescription && <p className="mt-3 text-sm leading-6 text-brand-ink/70">{localizedDescription}</p>}
+      <p className="mt-5 text-2xl font-bold text-brand-ink">{formatPrice(product.priceFrom)}</p>
+
+      {product.tagStudio ? (
+        <TagStudio
+          config={product.tagStudio}
+          value={tagStudioValue}
+          onChange={(value) => {
+            setTagStudioValue(value);
+            setAdded(false);
+          }}
+        />
+      ) : product.personalization ? (
+        <div className="mt-5">
+          <fieldset>
+            <legend className="mb-2 text-sm font-semibold text-brand-ink">
+              {product.personalization.label}
+            </legend>
+            {product.personalization.values && (
+              <div className="flex flex-wrap gap-2">
+                {product.personalization.values.map((value) => {
+                  const selected = personalizationStyle === value.value;
+                  return (
+                    <button
+                      key={value.value}
+                      type="button"
+                      aria-pressed={selected}
+                      onClick={() => {
+                        setPersonalizationStyle(value.value);
+                        setAdded(false);
+                      }}
+                      className={`min-h-10 rounded-full border px-3 text-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand ${
+                        selected
+                          ? 'border-brand bg-brand-soft text-brand-strong'
+                          : 'border-[#e6dcd3] bg-white text-brand-ink hover:border-brand'
+                      }`}
+                    >
+                      {value.label}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+          </fieldset>
+          <label htmlFor="product-personalization" className="mb-2 mt-3 block text-sm font-semibold text-brand-ink">
+            {t.product.engravedText}
+          </label>
+          <input
+            id="product-personalization"
+            type="text"
+            value={personalization}
+            onChange={(event) => {
+              setPersonalization(event.target.value);
+              setAdded(false);
+            }}
+            placeholder={t.product.writeName}
+            className="h-11 w-full rounded-lg border border-[#cfc4bb] bg-white px-3 text-sm text-brand-ink outline-none placeholder:text-[#6b6b6b] focus:border-brand focus:ring-2 focus:ring-brand/20"
+          />
+          {product.personalization.description && (
+            <p className="mt-1.5 text-xs text-brand-ink/70">{product.personalization.description}</p>
+          )}
+        </div>
+      ) : null}
+
+      {product.collections.includes('bandanas') && (
+        <section aria-labelledby="size-guide-title" className="mt-6">
+          <h2 id="size-guide-title" className="font-display text-lg font-semibold text-brand-ink">
+            {t.product.sizeGuide}
+          </h2>
+          <p className="mt-1 text-sm text-brand-ink/70">
+            {t.product.sizeGuideHelp}
+          </p>
+          <img
+            src={image('9_guia blog.png')}
+            alt=""
+            width={1200}
+            height={675}
+            loading="lazy"
+            className="mt-3 w-full rounded-xl object-cover"
+          />
+        </section>
+      )}
+
+      <div className="mt-5 flex items-center gap-2.5">
+        <div className="flex h-11 w-28 shrink-0 items-center justify-between rounded-lg border border-[#cfc4bb] bg-white px-2">
+          <button
+            type="button"
+            aria-label={t.product.decreaseQuantity}
+            disabled={quantity <= 1}
+            onClick={() => setQuantity((current) => Math.max(1, current - 1))}
+            className="flex h-8 w-8 items-center justify-center rounded text-brand-ink hover:bg-brand-cream disabled:opacity-40"
+          >
+            <Minus aria-hidden="true" className="h-4 w-4" />
+          </button>
+          <span aria-live="polite" className="min-w-5 text-center text-sm">{quantity}</span>
+          <button
+            type="button"
+            aria-label={t.product.increaseQuantity}
+            disabled={quantity >= 10}
+            onClick={() => setQuantity((current) => Math.min(10, current + 1))}
+            className="flex h-8 w-8 items-center justify-center rounded text-brand-ink hover:bg-brand-cream disabled:opacity-40"
+          >
+            <Plus aria-hidden="true" className="h-4 w-4" />
+          </button>
+        </div>
+        <button
+          type="button"
+          onClick={addConfiguredProduct}
+          disabled={!canPurchase}
+          className="inline-flex min-h-11 flex-1 items-center justify-center rounded-full bg-brand px-4 text-sm font-bold text-white hover:bg-brand-strong focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          <span className="sm:hidden">{t.product.addToCartShort} · {formatPrice(product.priceFrom)}</span>
+          <span className="hidden sm:inline">{t.product.addToCart} · {formatPrice(product.priceFrom)}</span>
+        </button>
+      </div>
+      <button
+        type="button"
+        onClick={() => {
+          addConfiguredProduct();
+          if (canPurchase) navigate('/carrito');
+        }}
+        disabled={!canPurchase}
+        className="mt-2 inline-flex min-h-11 w-full items-center justify-center rounded-full border border-brand-ink px-4 text-sm font-semibold text-brand-ink hover:bg-brand-cream focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand disabled:cursor-not-allowed disabled:opacity-50"
+      >
+        {isEn ? 'Buy Now' : 'Comprar ahora'}
+      </button>
+      {added && (
+        <p role="status" className="mt-3 text-sm font-medium text-brand-strong">
+          {t.product.addedToCart} <Link to="/carrito" className="underline">{t.product.viewCart}</Link>
+        </p>
+      )}
+    </section>
+  );
+}
+
+function ProductReviews({ product }: { product: Product }) {
+  const { t, isEn } = useTranslation();
+
+  return (
+    <section id="reviews" aria-labelledby="reviews-title" className="mt-12 grid gap-5 lg:grid-cols-[340px_minmax(0,1fr)] lg:gap-10">
+      <div className="rounded-[14px] border border-[#e6dcd3] bg-white p-5 sm:p-6">
+        <h2 id="reviews-title" className="font-display text-2xl font-semibold text-brand-ink">{t.product.customerReviews}</h2>
+        {product.rating !== undefined && product.reviewCount !== undefined ? (
+          <>
+            <div className="mt-3 flex items-center gap-3">
+              <span className="text-4xl font-bold text-brand-ink">{product.rating.toFixed(1)}</span>
+              <div>
+                <span className="tracking-[2px] text-brand" aria-hidden="true">
+                  {'★'.repeat(Math.round(product.rating))}
+                  {'☆'.repeat(5 - Math.round(product.rating))}
+                </span>
+                <p className="text-xs text-brand-ink/70">{product.reviewCount} {t.product.reviews}</p>
+              </div>
+            </div>
+            <p className="mt-4 text-sm text-brand-ink/70">
+              {isEn ? 'Verified customer ratings for this item.' : 'Opiniones de clientes sobre este producto.'}
+            </p>
+          </>
+        ) : (
+          <p className="mt-3 text-sm leading-6 text-brand-ink/70">
+            {isEn ? 'No reviews yet for this product.' : 'Todavía no hay reseñas para este producto.'}
+          </p>
+        )}
+      </div>
+      <div className="rounded-[14px] border border-[#e6dcd3] bg-white p-5 sm:p-6">
+        {product.rating !== undefined && product.reviewCount !== undefined ? (
+          <p className="text-sm text-brand-ink/70">
+            {isEn ? 'Verified customer reviews will appear here.' : 'Las opiniones verificadas aparecerán aquí.'}
+          </p>
+        ) : (
+          <div className="flex h-full min-h-24 items-center justify-center text-center text-sm text-brand-ink/70">
+            {isEn ? 'Share your experience once reviews are enabled.' : 'Comparte tu experiencia cuando las reseñas estén disponibles.'}
+          </div>
+        )}
+      </div>
+    </section>
+  );
+}
+
+function RelatedProducts({ product }: { product: Product }) {
+  const { t, formatPrice, isEn } = useTranslation();
+  const explicitRelated = (product.relatedHandles ?? [])
+    .map((handle) => products.find((item) => item.handle === handle))
+    .filter((item): item is Product => item !== undefined);
+  const sameCollection = products.filter(
+    (item) => item.handle !== product.handle && item.collections.some((collection) => product.collections.includes(collection)),
+  );
+  const related = [...explicitRelated, ...sameCollection]
+    .filter((item, index, all) => item.handle !== product.handle && all.findIndex((candidate) => candidate.handle === item.handle) === index)
+    .slice(0, 4);
+
+  if (related.length === 0) return null;
+
+  return (
+    <section aria-labelledby="related-title" className="mt-14">
+      <h2 id="related-title" className="font-display text-2xl font-bold text-brand-ink sm:text-[26px]">
+        {t.product.relatedProducts}
+      </h2>
+      <p className="mt-1 text-sm text-brand-ink/70">
+        {isEn ? 'Discover matching accessories for your pet.' : 'Descubre otros accesorios para tu mascota.'}
+      </p>
+      <ul className="mt-5 grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-4">
+        {related.map((item) => (
+          <li key={item.handle} className="rounded-[14px] border border-[#e6dcd3] bg-white p-2.5 sm:p-3.5">
+            <Link to={`/producto/${item.handle}`} className="block aspect-square overflow-hidden rounded-xl bg-brand-cream">
+              <img
+                src={image(productImage(item))}
+                alt=""
+                width={800}
+                height={800}
+                loading="lazy"
+                className="h-full w-full object-cover"
+              />
+            </Link>
+            <div className="px-0.5 py-2.5">
+              <h3 className="text-sm font-semibold text-brand-ink">
+                <Link to={`/producto/${item.handle}`} className="hover:text-brand-strong">{item.title}</Link>
+              </h3>
+              <p className="mt-0.5 text-sm font-bold text-brand-ink">{formatPrice(item.priceFrom)}</p>
+            </div>
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+}
+
+function ProductDetail({ product }: { product: Product }) {
+  const { t } = useTranslation();
+  const collection = collectionLinks.find((item) => product.collections.includes(item.handle));
+  const [tagStudioValue, setTagStudioValue] = useState<TagStudioValue>(() => ({
+    design: product.tagStudio?.defaultDesign ?? product.tagStudio?.designs[0]?.value ?? '',
+    finish: product.tagStudio?.defaultFinish ?? '',
+    name: '',
+    font: product.tagStudio?.defaultFont ?? product.tagStudio?.fonts[0]?.value ?? '',
+    phone: '',
+  }));
+  const [selectedOptions, setSelectedOptions] = useState<Record<string, string>>(() =>
+    Object.fromEntries((product.options ?? []).map((option) => [option.name, option.values[0]?.value ?? ''])),
+  );
+  const [added, setAdded] = useState(false);
+
+  return (
+    <div className="mx-auto max-w-[1440px] px-4 py-6 sm:px-6 sm:py-8 lg:px-10">
+      <nav aria-label="Breadcrumb navigation" className="mb-5 text-xs text-brand-ink/70 sm:text-sm">
+        <Link to="/" className="hover:text-brand-strong hover:underline">{t.nav.home}</Link>
+        {collection && (
+          <>
+            <span aria-hidden="true"> / </span>
+            <Link to={`/coleccion/${collection.handle}`} className="hover:text-brand-strong hover:underline">
+              {collection.title}
+            </Link>
+          </>
+        )}
+        <span aria-hidden="true"> / </span>
+        <span aria-current="page">{product.title}</span>
+      </nav>
+
+      <div className="grid items-start gap-7 md:gap-10 lg:grid-cols-[minmax(0,1fr)_440px] xl:gap-12">
+        <div className="lg:sticky lg:top-24">
+          <ProductGallery product={product} tagValue={tagStudioValue} />
+          <ProductOptions
+            product={product}
+            selectedOptions={selectedOptions}
+            onSelect={(name, value) => {
+              setSelectedOptions((current) => ({ ...current, [name]: value }));
+              setAdded(false);
+            }}
+          />
+          <ProductInfoBlocks product={product} />
+        </div>
+        <ProductDetails
+          key={product.handle}
+          product={product}
+          tagStudioValue={tagStudioValue}
+          setTagStudioValue={setTagStudioValue}
+          selectedOptions={selectedOptions}
+          setSelectedOptions={setSelectedOptions}
+          added={added}
+          setAdded={setAdded}
+        />
+      </div>
+
+      <ProductReviews product={product} />
+      <RelatedProducts product={product} />
+    </div>
+  );
+}
+
+export default function ProductPage() {
+  const { isEn } = useTranslation();
+  const { handle } = useParams();
+  const product = products.find((item) => item.handle === handle);
+
+  if (!product) {
+    return (
+      <StaticPage
+        title={isEn ? 'Product Not Found' : 'Producto no encontrado'}
+        body={isEn ? 'This product is no longer available.' : 'Este producto ya no está disponible.'}
+      />
+    );
+  }
+
+  return <ProductDetail key={product.handle} product={product} />;
 }

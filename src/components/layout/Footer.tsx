@@ -1,20 +1,6 @@
 import { Link } from 'react-router-dom';
-
-const shopLinks = [
-  { label: 'Bandanas', to: '/coleccion/bandanas' },
-  { label: 'Collares ID', to: '/coleccion/id-tags-anderson' },
-  { label: 'Tags', to: '/coleccion/tag-cat' },
-  { label: 'Accesorios' },
-];
-
-const helpLinks = ['Guía de tallas', 'Envíos', 'Devoluciones', 'Contacto'];
-
-const brandLinks = [
-  { label: 'Nosotros', to: '/nosotros' },
-  { label: 'Blog y guías', to: '/blog' },
-  { label: 'Instagram · TikTok' },
-  { label: 'Políticas' },
-];
+import { useTranslation } from '../../hooks/useTranslation';
+import LanguageSwitcher from './LanguageSwitcher';
 
 function FooterList({ items }: { items: { label: string; to?: string }[] }) {
   return (
@@ -29,24 +15,54 @@ function FooterList({ items }: { items: { label: string; to?: string }[] }) {
 }
 
 export default function Footer() {
+  const { t, isEn } = useTranslation();
+
+  const shopLinks = [
+    { label: t.nav.tags, to: '/coleccion/tag-cat' },
+    { label: t.nav.catTags, to: '/coleccion/tag-cat' },
+    { label: t.nav.dogTags, to: '/coleccion/id-tags-anderson' },
+    { label: t.nav.bandanas, to: '/coleccion/bandanas' },
+  ];
+
+  const helpLinks = [
+    { label: isEn ? 'Size Guide' : 'Guía de tallas', to: '/preguntas-frecuentes' },
+    { label: isEn ? 'Shipping Info' : 'Envíos', to: '/preguntas-frecuentes' },
+    { label: isEn ? 'Returns & Exchanges' : 'Devoluciones', to: '/preguntas-frecuentes' },
+    { label: isEn ? 'Contact Support' : 'Contacto', to: '/contacto' },
+  ];
+
+  const brandLinks = [
+    { label: t.nav.about, to: '/nosotros' },
+    { label: t.nav.blog, to: '/blog' },
+    { label: 'Instagram · TikTok' },
+  ];
+
   return (
-    <footer className="grid grid-cols-1 gap-8 bg-brand-ink px-10 py-12 text-[13px] text-white sm:grid-cols-2 md:grid-cols-[1.4fr_1fr_1fr_1fr] max-md:px-4 max-md:py-8">
-      <div>
-        <h4 className="mb-2.5 font-display text-sm font-bold">MIAUCRAFT</h4>
-        <p className="text-[#cfc8c2]">Accesorios para perros y gatos.</p>
-        <p className="mt-3 text-xs text-[#cfc8c2]">El formulario de novedades no está conectado en esta vista previa.</p>
+    <footer className="bg-brand-ink px-6 py-12 text-[13px] text-white md:px-10 max-md:py-8">
+      <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 md:grid-cols-[1.4fr_1fr_1fr_1fr]">
+        <div>
+          <h4 className="mb-2.5 font-display text-sm font-bold">MIAUCRAFT</h4>
+          <p className="text-[#cfc8c2]">{t.footer.tagline}</p>
+          <div className="mt-4 flex items-center gap-3">
+            <span className="text-xs text-[#cfc8c2]">{isEn ? 'Language:' : 'Idioma:'}</span>
+            <LanguageSwitcher />
+          </div>
+        </div>
+        <div>
+          <h4 className="mb-2.5 font-display text-sm font-bold">{t.footer.shop}</h4>
+          <FooterList items={shopLinks} />
+        </div>
+        <div>
+          <h4 className="mb-2.5 font-display text-sm font-bold">{t.footer.help}</h4>
+          <FooterList items={helpLinks} />
+        </div>
+        <div>
+          <h4 className="mb-2.5 font-display text-sm font-bold">{t.footer.company}</h4>
+          <FooterList items={brandLinks} />
+        </div>
       </div>
-      <div>
-        <h4 className="mb-2.5 font-display text-sm font-bold">Tienda</h4>
-        <FooterList items={shopLinks} />
-      </div>
-      <div>
-        <h4 className="mb-2.5 font-display text-sm font-bold">Ayuda</h4>
-        <FooterList items={helpLinks.map((label) => ({ label }))} />
-      </div>
-      <div>
-        <h4 className="mb-2.5 font-display text-sm font-bold">Marca</h4>
-        <FooterList items={brandLinks} />
+      <div className="mt-10 border-t border-white/10 pt-6 text-center text-xs text-[#cfc8c2]">
+        © {new Date().getFullYear()} Miaucraft. {t.footer.allRightsReserved}
       </div>
     </footer>
   );

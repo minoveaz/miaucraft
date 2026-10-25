@@ -1,65 +1,30 @@
 // Catálogo de demo extraído de Shopify (products.json); sustituir por Storefront API al conectar Shopify.
 import { tagDimensionsMm } from './tag-outlines';
+import type {
+  Product,
+  ProductMedia,
+  ProductOption,
+  ProductOptionValue,
+  ProductPersonalization,
+  ProductType,
+  TagDesign,
+  TagFinish,
+  TagFont,
+  TagStudioConfig,
+} from '../types/product';
 
-export interface Product {
-  handle: string;
-  title: string;
-  priceFrom: number;
-  collections: string[];
-  description?: string;
-  badge?: string;
-  rating?: number;
-  reviewCount?: number;
-  media?: ProductMedia[];
-  options?: ProductOption[];
-  tagStudio?: TagStudioConfig;
-  personalization?: {
-    label: string;
-    description?: string;
-    values?: { value: string; label: string }[];
-  };
-  purchaseHighlights?: string[];
-  details?: { title: string; content: string }[];
-  relatedHandles?: string[];
-}
-
-export interface ProductMedia {
-  image: string;
-  alt: string;
-}
-
-export interface ProductOption {
-  name: string;
-  label: string;
-  values: { value: string; label: string; available?: boolean }[];
-}
-
-export interface TagStudioConfig {
-  designs: {
-    value: string;
-    label: string;
-    shape: 'cat-head' | 'round' | 'bone' | 'paw';
-    image: string;
-    artwork: string;
-    nameSide: 'front' | 'back';
-  }[];
-  specs?: { label: string; value: string }[];
-  finishes: { value: string; label: string; baseImage?: string; sideColor?: string }[];
-  fonts: {
-    value: string;
-    label: string;
-    previewFontFamily: string;
-    previewFontWeight?: 'normal' | 'bold';
-    previewFontStyle?: 'normal' | 'italic';
-  }[];
-  defaultDesign?: string;
-  defaultFinish?: string;
-  defaultFont?: string;
-  maxNameLength?: number;
-  phoneEnabled?: boolean;
-  phoneMaxLength?: number;
-  finishSwatches?: Record<string, string>;
-}
+export type {
+  Product,
+  ProductMedia,
+  ProductOption,
+  ProductOptionValue,
+  ProductPersonalization,
+  ProductType,
+  TagDesign,
+  TagFinish,
+  TagFont,
+  TagStudioConfig,
+};
 
 const goldenCatFonts: TagStudioConfig['fonts'] = [
   { value: 'FT12', label: 'FT12', previewFontFamily: 'Georgia, serif' },

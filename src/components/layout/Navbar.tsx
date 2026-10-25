@@ -2,19 +2,12 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, NavLink } from 'react-router-dom';
 import { Menu, Search, ShoppingBag, UserRound, X } from 'lucide-react';
 import Logo from './Logo';
+import LanguageSwitcher from './LanguageSwitcher';
 import { useCart } from '../../lib/cart';
-import { formatPrice, productImage, products } from '../../lib/products';
+import { productImage, products } from '../../lib/products';
+import { useTranslation } from '../../hooks/useTranslation';
 
 const base = import.meta.env.BASE_URL;
-
-const navItems = [
-  { label: 'Home', to: '/' },
-  { label: 'Bandanas', to: '/coleccion/bandanas' },
-  { label: 'Collares ID', to: '/coleccion/id-tags-anderson' },
-  { label: 'Tags', to: '/coleccion/tag-cat' },
-  { label: 'Blog', to: '/blog' },
-  { label: 'Nosotros', to: '/nosotros' },
-];
 
 function NavigationLink({ label, to, onNavigate }: { label: string; to: string; onNavigate: () => void }) {
   return (
@@ -35,10 +28,22 @@ function NavigationLink({ label, to, onNavigate }: { label: string; to: string; 
 
 export default function Navbar() {
   const { count } = useCart();
+  const { t, formatPrice } = useTranslation();
   const [query, setQuery] = useState('');
   const [searchOpen, setSearchOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const headerRef = useRef<HTMLDivElement>(null);
+
+  const navItems = useMemo(() => [
+    { label: t.nav.home, to: '/' },
+    { label: t.nav.tags, to: '/coleccion/tag-cat' },
+    { label: t.nav.catTags, to: '/coleccion/tag-cat' },
+    { label: t.nav.dogTags, to: '/coleccion/id-tags-anderson' },
+    { label: t.nav.bandanas, to: '/coleccion/bandanas' },
+    { label: t.nav.about, to: '/nosotros' },
+    { label: t.nav.blog, to: '/blog' },
+  ], [t]);
+
   const matches = useMemo(() => {
     const normalized = query.trim().toLocaleLowerCase();
     if (!normalized) return [];
@@ -83,7 +88,7 @@ export default function Navbar() {
         ref={headerRef}
         className="sticky top-0 z-50 border-b border-[#e6dcd3] bg-white shadow-[0_1px_4px_rgba(16,16,16,0.04)]"
       >
-        <div className="relative flex h-14 items-center gap-2 px-3 sm:gap-3 sm:px-5 md:h-[76px] md:justify-between md:gap-8 md:px-10">
+        <div className="relative flex h-14 items-center gap-2 px-3 sm:gap-3 sm:px-5 md:h-[76px] md:justify-between md:gap-6 md:px-10">
           <button
             type="button"
             aria-label={mobileMenuOpen ? 'Cerrar menú' : 'Abrir menú'}
@@ -99,7 +104,7 @@ export default function Navbar() {
               : <Menu aria-hidden="true" className="h-5 w-5" strokeWidth={1.8} />}
           </button>
           <Logo />
-          <div className="relative min-w-0 flex-1 md:max-w-[400px]">
+          <div className="relative min-w-0 flex-1 md:max-w-[360px] lg:max-w-[420px]">
             <Search aria-hidden="true" className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#6b6b6b]" />
             <input
               type="search"
@@ -116,24 +121,25 @@ export default function Navbar() {
               onKeyDown={(event) => {
                 if (event.key === 'Escape') setSearchOpen(false);
               }}
-              placeholder="Buscar"
-              aria-label="Buscar productos"
+              placeholder={t.nav.searchPlaceholder}
+              aria-label={t.nav.search}
               aria-expanded={searchOpen && query.trim().length > 0}
               className="h-9 w-full rounded-full border border-[#cfc4bb] bg-white pl-9 pr-2 text-xs text-brand-ink outline-none placeholder:text-[#6b6b6b] focus:border-brand sm:pr-3 sm:text-sm md:h-10 md:pl-10"
             />
           </div>
-          <div className="flex shrink-0 items-center gap-2 sm:gap-4">
-            <a
-              href="https://miaucraft.com/account"
-              aria-label="Mi cuenta en Miaucraft"
+          <div className="flex shrink-0 items-center gap-2 sm:gap-3 md:gap-4">
+            <LanguageSwitcher />
+            <Link
+              to="/cuenta"
+              aria-label={t.nav.account}
               onClick={() => setSearchOpen(false)}
               className="text-brand-ink hover:text-brand"
             >
               <UserRound aria-hidden="true" className="h-5 w-5" strokeWidth={1.8} />
-            </a>
+            </Link>
             <Link
               to="/carrito"
-              aria-label={`Carrito, ${count} artículos`}
+              aria-label={`${t.nav.cart}, ${count} items`}
               onClick={() => setSearchOpen(false)}
               className="relative text-brand-ink hover:text-brand"
             >
@@ -169,7 +175,7 @@ export default function Navbar() {
                 </Link>
               ))
             ) : (
-              <p className="px-3 py-4 text-sm text-brand-ink/70">No encontramos productos con ese nombre.</p>
+              <p className="px-3 py-4 text-sm text-brand-ink/70">{t.common.loading ? 'No results found.' : 'Sin resultados.'}</p>
             )}
           </div>
         )}

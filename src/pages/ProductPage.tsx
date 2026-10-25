@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { BadgeCheck, Clock, Minus, Plus, RotateCcw, Ruler, Truck, type LucideIcon } from 'lucide-react';
+import { BadgeCheck, Clock, Minus, Plus, RotateCcw, Ruler, ShieldCheck, Truck, type LucideIcon } from 'lucide-react';
 import { collectionLinks } from '../lib/navigation';
 import { productImage, products, type Product } from '../lib/products';
 import { useCart } from '../lib/cart';
@@ -19,40 +19,68 @@ type GallerySlot = { kind: 'tag' } | { kind: 'image'; image: string; alt: string
 
 // Name size relative to the tag's image height; shrinks for longer names.
 const nameFontSize = (name: string) => Math.max(0.07, Math.min(0.11, 0.11 - Math.max(0, name.length - 6) * 0.004));
-const phoneFontSize = (phoneText: string) =>
-  Math.max(0.046, Math.min(0.068, 0.068 - Math.max(0, phoneText.length - 10) * 0.0018));
+
+function wrapTextToLines(text: string, maxCharsPerLine = 19): string[] {
+  const words = text.trim().split(/\s+/).filter(Boolean);
+  if (words.length === 0) return [];
+  const lines: string[] = [];
+  let currentLine = '';
+
+  for (const word of words) {
+    if (!currentLine) {
+      currentLine = word;
+    } else if ((currentLine + ' ' + word).length <= maxCharsPerLine) {
+      currentLine += ' ' + word;
+    } else {
+      lines.push(currentLine);
+      currentLine = word;
+    }
+  }
+  if (currentLine) {
+    lines.push(currentLine);
+  }
+  return lines;
+}
+
+const clampFontSize = (desired: number, text: string) => {
+  const maxAllowable = 0.62 / Math.max(1, text.length * 0.56);
+  return Math.min(desired, maxAllowable);
+};
 
 function TagViewer({
   config,
   value,
   view,
   side,
+  showSafeZone = false,
   className,
 }: {
   config: TagStudioConfig;
   value: TagStudioValue;
   view: ViewMode;
   side: ProductFace;
+  showSafeZone?: boolean;
   className?: string;
 }) {
   const design = config.designs.find((item) => item.value === value.design) ?? config.designs[0];
   const font = config.fonts.find((item) => item.value === value.font) ?? config.fonts[0];
   const name = value.name.trim();
-  const phone = value.phone.trim();
   const finish = config.finishes.find((item) => item.value === value.finish);
   const engravingColor = '#292622';
+
   const nameLayer: Layer = {
     id: 'name',
     type: 'text',
-    text: name || 'Text here',
+    text: name || 'Amber',
     x: 0.5,
     y: 0.6,
-    fontSize: nameFontSize(name || 'Text here'),
+    fontSize: nameFontSize(name || 'Amber'),
     fontFamily: font.previewFontFamily,
     fontWeight: font.previewFontWeight,
     fontStyle: font.previewFontStyle,
     color: name ? engravingColor : 'rgba(41, 38, 34, 0.35)',
   };
+
   const frontLayers: Layer[] = [
     {
       id: 'design',
@@ -66,88 +94,242 @@ function TagViewer({
     ...(design.nameSide === 'front' ? [nameLayer] : []),
   ];
 
-  // Reverso: si el diseño lleva el nombre atrás, lo mantiene; en caso estándar, graba nombre y teléfono de emergencia
+  // Zona segura de reverso: autoajuste multilínea y distribución de datos de contacto
+  const isFrontDesign = design.nameSide === 'front';
+  const includeNameOnBack = isFrontDesign ? Boolean(value.showNameOnBack) : true;
+
+  const rawContact1 = value.phone?.trim() ?? '';
+  const rawContact2 = value.contactLine2?.trim() ?? '';
+
+  const wrapped1 = wrapTextToLines(rawContact1, 19);
+  const wrapped2 = wrapTextToLines(rawContact2, 19);
+  const contactLines = [...wrapped1, ...wrapped2].slice(0, 4);
+
   const backLayers: Layer[] = [];
-  if (design.nameSide === 'back') {
-    backLayers.push(nameLayer);
-    if (phone) {
+
+  if (includeNameOnBack) {
+    const n = Math.min(contactLines.length, 3);
+    const nameY = n === 0 ? 0.56 : n === 1 ? 0.46 : n === 2 ? 0.42 : 0.39;
+    const nameScale = n === 0 ? 1 : n === 1 ? 0.88 : n === 2 ? 0.82 : 0.74;
+
+    backLayers.push({
+      id: 'back-name',
+      type: 'text',
+      text: name || 'Amber',
+      x: 0.5,
+      y: nameY,
+      fontSize: clampFontSize(nameFontSize(name || 'Amber') * nameScale, name || 'Amber'),
+      fontFamily: font.previewFontFamily,
+      fontWeight: font.previewFontWeight,
+      fontStyle: font.previewFontStyle,
+      color: name ? engravingColor : 'rgba(41, 38, 34, 0.35)',
+    });
+
+    if (n === 0) {
       backLayers.push({
-        id: 'phone',
+        id: 'back-contact-placeholder',
         type: 'text',
-        text: phone,
+        text: 'Tel / Contacto',
         x: 0.5,
-        y: 0.74,
-        fontSize: phoneFontSize(phone),
+        y: 0.68,
+        fontSize: 0.046,
+        fontFamily: font.previewFontFamily,
+        color: 'rgba(41, 38, 34, 0.28)',
+      });
+    } else if (n === 1) {
+      backLayers.push({
+        id: 'back-contact-0',
+        type: 'text',
+        text: contactLines[0],
+        x: 0.5,
+        y: 0.66,
+        fontSize: clampFontSize(0.055, contactLines[0]),
         fontFamily: font.previewFontFamily,
         fontWeight: font.previewFontWeight ?? 'normal',
         fontStyle: font.previewFontStyle,
         color: engravingColor,
+      });
+    } else if (n === 2) {
+      const ys = [0.58, 0.69];
+      contactLines.slice(0, 2).forEach((line, idx) => {
+        backLayers.push({
+          id: `back-contact-${idx}`,
+          type: 'text',
+          text: line,
+          x: 0.5,
+          y: ys[idx],
+          fontSize: clampFontSize(0.048, line),
+          fontFamily: font.previewFontFamily,
+          fontWeight: font.previewFontWeight ?? 'normal',
+          fontStyle: font.previewFontStyle,
+          color: engravingColor,
+        });
+      });
+    } else {
+      const ys = [0.51, 0.61, 0.71];
+      contactLines.slice(0, 3).forEach((line, idx) => {
+        backLayers.push({
+          id: `back-contact-${idx}`,
+          type: 'text',
+          text: line,
+          x: 0.5,
+          y: ys[idx],
+          fontSize: clampFontSize(0.042, line),
+          fontFamily: font.previewFontFamily,
+          fontWeight: font.previewFontWeight ?? 'normal',
+          fontStyle: font.previewFontStyle,
+          color: engravingColor,
+        });
       });
     }
   } else {
-    if (name) {
+    // Si el nombre ya está adelante, el reverso aprovecha el 100% de la zona segura para contacto
+    const n = contactLines.length;
+    if (n === 0) {
       backLayers.push({
-        id: 'back-name',
+        id: 'back-contact-placeholder',
         type: 'text',
-        text: name,
+        text: 'Datos de contacto / Teléfono',
         x: 0.5,
-        y: phone ? 0.46 : 0.56,
-        fontSize: phone ? nameFontSize(name) * 0.88 : nameFontSize(name),
+        y: 0.56,
+        fontSize: 0.054,
         fontFamily: font.previewFontFamily,
-        fontWeight: font.previewFontWeight,
-        fontStyle: font.previewFontStyle,
-        color: engravingColor,
+        color: 'rgba(41, 38, 34, 0.28)',
       });
-    }
-    if (phone) {
+    } else if (n === 1) {
       backLayers.push({
-        id: 'back-phone',
+        id: 'back-contact-0',
         type: 'text',
-        text: phone,
+        text: contactLines[0],
         x: 0.5,
-        y: name ? 0.66 : 0.56,
-        fontSize: phoneFontSize(phone),
+        y: 0.56,
+        fontSize: clampFontSize(0.065, contactLines[0]),
         fontFamily: font.previewFontFamily,
         fontWeight: font.previewFontWeight ?? 'normal',
         fontStyle: font.previewFontStyle,
         color: engravingColor,
       });
-    } else if (!name) {
-      backLayers.push({
-        id: 'back-placeholder',
-        type: 'text',
-        text: 'Tel / Contact Info',
-        x: 0.5,
-        y: 0.56,
-        fontSize: 0.058,
-        fontFamily: font.previewFontFamily,
-        color: 'rgba(41, 38, 34, 0.28)',
+    } else if (n === 2) {
+      const ys = [0.50, 0.64];
+      contactLines.forEach((line, idx) => {
+        backLayers.push({
+          id: `back-contact-${idx}`,
+          type: 'text',
+          text: line,
+          x: 0.5,
+          y: ys[idx],
+          fontSize: clampFontSize(0.056, line),
+          fontFamily: font.previewFontFamily,
+          fontWeight: font.previewFontWeight ?? 'normal',
+          fontStyle: font.previewFontStyle,
+          color: engravingColor,
+        });
+      });
+    } else if (n === 3) {
+      const ys = [0.45, 0.57, 0.69];
+      contactLines.forEach((line, idx) => {
+        backLayers.push({
+          id: `back-contact-${idx}`,
+          type: 'text',
+          text: line,
+          x: 0.5,
+          y: ys[idx],
+          fontSize: clampFontSize(0.048, line),
+          fontFamily: font.previewFontFamily,
+          fontWeight: font.previewFontWeight ?? 'normal',
+          fontStyle: font.previewFontStyle,
+          color: engravingColor,
+        });
+      });
+    } else {
+      const ys = [0.42, 0.52, 0.62, 0.72];
+      contactLines.forEach((line, idx) => {
+        backLayers.push({
+          id: `back-contact-${idx}`,
+          type: 'text',
+          text: line,
+          x: 0.5,
+          y: ys[idx],
+          fontSize: clampFontSize(0.042, line),
+          fontFamily: font.previewFontFamily,
+          fontWeight: font.previewFontWeight ?? 'normal',
+          fontStyle: font.previewFontStyle,
+          color: engravingColor,
+        });
       });
     }
   }
 
   return (
-    <ProductViewer
-      view={view}
-      source={{
-        baseImage: image(finish?.baseImage ?? 'tag-cats/base/tag-golden.png'),
-        sideColor: finish?.sideColor,
-        outline: tagOutline.map(([x, y]) => ({ x, y })),
-        hole: tagHole,
-        widthMm: tagDimensionsMm.width,
-        heightMm: tagDimensionsMm.height,
-        thicknessMm: tagDimensionsMm.thickness,
-      }}
-      frontLayers={frontLayers}
-      backLayers={backLayers}
-      side={side}
-      className={className}
-      label={`Tag ${design.label}, ${side === 'front' ? 'frontal' : 'reverso'}${name ? `, nombre ${name}` : ''}`}
-    />
+    <div className={`relative ${className ?? ''}`}>
+      <ProductViewer
+        view={view}
+        source={{
+          baseImage: image(finish?.baseImage ?? 'tag-cats/base/tag-golden.png'),
+          sideColor: finish?.sideColor,
+          outline: tagOutline.map(([x, y]) => ({ x, y })),
+          hole: tagHole,
+          widthMm: tagDimensionsMm.width,
+          heightMm: tagDimensionsMm.height,
+          thicknessMm: tagDimensionsMm.thickness,
+        }}
+        frontLayers={frontLayers}
+        backLayers={backLayers}
+        side={side}
+        className="h-full w-full"
+        label={`Tag ${design.label}, ${side === 'front' ? 'frontal' : 'reverso'}${name ? `, nombre ${name}` : ''}`}
+      />
+      {showSafeZone && side === 'back' && (
+        <div className="pointer-events-none absolute inset-0 flex items-center justify-center p-2">
+          <svg viewBox="0 0 100 100" className="h-full w-full max-h-full max-w-full">
+            <rect
+              x="18"
+              y="37"
+              width="64"
+              height="39"
+              rx="10"
+              fill="rgba(229, 44, 119, 0.05)"
+              stroke="#E52C77"
+              strokeWidth="0.9"
+              strokeDasharray="2.5 2"
+            />
+            <rect
+              x="30"
+              y="33.5"
+              width="40"
+              height="5"
+              rx="2.5"
+              fill="#C81E63"
+            />
+            <text
+              x="50"
+              y="37"
+              textAnchor="middle"
+              fontSize="2.7"
+              fontWeight="bold"
+              fill="#FFFFFF"
+              letterSpacing="0.06em"
+            >
+              ZONA SEGURA
+            </text>
+          </svg>
+        </div>
+      )}
+    </div>
   );
 }
 
-function ProductGallery({ product, tagValue }: { product: Product; tagValue: TagStudioValue }) {
+function ProductGallery({
+  product,
+  tagValue,
+  tagSide,
+  setTagSide,
+}: {
+  product: Product;
+  tagValue: TagStudioValue;
+  tagSide: ProductFace;
+  setTagSide: (side: ProductFace) => void;
+}) {
   const { t, isEn } = useTranslation();
   const photos = product.media ?? [{ image: productImage(product), alt: product.title }];
   const tagConfig = product.tagStudio;
@@ -157,7 +339,7 @@ function ProductGallery({ product, tagValue }: { product: Product; tagValue: Tag
   ];
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [tagView, setTagView] = useState<ViewMode>('2d');
-  const [tagSide, setTagSide] = useState<ProductFace>('front');
+  const [showSafeZone, setShowSafeZone] = useState(false);
   useEffect(() => setSelectedIndex(0), [tagValue.finish]);
   const selected = slots[selectedIndex] ?? slots[0];
   const slotKey = (slot: GallerySlot) => (slot.kind === 'tag' ? 'tag' : slot.image);
@@ -211,10 +393,25 @@ function ProductGallery({ product, tagValue }: { product: Product; tagValue: Tag
                 />
               </div>
               <div className="min-h-0 w-full flex-1">
-                <TagViewer config={tagConfig} value={tagValue} view={tagView} side={tagSide} className="h-full w-full" />
+                <TagViewer config={tagConfig} value={tagValue} view={tagView} side={tagSide} showSafeZone={showSafeZone} className="h-full w-full" />
               </div>
               {tagView === '2d' && (
-                <div className="flex shrink-0 justify-end pt-0.5 sm:pt-1">
+                <div className="flex shrink-0 items-center justify-between pt-0.5 sm:pt-1">
+                  {tagSide === 'back' ? (
+                    <button
+                      type="button"
+                      onClick={() => setShowSafeZone(!showSafeZone)}
+                      className={`flex items-center gap-1 rounded-full border px-2 py-0.5 sm:px-2.5 sm:py-1 text-[10px] sm:text-xs transition-all ${
+                        showSafeZone
+                          ? 'border-brand bg-brand-soft text-brand-strong font-semibold shadow-xs'
+                          : 'border-[#e6dcd3] bg-white/90 text-brand-ink/75 hover:border-brand/40'
+                      }`}
+                      aria-pressed={showSafeZone}
+                    >
+                      <ShieldCheck className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-brand" strokeWidth={2} />
+                      <span>{t.product.safeZoneToggle}</span>
+                    </button>
+                  ) : <div />}
                   <FaceToggle
                     value={tagSide}
                     onChange={setTagSide}
@@ -428,6 +625,8 @@ function ProductDetails({
   setSelectedOptions,
   added,
   setAdded,
+  tagSide,
+  setTagSide,
 }: {
   product: Product;
   tagStudioValue: TagStudioValue;
@@ -436,6 +635,8 @@ function ProductDetails({
   setSelectedOptions: (value: Record<string, string>) => void;
   added: boolean;
   setAdded: (value: boolean) => void;
+  tagSide: ProductFace;
+  setTagSide: (side: ProductFace) => void;
 }) {
   const { t, formatPrice, isEn } = useTranslation();
   const { addLine } = useCart();
@@ -458,7 +659,13 @@ function ProductDetails({
         [isEn ? 'Engraved Name' : 'Nombre grabado']: tagStudioValue.name.trim(),
         [isEn ? 'Typography' : 'Tipografía']: tagStudioValue.font,
         ...(product.tagStudio.phoneEnabled && tagStudioValue.phone.trim()
-          ? { [isEn ? 'Phone' : 'Teléfono']: tagStudioValue.phone.trim() }
+          ? { [isEn ? 'Phone / Line 1' : 'Teléfono / Línea 1']: tagStudioValue.phone.trim() }
+          : {}),
+        ...(product.tagStudio.phoneEnabled && tagStudioValue.contactLine2?.trim()
+          ? { [isEn ? 'Contact / Line 2' : 'Dirección / Línea 2']: tagStudioValue.contactLine2.trim() }
+          : {}),
+        ...(tagStudioValue.showNameOnBack
+          ? { [isEn ? 'Also engrave name on back' : 'Grabar también nombre en reverso']: isEn ? 'Yes' : 'Sí' }
           : {}),
       }
     : {};
@@ -539,6 +746,8 @@ function ProductDetails({
             setTagStudioValue(value);
             setAdded(false);
           }}
+          activeSide={tagSide}
+          onSideChange={setTagSide}
         />
       ) : product.personalization ? (
         <div className="mt-5">
@@ -764,7 +973,10 @@ function ProductDetail({ product }: { product: Product }) {
     name: '',
     font: product.tagStudio?.defaultFont ?? product.tagStudio?.fonts[0]?.value ?? '',
     phone: '',
+    contactLine2: '',
+    showNameOnBack: false,
   }));
+  const [tagSide, setTagSide] = useState<ProductFace>('front');
   const [selectedOptions, setSelectedOptions] = useState<Record<string, string>>(() =>
     Object.fromEntries((product.options ?? []).map((option) => [option.name, option.values[0]?.value ?? ''])),
   );
@@ -788,7 +1000,12 @@ function ProductDetail({ product }: { product: Product }) {
 
       <div className="grid items-start gap-8 lg:grid-cols-2 xl:gap-12">
         <div className="sticky top-14 z-30 -mx-4 border-b border-[#e6dcd3]/80 bg-white/95 px-4 pb-2.5 pt-2 shadow-[0_4px_12px_rgba(16,16,16,0.06)] backdrop-blur-md md:static md:mx-0 md:border-b-0 md:bg-transparent md:p-0 md:shadow-none lg:sticky lg:top-24">
-          <ProductGallery product={product} tagValue={tagStudioValue} />
+          <ProductGallery
+            product={product}
+            tagValue={tagStudioValue}
+            tagSide={tagSide}
+            setTagSide={setTagSide}
+          />
         </div>
         <div className="min-w-0 pt-2 md:pt-0">
           <ProductDetails
@@ -800,6 +1017,8 @@ function ProductDetail({ product }: { product: Product }) {
             setSelectedOptions={setSelectedOptions}
             added={added}
             setAdded={setAdded}
+            tagSide={tagSide}
+            setTagSide={setTagSide}
           />
           <ProductInfoBlocks product={product} />
         </div>

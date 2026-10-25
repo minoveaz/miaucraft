@@ -1,4 +1,5 @@
 import { useId } from 'react';
+import { ShieldCheck, RotateCcw } from 'lucide-react';
 import type { TagStudioConfig } from '../../lib/products';
 import { useTranslation } from '../../hooks/useTranslation';
 
@@ -11,15 +12,19 @@ export interface TagStudioValue {
   name: string;
   font: string;
   phone: string;
+  contactLine2?: string;
+  showNameOnBack?: boolean;
 }
 
 interface TagStudioProps {
   config: TagStudioConfig;
   value: TagStudioValue;
   onChange: (value: TagStudioValue) => void;
+  activeSide?: 'front' | 'back';
+  onSideChange?: (side: 'front' | 'back') => void;
 }
 
-export default function TagStudio({ config, value, onChange }: TagStudioProps) {
+export default function TagStudio({ config, value, onChange, activeSide = 'front', onSideChange }: TagStudioProps) {
   const { t, isEn } = useTranslation();
   const instanceId = useId().replace(/:/g, '');
   const design = config.designs.find((item) => item.value === value.design) ?? config.designs[0];
@@ -135,6 +140,7 @@ export default function TagStudio({ config, value, onChange }: TagStudioProps) {
             value={value.name}
             maxLength={config.maxNameLength}
             onChange={(event) => update({ name: event.target.value })}
+            onFocus={() => onSideChange?.('front')}
             placeholder={t.product.namePlaceholder}
             aria-describedby={`${instanceId}-name-help`}
             className="h-11 w-full rounded-lg border border-[#cfc4bb] bg-white px-3 text-sm text-brand-ink outline-none placeholder:text-[#6b6b6b] focus:border-brand focus:ring-2 focus:ring-brand/20"
@@ -148,8 +154,8 @@ export default function TagStudio({ config, value, onChange }: TagStudioProps) {
         </div>
 
         {config.phoneEnabled && (
-          <div>
-            <div className="mb-2 flex items-center justify-between">
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
               <label htmlFor={`${instanceId}-phone`} className="block text-sm font-semibold text-brand-ink">
                 {t.product.step4Phone}
               </label>
@@ -157,22 +163,76 @@ export default function TagStudio({ config, value, onChange }: TagStudioProps) {
                 {isEn ? 'Back side' : 'Reverso'}
               </span>
             </div>
-            <input
-              id={`${instanceId}-phone`}
-              type="text"
-              value={value.phone}
-              maxLength={config.phoneMaxLength}
-              onChange={(event) => update({ phone: event.target.value })}
-              placeholder={t.product.phonePlaceholder}
-              aria-describedby={`${instanceId}-phone-help`}
-              className="h-11 w-full rounded-lg border border-[#cfc4bb] bg-white px-3 text-sm text-brand-ink outline-none placeholder:text-[#6b6b6b] focus:border-brand focus:ring-2 focus:ring-brand/20"
-            />
-            <p id={`${instanceId}-phone-help`} className="mt-1.5 flex justify-between gap-2 text-xs text-brand-ink/70">
-              <span>{t.product.phoneHelp}</span>
-              <span className="shrink-0">
-                {value.phone.length}{config.phoneMaxLength ? ` / ${config.phoneMaxLength}` : ''}
-              </span>
-            </p>
+
+            {/* Si el diseño muestra el nombre adelante, permitir elegir si se graba también en el reverso */}
+            {design.nameSide === 'front' && (
+              <label className="flex items-start gap-2.5 rounded-lg border border-[#e6dcd3] bg-[#faf7f2]/80 p-2.5 text-xs text-brand-ink cursor-pointer hover:bg-[#faf7f2] transition-colors">
+                <input
+                  type="checkbox"
+                  checked={Boolean(value.showNameOnBack)}
+                  onChange={(event) => {
+                    update({ showNameOnBack: event.target.checked });
+                    onSideChange?.('back');
+                  }}
+                  className="mt-0.5 h-4 w-4 rounded border-[#cfc4bb] text-brand focus:ring-brand accent-brand cursor-pointer"
+                />
+                <div className="flex-1 leading-snug">
+                  <span className="font-semibold text-brand-ink">{t.product.showNameOnBackLabel}</span>
+                  <p className="mt-0.5 text-[11px] text-brand-ink/70">
+                    {isEn
+                      ? 'Off by default: leaves 100% of the back safe zone for emergency contact and address.'
+                      : 'Por defecto desactivado: deja el 100% de la zona segura trasera para teléfono y dirección.'}
+                  </p>
+                </div>
+              </label>
+            )}
+
+            <div className="space-y-2">
+              <div>
+                <input
+                  id={`${instanceId}-phone`}
+                  type="text"
+                  value={value.phone}
+                  maxLength={36}
+                  onChange={(event) => update({ phone: event.target.value })}
+                  onFocus={() => onSideChange?.('back')}
+                  placeholder={t.product.contactLine1Placeholder}
+                  aria-describedby={`${instanceId}-phone-help`}
+                  className="h-10 w-full rounded-lg border border-[#cfc4bb] bg-white px-3 text-sm text-brand-ink outline-none placeholder:text-[#6b6b6b] focus:border-brand focus:ring-2 focus:ring-brand/20"
+                />
+              </div>
+              <div>
+                <input
+                  id={`${instanceId}-contact2`}
+                  type="text"
+                  value={value.contactLine2 ?? ''}
+                  maxLength={40}
+                  onChange={(event) => update({ contactLine2: event.target.value })}
+                  onFocus={() => onSideChange?.('back')}
+                  placeholder={t.product.contactLine2Placeholder}
+                  className="h-10 w-full rounded-lg border border-[#cfc4bb] bg-white px-3 text-sm text-brand-ink outline-none placeholder:text-[#6b6b6b] focus:border-brand focus:ring-2 focus:ring-brand/20"
+                />
+              </div>
+            </div>
+
+            <div className="flex items-start justify-between gap-2 rounded-lg bg-brand-cream/80 p-2.5 text-xs text-brand-ink/80 border border-[#e6dcd3]">
+              <div className="flex items-start gap-1.5">
+                <ShieldCheck className="h-4 w-4 shrink-0 text-brand mt-0.5" strokeWidth={2} />
+                <p className="text-[11px] leading-relaxed text-brand-ink/80">
+                  {t.product.safeZoneNote}
+                </p>
+              </div>
+              {onSideChange && (
+                <button
+                  type="button"
+                  onClick={() => onSideChange(activeSide === 'back' ? 'front' : 'back')}
+                  className="shrink-0 flex items-center gap-1 font-semibold text-brand hover:text-brand-strong underline text-[11px] whitespace-nowrap pt-0.5"
+                >
+                  <RotateCcw className="h-3 w-3" />
+                  {activeSide === 'back' ? t.product.viewFrontSide : t.product.viewBackSide}
+                </button>
+              )}
+            </div>
           </div>
         )}
 

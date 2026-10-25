@@ -66,6 +66,13 @@ export interface I18nDictionary {
     step4Phone: string;
     phonePlaceholder: string;
     phoneHelp: string;
+    contactLine1Placeholder: string;
+    contactLine2Placeholder: string;
+    showNameOnBackLabel: string;
+    safeZoneNote: string;
+    safeZoneToggle: string;
+    viewBackSide: string;
+    viewFrontSide: string;
     step5Font: string;
     fontHelp: string;
     yourDesign: string;

@@ -264,16 +264,29 @@ export default function TagStudio({
     if (openFontPickerId === id) setOpenFontPickerId(null);
   };
 
+  const ensureSide = (id: string) => {
+    const item = currentEngravings.find((e) => e.id === id);
+    if (item && item.side) {
+      if (selectedFace !== item.side) {
+        setSelectedFace(item.side);
+      }
+      onSideChange?.(item.side);
+    }
+  };
+
   const updateZoneText = (id: string, text: string) => {
+    ensureSide(id);
     updateEngravings(currentEngravings.map((e) => (e.id === id ? { ...e, text } : e)));
   };
 
   const updateZoneFont = (id: string, font: string) => {
+    ensureSide(id);
     updateEngravings(currentEngravings.map((e) => (e.id === id ? { ...e, font } : e)));
   };
 
   // Fine-tuning position & formatting controls
   const adjustSize = (id: string, delta: number) => {
+    ensureSide(id);
     updateEngravings(
       currentEngravings.map((e) => {
         if (e.id !== id) return e;
@@ -285,6 +298,7 @@ export default function TagStudio({
   };
 
   const adjustY = (id: string, delta: number) => {
+    ensureSide(id);
     updateEngravings(
       currentEngravings.map((e) => {
         if (e.id !== id) return e;
@@ -296,6 +310,7 @@ export default function TagStudio({
   };
 
   const adjustX = (id: string, delta: number) => {
+    ensureSide(id);
     updateEngravings(
       currentEngravings.map((e) => {
         if (e.id !== id) return e;
@@ -307,18 +322,21 @@ export default function TagStudio({
   };
 
   const setXOffset = (id: string, value: number) => {
+    ensureSide(id);
     updateEngravings(
       currentEngravings.map((e) => (e.id === id ? { ...e, xOffset: value } : e)),
     );
   };
 
   const toggleUppercase = (id: string) => {
+    ensureSide(id);
     updateEngravings(
       currentEngravings.map((e) => (e.id === id ? { ...e, uppercase: !e.uppercase } : e)),
     );
   };
 
   const resetItemTransform = (id: string) => {
+    ensureSide(id);
     updateEngravings(
       currentEngravings.map((e) =>
         e.id === id
@@ -603,6 +621,12 @@ export default function TagStudio({
                         type="text"
                         value={item.text}
                         maxLength={32}
+                        onFocus={() => {
+                          if (selectedFace !== item.side) {
+                            setSelectedFace(item.side);
+                          }
+                          onSideChange?.(item.side);
+                        }}
                         onChange={(e) => updateZoneText(item.id, e.target.value)}
                         placeholder={zonePlaceholder(selectedFace, zone)}
                         className="h-10 w-full rounded-lg border border-[#cfc4bb] bg-white px-3 text-sm text-brand-ink outline-none placeholder:text-[#888] focus:border-brand focus:ring-2 focus:ring-brand/20"

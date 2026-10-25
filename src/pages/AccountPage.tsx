@@ -276,81 +276,90 @@ export default function AccountPage() {
     <div className="min-h-[80vh] bg-[#fbf9f6] py-8 sm:py-12">
       <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
         {/* Cabecera del Portal */}
-        <div className="rounded-2xl border border-[#e6dcd3] bg-white p-6 shadow-xs sm:p-8">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div className="flex items-center gap-4">
-              <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-brand-soft font-display text-lg font-bold text-brand-strong ring-4 ring-brand-cream">
-                {user.firstName.charAt(0)}
-                {user.lastName ? user.lastName.charAt(0) : ''}
-              </div>
-              <div>
-                <div className="flex flex-wrap items-center gap-2">
-                  <h1 className="font-display text-xl sm:text-2xl font-bold text-brand-ink">
-                    {t.account.welcomeBack}, {user.firstName}
-                  </h1>
-                  <span className="inline-flex items-center gap-1 rounded-full border border-brand-soft bg-brand-cream/60 px-2.5 py-0.5 text-[11px] font-bold text-brand-strong">
-                    <Sparkles className="h-3 w-3" />
-                    {t.account.memberBadge}
-                  </span>
+        <div className="rounded-2xl border border-[#e6dcd3] bg-white shadow-xs">
+          <div className="p-5 sm:p-8 pb-4 sm:pb-6">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div className="flex items-center gap-4">
+                <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-brand-soft font-display text-lg font-bold text-brand-strong ring-4 ring-brand-cream">
+                  {user.firstName.charAt(0)}
+                  {user.lastName ? user.lastName.charAt(0) : ''}
                 </div>
-                <p className="mt-0.5 text-xs text-brand-ink/65">
-                  {user.email}
-                  {user.catProfile && (
-                    <span className="ml-2 font-medium text-brand-strong">
-                      · {isEn ? 'Cat:' : 'Gato:'} {user.catProfile.catName} ({user.catProfile.breed})
+                <div>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <h1 className="font-display text-xl sm:text-2xl font-bold text-brand-ink">
+                      {t.account.welcomeBack}, {user.firstName}
+                    </h1>
+                    <span className="inline-flex items-center gap-1 rounded-full border border-brand-soft bg-brand-cream/60 px-2.5 py-0.5 text-[11px] font-bold text-brand-strong">
+                      <Sparkles className="h-3 w-3" />
+                      {t.account.memberBadge}
                     </span>
-                  )}
-                </p>
+                  </div>
+                  <p className="mt-0.5 text-xs text-brand-ink/65">
+                    {user.email}
+                    {user.catProfile && (
+                      <span className="ml-2 font-medium text-brand-strong">
+                        · {isEn ? 'Cat:' : 'Gato:'} {user.catProfile.catName} ({user.catProfile.breed})
+                      </span>
+                    )}
+                  </p>
+                </div>
               </div>
-            </div>
 
-            <button
-              type="button"
-              onClick={logout}
-              className="inline-flex min-h-9 items-center justify-center gap-1.5 rounded-full border border-[#cfc4bb] bg-white px-4 text-xs font-semibold text-brand-ink/80 shadow-2xs hover:border-red-300 hover:bg-red-50 hover:text-red-700 transition-colors self-start sm:self-auto"
-            >
-              <LogOut className="h-3.5 w-3.5" />
-              <span>{t.account.profile.logoutButton}</span>
-            </button>
+              <button
+                type="button"
+                onClick={logout}
+                className="inline-flex min-h-9 items-center justify-center gap-1.5 rounded-full border border-[#cfc4bb] bg-white px-4 text-xs font-semibold text-brand-ink/80 shadow-2xs hover:border-red-300 hover:bg-red-50 hover:text-red-700 transition-colors self-start sm:self-auto"
+              >
+                <LogOut className="h-3.5 w-3.5" />
+                <span>{t.account.profile.logoutButton}</span>
+              </button>
+            </div>
           </div>
 
-          {/* Navegación por Pestañas */}
-          <nav aria-label="Account Tabs" className="mt-6 flex flex-wrap gap-2 border-t border-[#e6dcd3] pt-4 sm:gap-3">
-            {[
-              { id: 'overview', label: t.account.tabs.overview, icon: UserRound },
-              { id: 'orders', label: t.account.tabs.orders, icon: Package, count: orders.length },
-              { id: 'addresses', label: t.account.tabs.addresses, icon: MapPin, count: user.addresses.length },
-              { id: 'wishlist', label: t.account.tabs.wishlist, icon: Heart, count: wishlist.length },
-              { id: 'profile', label: t.account.tabs.profile, icon: Settings },
-            ].map((tab) => {
-              const Icon = tab.icon;
-              const isActive = activeTab === tab.id;
-              return (
-                <button
-                  key={tab.id}
-                  type="button"
-                  onClick={() => handleTabChange(tab.id as typeof activeTab)}
-                  className={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-xs font-bold transition-all ${
-                    isActive
-                      ? 'bg-brand-strong text-white shadow-xs'
-                      : 'border border-[#e6dcd3] bg-white text-brand-ink/75 hover:bg-brand-cream hover:text-brand-ink'
-                  }`}
-                >
-                  <Icon className="h-3.5 w-3.5" />
-                  <span>{tab.label}</span>
-                  {tab.count !== undefined && (
-                    <span
-                      className={`ml-0.5 rounded-full px-1.5 py-0.2 text-[10px] font-bold ${
-                        isActive ? 'bg-white/20 text-white' : 'bg-brand-soft text-brand-strong'
-                      }`}
-                    >
-                      {tab.count}
-                    </span>
-                  )}
-                </button>
-              );
-            })}
-          </nav>
+          {/* Navegación por Pestañas: Underline Tabs en una sola fila con scroll horizontal limpio en móvil */}
+          <div className="border-t border-[#e6dcd3] px-4 sm:px-8 bg-brand-cream/20 rounded-b-2xl">
+            <nav
+              aria-label="Account Tabs"
+              className="-mb-px flex items-center gap-4 sm:gap-8 overflow-x-auto no-scrollbar scroll-smooth"
+            >
+              {[
+                { id: 'overview', label: t.account.tabs.overview, icon: UserRound },
+                { id: 'orders', label: t.account.tabs.orders, icon: Package, count: orders.length },
+                { id: 'addresses', label: t.account.tabs.addresses, icon: MapPin, count: user.addresses.length },
+                { id: 'wishlist', label: t.account.tabs.wishlist, icon: Heart, count: wishlist.length },
+                { id: 'profile', label: t.account.tabs.profile, icon: Settings },
+              ].map((tab) => {
+                const Icon = tab.icon;
+                const isActive = activeTab === tab.id;
+                return (
+                  <button
+                    key={tab.id}
+                    type="button"
+                    onClick={() => handleTabChange(tab.id as typeof activeTab)}
+                    className={`inline-flex shrink-0 items-center gap-2 border-b-2 py-3.5 text-xs sm:text-sm font-semibold transition-all ${
+                      isActive
+                        ? 'border-brand-strong text-brand-strong font-bold'
+                        : 'border-transparent text-brand-ink/65 hover:border-brand/40 hover:text-brand-ink'
+                    }`}
+                  >
+                    <Icon className={`h-4 w-4 ${isActive ? 'text-brand-strong' : 'text-brand-ink/50'}`} />
+                    <span className="whitespace-nowrap">{tab.label}</span>
+                    {tab.count !== undefined && (
+                      <span
+                        className={`rounded-full px-1.5 py-0.5 text-[10px] font-bold leading-none ${
+                          isActive
+                            ? 'bg-brand-soft text-brand-strong'
+                            : 'bg-[#e6dcd3]/60 text-brand-ink/70'
+                        }`}
+                      >
+                        {tab.count}
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
+            </nav>
+          </div>
         </div>
 
         {/* CONTENIDO DE CADA PESTAÑA */}

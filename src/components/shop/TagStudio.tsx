@@ -165,29 +165,53 @@ export default function TagStudio({ config, value, onChange }: TagStudioProps) {
         )}
 
         <fieldset>
-          <legend className="mb-2 text-sm font-semibold text-brand-ink">{t.product.step5Font}</legend>
-          <div className="flex items-center gap-3">
-            <select
-              id={`${instanceId}-font`}
-              value={value.font}
-              onChange={(event) => update({ font: event.target.value })}
-              className="h-11 min-w-0 flex-1 rounded-lg border border-[#cfc4bb] bg-white px-3 text-sm text-brand-ink outline-none focus:border-brand focus:ring-2 focus:ring-brand/20"
-            >
-              {config.fonts.map((option) => (
-                <option key={option.value} value={option.value}>{option.label}</option>
-              ))}
-            </select>
-            <span
-              aria-label={`Muestra de ${font.label}`}
-              className="max-w-28 truncate text-lg text-brand-ink"
-              style={{
-                fontFamily: font.previewFontFamily,
-                fontWeight: font.previewFontWeight ?? 'normal',
-                fontStyle: font.previewFontStyle ?? 'normal',
-              }}
-            >
-              {previewName}
+          <div className="mb-2 flex items-center justify-between">
+            <legend className="text-sm font-semibold text-brand-ink">
+              {t.product.step5Font}
+            </legend>
+            <span className="rounded-full bg-brand-soft px-2.5 py-0.5 text-xs font-bold text-brand-strong">
+              {font.label}
             </span>
+          </div>
+
+          <div className="max-h-[210px] overflow-y-auto rounded-xl border border-[#e6dcd3] bg-[#faf7f2]/50 p-2 pr-1.5">
+            <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+              {config.fonts.map((option) => {
+                const isSelected = value.font === option.value;
+                return (
+                  <button
+                    key={option.value}
+                    type="button"
+                    aria-label={`${option.label}: ${previewName}`}
+                    aria-pressed={isSelected}
+                    onClick={() => update({ font: option.value })}
+                    className={`group relative flex flex-col items-center justify-center rounded-xl border px-3 py-2.5 text-center transition-all ${
+                      isSelected
+                        ? 'border-brand bg-white shadow-xs ring-1.5 ring-brand'
+                        : 'border-[#e6dcd3] bg-white/80 hover:border-brand/40 hover:bg-white'
+                    }`}
+                  >
+                    <span
+                      className="block w-full truncate text-base leading-tight text-brand-ink sm:text-lg"
+                      style={{
+                        fontFamily: option.previewFontFamily,
+                        fontWeight: option.previewFontWeight ?? 'normal',
+                        fontStyle: option.previewFontStyle ?? 'normal',
+                      }}
+                    >
+                      {previewName}
+                    </span>
+                    <span
+                      className={`mt-1 block text-[10px] font-semibold uppercase tracking-wider ${
+                        isSelected ? 'font-bold text-brand-strong' : 'text-brand-ink/60'
+                      }`}
+                    >
+                      {option.label}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
           </div>
           <p className="mt-2 text-xs text-brand-ink/70">
             {t.product.fontHelp}

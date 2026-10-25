@@ -5,7 +5,13 @@ import { collectionLinks } from '../lib/navigation';
 import { productImage, products, type Product } from '../lib/products';
 import { useCart } from '../lib/cart';
 import { useTranslation } from '../hooks/useTranslation';
-import TagStudio, { type TagStudioValue } from '../components/shop/TagStudio';
+import TagStudio, {
+  type TagStudioValue,
+  type TagEngravingItem,
+  type TagSide,
+  type TagZone,
+  getInitialEngravings,
+} from '../components/shop/TagStudio';
 import { FaceToggle, ViewToggle, type Layer, type ProductFace, type ViewMode } from '@minoveaz/product-viewer';
 import { ProductViewer } from '../components/viewer/ProductViewer';
 import type { TagStudioConfig } from '../lib/products';
@@ -47,6 +53,109 @@ const clampFontSize = (desired: number, text: string) => {
   return Math.min(desired, maxAllowable);
 };
 
+function buildFaceLayers(
+  engravings: TagEngravingItem[],
+  face: TagSide,
+  fonts: TagStudioConfig['fonts'],
+  engravingColor = '#292622',
+): Layer[] {
+  const items = engravings.filter((item) => item.side === face && item.text.trim().length > 0);
+  if (items.length === 0) return [];
+
+  const topItem = items.find((i) => i.zone === 'top');
+  const centerItem = items.find((i) => i.zone === 'center');
+  const bottomItem = items.find((i) => i.zone === 'bottom');
+
+  const layers: Layer[] = [];
+
+  const hasTop = Boolean(topItem);
+  const hasCenter = Boolean(centerItem);
+  const hasBottom = Boolean(bottomItem);
+
+  let topY = 0.44;
+  let topSize = 0.055;
+  let centerY = 0.58;
+  let centerSize = 0.082;
+  let bottomY = 0.70;
+  let bottomSize = 0.052;
+
+  if (hasTop && hasCenter && hasBottom) {
+    topY = 0.42;
+    topSize = 0.048;
+    centerY = 0.56;
+    centerSize = 0.065;
+    bottomY = 0.70;
+    bottomSize = 0.046;
+  } else if (hasTop && hasCenter && !hasBottom) {
+    topY = 0.44;
+    topSize = 0.052;
+    centerY = 0.63;
+    centerSize = 0.076;
+  } else if (!hasTop && hasCenter && hasBottom) {
+    centerY = 0.52;
+    centerSize = 0.076;
+    bottomY = 0.68;
+    bottomSize = 0.052;
+  } else if (hasTop && !hasCenter && hasBottom) {
+    topY = 0.45;
+    topSize = 0.055;
+    bottomY = 0.68;
+    bottomSize = 0.055;
+  } else if (!hasTop && hasCenter && !hasBottom) {
+    centerY = 0.58;
+    centerSize = 0.088;
+  } else if (hasTop && !hasCenter && !hasBottom) {
+    topY = 0.46;
+    topSize = 0.068;
+  } else if (!hasTop && !hasCenter && hasBottom) {
+    bottomY = 0.67;
+    bottomSize = 0.062;
+  }
+
+  const renderItem = (item: TagEngravingItem, y: number, baseSize: number) => {
+    const fontConfig = fonts.find((f) => f.value === item.font) ?? fonts[0];
+    const wrapped = wrapTextToLines(item.text, 19);
+
+    if (wrapped.length <= 1) {
+      layers.push({
+        id: `${face}-${item.zone}-0`,
+        type: 'text',
+        text: item.text,
+        x: 0.5,
+        y,
+        fontSize: clampFontSize(baseSize, item.text),
+        fontFamily: fontConfig.previewFontFamily,
+        fontWeight: fontConfig.previewFontWeight,
+        fontStyle: fontConfig.previewFontStyle,
+        color: engravingColor,
+      });
+    } else {
+      const lineStep = 0.054;
+      const startY = y - ((wrapped.length - 1) * lineStep) / 2;
+      wrapped.forEach((line, idx) => {
+        layers.push({
+          id: `${face}-${item.zone}-${idx}`,
+          type: 'text',
+          text: line,
+          x: 0.5,
+          y: startY + idx * lineStep,
+          fontSize: clampFontSize(baseSize * 0.88, line),
+          fontFamily: fontConfig.previewFontFamily,
+          fontWeight: fontConfig.previewFontWeight ?? 'normal',
+          fontStyle: fontConfig.previewFontStyle,
+          color: engravingColor,
+        });
+      });
+    }
+  };
+
+  if (topItem) renderItem(topItem, topY, topSize);
+  if (centerItem) renderItem(centerItem, centerY, centerSize);
+  if (bottomItem) renderItem(bottomItem, bottomY, bottomSize);
+
+  return layers;
+}
+
 function TagViewer({
   config,
   value,
@@ -64,22 +173,20 @@ function TagViewer({
 }) {
   const design = config.designs.find((item) => item.value === value.design) ?? config.designs[0];
   const font = config.fonts.find((item) => item.value === value.font) ?? config.fonts[0];
-  const name = value.name.trim();
   const finish = config.finishes.find((item) => item.value === value.finish);
   const engravingColor = '#292622';
+  const isFrontDesign = design.nameSide === 'front';
 
-  const nameLayer: Layer = {
-    id: 'name',
-    type: 'text',
-    text: name || 'Amber',
-    x: 0.5,
-    y: 0.6,
-    fontSize: nameFontSize(name || 'Amber'),
-    fontFamily: font.previewFontFamily,
-    fontWeight: font.previewFontWeight,
-    fontStyle: font.previewFontStyle,
-    color: name ? engravingColor : 'rgba(41, 38, 34, 0.35)',
-  };
+  const engravings =
+    value.engravings && value.engravings.length > 0
+      ? value.engravings
+      : getInitialEngravings(value, design, config.defaultFont || 'FT12');
+
+  const frontTextLayers = isFrontDesign
+    ? buildFaceLayers(engravings, 'front', config.fonts, engravingColor)
+    : [];
+
+  const backTextLayers = buildFaceLayers(engravings, 'back', config.fonts, engravingColor);
 
   const frontLayers: Layer[] = [
     {
@@ -91,174 +198,26 @@ function TagViewer({
       width: 1,
       height: 1,
     },
-    ...(design.nameSide === 'front' ? [nameLayer] : []),
+    ...frontTextLayers,
   ];
 
-  // Zona segura de reverso: autoajuste multilínea y distribución de datos de contacto
-  const isFrontDesign = design.nameSide === 'front';
-  const includeNameOnBack = isFrontDesign ? Boolean(value.showNameOnBack) : true;
+  const backLayers: Layer[] =
+    backTextLayers.length > 0
+      ? backTextLayers
+      : [
+          {
+            id: 'back-placeholder',
+            type: 'text',
+            text: 'Datos de contacto',
+            x: 0.5,
+            y: 0.58,
+            fontSize: 0.054,
+            fontFamily: font.previewFontFamily,
+            color: 'rgba(41, 38, 34, 0.28)',
+          },
+        ];
 
-  const rawContact1 = value.phone?.trim() ?? '';
-  const rawContact2 = value.contactLine2?.trim() ?? '';
-
-  const wrapped1 = wrapTextToLines(rawContact1, 19);
-  const wrapped2 = wrapTextToLines(rawContact2, 19);
-  const contactLines = [...wrapped1, ...wrapped2].slice(0, 4);
-
-  const backLayers: Layer[] = [];
-
-  if (includeNameOnBack) {
-    const n = Math.min(contactLines.length, 3);
-    const nameY = n === 0 ? 0.56 : n === 1 ? 0.46 : n === 2 ? 0.42 : 0.39;
-    const nameScale = n === 0 ? 1 : n === 1 ? 0.88 : n === 2 ? 0.82 : 0.74;
-
-    backLayers.push({
-      id: 'back-name',
-      type: 'text',
-      text: name || 'Amber',
-      x: 0.5,
-      y: nameY,
-      fontSize: clampFontSize(nameFontSize(name || 'Amber') * nameScale, name || 'Amber'),
-      fontFamily: font.previewFontFamily,
-      fontWeight: font.previewFontWeight,
-      fontStyle: font.previewFontStyle,
-      color: name ? engravingColor : 'rgba(41, 38, 34, 0.35)',
-    });
-
-    if (n === 0) {
-      backLayers.push({
-        id: 'back-contact-placeholder',
-        type: 'text',
-        text: 'Tel / Contacto',
-        x: 0.5,
-        y: 0.68,
-        fontSize: 0.046,
-        fontFamily: font.previewFontFamily,
-        color: 'rgba(41, 38, 34, 0.28)',
-      });
-    } else if (n === 1) {
-      backLayers.push({
-        id: 'back-contact-0',
-        type: 'text',
-        text: contactLines[0],
-        x: 0.5,
-        y: 0.66,
-        fontSize: clampFontSize(0.055, contactLines[0]),
-        fontFamily: font.previewFontFamily,
-        fontWeight: font.previewFontWeight ?? 'normal',
-        fontStyle: font.previewFontStyle,
-        color: engravingColor,
-      });
-    } else if (n === 2) {
-      const ys = [0.58, 0.69];
-      contactLines.slice(0, 2).forEach((line, idx) => {
-        backLayers.push({
-          id: `back-contact-${idx}`,
-          type: 'text',
-          text: line,
-          x: 0.5,
-          y: ys[idx],
-          fontSize: clampFontSize(0.048, line),
-          fontFamily: font.previewFontFamily,
-          fontWeight: font.previewFontWeight ?? 'normal',
-          fontStyle: font.previewFontStyle,
-          color: engravingColor,
-        });
-      });
-    } else {
-      const ys = [0.51, 0.61, 0.71];
-      contactLines.slice(0, 3).forEach((line, idx) => {
-        backLayers.push({
-          id: `back-contact-${idx}`,
-          type: 'text',
-          text: line,
-          x: 0.5,
-          y: ys[idx],
-          fontSize: clampFontSize(0.042, line),
-          fontFamily: font.previewFontFamily,
-          fontWeight: font.previewFontWeight ?? 'normal',
-          fontStyle: font.previewFontStyle,
-          color: engravingColor,
-        });
-      });
-    }
-  } else {
-    // Si el nombre ya está adelante, el reverso aprovecha el 100% de la zona segura para contacto
-    const n = contactLines.length;
-    if (n === 0) {
-      backLayers.push({
-        id: 'back-contact-placeholder',
-        type: 'text',
-        text: 'Datos de contacto / Teléfono',
-        x: 0.5,
-        y: 0.56,
-        fontSize: 0.054,
-        fontFamily: font.previewFontFamily,
-        color: 'rgba(41, 38, 34, 0.28)',
-      });
-    } else if (n === 1) {
-      backLayers.push({
-        id: 'back-contact-0',
-        type: 'text',
-        text: contactLines[0],
-        x: 0.5,
-        y: 0.56,
-        fontSize: clampFontSize(0.065, contactLines[0]),
-        fontFamily: font.previewFontFamily,
-        fontWeight: font.previewFontWeight ?? 'normal',
-        fontStyle: font.previewFontStyle,
-        color: engravingColor,
-      });
-    } else if (n === 2) {
-      const ys = [0.50, 0.64];
-      contactLines.forEach((line, idx) => {
-        backLayers.push({
-          id: `back-contact-${idx}`,
-          type: 'text',
-          text: line,
-          x: 0.5,
-          y: ys[idx],
-          fontSize: clampFontSize(0.056, line),
-          fontFamily: font.previewFontFamily,
-          fontWeight: font.previewFontWeight ?? 'normal',
-          fontStyle: font.previewFontStyle,
-          color: engravingColor,
-        });
-      });
-    } else if (n === 3) {
-      const ys = [0.45, 0.57, 0.69];
-      contactLines.forEach((line, idx) => {
-        backLayers.push({
-          id: `back-contact-${idx}`,
-          type: 'text',
-          text: line,
-          x: 0.5,
-          y: ys[idx],
-          fontSize: clampFontSize(0.048, line),
-          fontFamily: font.previewFontFamily,
-          fontWeight: font.previewFontWeight ?? 'normal',
-          fontStyle: font.previewFontStyle,
-          color: engravingColor,
-        });
-      });
-    } else {
-      const ys = [0.42, 0.52, 0.62, 0.72];
-      contactLines.forEach((line, idx) => {
-        backLayers.push({
-          id: `back-contact-${idx}`,
-          type: 'text',
-          text: line,
-          x: 0.5,
-          y: ys[idx],
-          fontSize: clampFontSize(0.042, line),
-          fontFamily: font.previewFontFamily,
-          fontWeight: font.previewFontWeight ?? 'normal',
-          fontStyle: font.previewFontStyle,
-          color: engravingColor,
-        });
-      });
-    }
-  }
+  const mainName = value.name.trim() || 'Tag';
 
   return (
     <div className={`relative ${className ?? ''}`}>
@@ -277,9 +236,9 @@ function TagViewer({
         backLayers={backLayers}
         side={side}
         className="h-full w-full"
-        label={`Tag ${design.label}, ${side === 'front' ? 'frontal' : 'reverso'}${name ? `, nombre ${name}` : ''}`}
+        label={`Tag ${design.label}, ${side === 'front' ? 'frontal' : 'reverso'}${mainName ? `, ${mainName}` : ''}`}
       />
-      {showSafeZone && side === 'back' && (
+      {showSafeZone && (
         <div className="pointer-events-none absolute inset-0 flex items-center justify-center p-2">
           <svg viewBox="0 0 100 100" className="h-full w-full max-h-full max-w-full">
             <rect
@@ -293,24 +252,17 @@ function TagViewer({
               strokeWidth="0.9"
               strokeDasharray="2.5 2"
             />
-            <rect
-              x="30"
-              y="33.5"
-              width="40"
-              height="5"
-              rx="2.5"
-              fill="#C81E63"
-            />
-            <text
-              x="50"
-              y="37"
-              textAnchor="middle"
-              fontSize="2.7"
-              fontWeight="bold"
-              fill="#FFFFFF"
-              letterSpacing="0.06em"
-            >
-              ZONA SEGURA
+            <line x1="20" y1="48" x2="80" y2="48" stroke="#E52C77" strokeWidth="0.5" strokeDasharray="1.5 1.5" opacity="0.6" />
+            <line x1="20" y1="63" x2="80" y2="63" stroke="#E52C77" strokeWidth="0.5" strokeDasharray="1.5 1.5" opacity="0.6" />
+
+            <text x="80" y="44" textAnchor="end" fontSize="2.2" fontWeight="bold" fill="#C81E63" opacity="0.8">
+              ARRIBA
+            </text>
+            <text x="80" y="56" textAnchor="end" fontSize="2.2" fontWeight="bold" fill="#C81E63" opacity="0.8">
+              CENTRO
+            </text>
+            <text x="80" y="70" textAnchor="end" fontSize="2.2" fontWeight="bold" fill="#C81E63" opacity="0.8">
+              ABAJO
             </text>
           </svg>
         </div>
@@ -397,21 +349,19 @@ function ProductGallery({
               </div>
               {tagView === '2d' && (
                 <div className="flex shrink-0 items-center justify-between pt-0.5 sm:pt-1">
-                  {tagSide === 'back' ? (
-                    <button
-                      type="button"
-                      onClick={() => setShowSafeZone(!showSafeZone)}
-                      className={`flex items-center gap-1 rounded-full border px-2 py-0.5 sm:px-2.5 sm:py-1 text-[10px] sm:text-xs transition-all ${
-                        showSafeZone
-                          ? 'border-brand bg-brand-soft text-brand-strong font-semibold shadow-xs'
-                          : 'border-[#e6dcd3] bg-white/90 text-brand-ink/75 hover:border-brand/40'
-                      }`}
-                      aria-pressed={showSafeZone}
-                    >
-                      <ShieldCheck className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-brand" strokeWidth={2} />
-                      <span>{t.product.safeZoneToggle}</span>
-                    </button>
-                  ) : <div />}
+                  <button
+                    type="button"
+                    onClick={() => setShowSafeZone(!showSafeZone)}
+                    className={`flex items-center gap-1 rounded-full border px-2 py-0.5 sm:px-2.5 sm:py-1 text-[10px] sm:text-xs transition-all ${
+                      showSafeZone
+                        ? 'border-brand bg-brand-soft text-brand-strong font-semibold shadow-xs'
+                        : 'border-[#e6dcd3] bg-white/90 text-brand-ink/75 hover:border-brand/40'
+                    }`}
+                    aria-pressed={showSafeZone}
+                  >
+                    <ShieldCheck className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-brand" strokeWidth={2} />
+                    <span>{t.product.safeZoneToggle}</span>
+                  </button>
                   <FaceToggle
                     value={tagSide}
                     onChange={setTagSide}
@@ -644,31 +594,43 @@ function ProductDetails({
   const [quantity, setQuantity] = useState(1);
   const [personalization, setPersonalization] = useState('');
   const [personalizationStyle, setPersonalizationStyle] = useState('');
+  const hasEngravings =
+    (tagStudioValue.engravings && tagStudioValue.engravings.some((e) => e.text.trim().length > 0)) ||
+    Boolean(tagStudioValue.name.trim());
+
   const tagStudioReady = Boolean(
-    product.tagStudio
-      && tagStudioValue.design
-      && tagStudioValue.finish
-      && tagStudioValue.name.trim()
-      && tagStudioValue.font,
+    product.tagStudio && tagStudioValue.design && tagStudioValue.finish && hasEngravings,
   );
   const canPurchase = !product.tagStudio || tagStudioReady;
-  const tagStudioOptions = product.tagStudio
-    ? {
-        [isEn ? 'Tag Design' : 'Diseño del tag']: tagStudioValue.design,
-        [isEn ? 'Finish' : 'Color']: product.tagStudio.finishes.find((finish) => finish.value === tagStudioValue.finish)?.label ?? tagStudioValue.finish,
-        [isEn ? 'Engraved Name' : 'Nombre grabado']: tagStudioValue.name.trim(),
-        [isEn ? 'Typography' : 'Tipografía']: tagStudioValue.font,
-        ...(product.tagStudio.phoneEnabled && tagStudioValue.phone.trim()
-          ? { [isEn ? 'Phone / Line 1' : 'Teléfono / Línea 1']: tagStudioValue.phone.trim() }
-          : {}),
-        ...(product.tagStudio.phoneEnabled && tagStudioValue.contactLine2?.trim()
-          ? { [isEn ? 'Contact / Line 2' : 'Dirección / Línea 2']: tagStudioValue.contactLine2.trim() }
-          : {}),
-        ...(tagStudioValue.showNameOnBack
-          ? { [isEn ? 'Also engrave name on back' : 'Grabar también nombre en reverso']: isEn ? 'Yes' : 'Sí' }
-          : {}),
+
+  const tagStudioOptions: Record<string, string> = {};
+  if (product.tagStudio) {
+    tagStudioOptions[isEn ? 'Tag Design' : 'Diseño del tag'] = tagStudioValue.design;
+    tagStudioOptions[isEn ? 'Finish' : 'Color'] =
+      product.tagStudio.finishes.find((finish) => finish.value === tagStudioValue.finish)?.label ??
+      tagStudioValue.finish;
+
+    const activeEngravings = (tagStudioValue.engravings ?? []).filter((e) => e.text.trim().length > 0);
+    if (activeEngravings.length > 0) {
+      activeEngravings.forEach((e) => {
+        const sideLabel = e.side === 'front' ? (isEn ? 'Front' : 'Frontal') : (isEn ? 'Back' : 'Reverso');
+        const zoneLabel =
+          e.zone === 'top'
+            ? (isEn ? 'Top' : 'Superior')
+            : e.zone === 'center'
+            ? (isEn ? 'Center' : 'Centro')
+            : (isEn ? 'Bottom' : 'Inferior');
+        const fontName = product.tagStudio?.fonts.find((f) => f.value === e.font)?.label ?? e.font;
+        tagStudioOptions[`${sideLabel} (${zoneLabel})`] = `${e.text.trim()} [${fontName}]`;
+      });
+    } else if (tagStudioValue.name.trim()) {
+      tagStudioOptions[isEn ? 'Engraved Name' : 'Nombre grabado'] = tagStudioValue.name.trim();
+      tagStudioOptions[isEn ? 'Typography' : 'Tipografía'] = tagStudioValue.font;
+      if (tagStudioValue.phone.trim()) {
+        tagStudioOptions[isEn ? 'Phone' : 'Teléfono'] = tagStudioValue.phone.trim();
       }
-    : {};
+    }
+  }
   const cartOptions = {
     ...selectedOptions,
     ...(product.tagStudio
@@ -967,15 +929,25 @@ function RelatedProducts({ product }: { product: Product }) {
 function ProductDetail({ product }: { product: Product }) {
   const { t } = useTranslation();
   const collection = collectionLinks.find((item) => product.collections.includes(item.handle));
-  const [tagStudioValue, setTagStudioValue] = useState<TagStudioValue>(() => ({
-    design: product.tagStudio?.defaultDesign ?? product.tagStudio?.designs[0]?.value ?? '',
-    finish: product.tagStudio?.defaultFinish ?? '',
-    name: '',
-    font: product.tagStudio?.defaultFont ?? product.tagStudio?.fonts[0]?.value ?? '',
-    phone: '',
-    contactLine2: '',
-    showNameOnBack: false,
-  }));
+  const [tagStudioValue, setTagStudioValue] = useState<TagStudioValue>(() => {
+    const defaultDesign = product.tagStudio?.defaultDesign ?? product.tagStudio?.designs[0]?.value ?? '';
+    const defaultFinish = product.tagStudio?.defaultFinish ?? '';
+    const defaultFont = product.tagStudio?.defaultFont ?? product.tagStudio?.fonts[0]?.value ?? 'FT12';
+    const designObj = product.tagStudio?.designs.find((d) => d.value === defaultDesign) ?? { nameSide: 'front' as const };
+    const initialEngravings = getInitialEngravings(
+      { design: defaultDesign, finish: defaultFinish, name: 'Amber', font: defaultFont, phone: '' },
+      designObj,
+      defaultFont,
+    );
+    return {
+      design: defaultDesign,
+      finish: defaultFinish,
+      name: 'Amber',
+      font: defaultFont,
+      phone: '',
+      engravings: initialEngravings,
+    };
+  });
   const [tagSide, setTagSide] = useState<ProductFace>('front');
   const [selectedOptions, setSelectedOptions] = useState<Record<string, string>>(() =>
     Object.fromEntries((product.options ?? []).map((option) => [option.name, option.values[0]?.value ?? ''])),

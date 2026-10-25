@@ -153,8 +153,8 @@ export default function LoginPage() {
               </div>
               <p className="mt-0.5 text-xs text-brand-ink/75">
                 {isEn
-                  ? 'Explore orders, engraved tags, and address book as Valentina Ríos in 1 click.'
-                  : 'Explora pedidos, placas grabadas y libreta como Valentina Ríos en 1 clic.'}
+                  ? 'Explore active orders, engraved tags, and address book as Chloe Vance (San Francisco, CA) in 1 click.'
+                  : 'Explora pedidos en curso, placas grabadas y libreta como Chloe Vance (San Francisco, CA) en 1 clic.'}
               </p>
             </div>
             <button

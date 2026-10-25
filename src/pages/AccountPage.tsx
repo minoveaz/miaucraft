@@ -66,8 +66,8 @@ export default function AccountPage() {
     apartment: '',
     postalCode: '',
     city: '',
-    province: '',
-    country: 'ES',
+    province: 'California',
+    country: 'US',
     isDefaultShipping: false,
     isDefaultBilling: false,
   });
@@ -130,8 +130,8 @@ export default function AccountPage() {
       apartment: '',
       postalCode: '',
       city: '',
-      province: '',
-      country: 'ES',
+      province: 'California',
+      country: 'US',
       isDefaultShipping: user.addresses.length === 0,
       isDefaultBilling: user.addresses.length === 0,
     });

@@ -151,20 +151,17 @@ function ProductGallery({ product, tagValue }: { product: Product; tagValue: Tag
               <div className="min-h-0 w-full flex-1">
                 <TagViewer config={tagConfig} value={tagValue} view={tagView} side={tagSide} className="h-full w-full" />
               </div>
-              <div className="flex shrink-0 items-center justify-between pt-0.5 sm:pt-1">
-                <p className="text-[9px] sm:text-xs text-brand-ink/70">
-                  {t.product.livePreviewBadge}
-                </p>
-                {tagView === '2d' && (
+              {tagView === '2d' && (
+                <div className="flex shrink-0 justify-end pt-0.5 sm:pt-1">
                   <FaceToggle
                     value={tagSide}
                     onChange={setTagSide}
                     className="flex overflow-hidden rounded-full border border-[#e6dcd3] bg-white/90 text-[10px] sm:text-xs font-medium"
-                    buttonClassName="px-2 py-0.5 sm:px-3 sm:py-1 text-brand-ink/75 transition-colors"
+                    buttonClassName="px-2.5 py-0.5 sm:px-3 sm:py-1 text-brand-ink/75 transition-colors"
                     activeClassName="bg-brand-soft text-brand-strong font-semibold"
                   />
-                )}
-              </div>
+                </div>
+              )}
             </div>
           ) : (
             selected.kind === 'image' && (

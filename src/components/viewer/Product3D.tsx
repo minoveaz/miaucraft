@@ -1,11 +1,11 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Canvas, useThree } from '@react-three/fiber';
+import { Canvas, useThree, useFrame } from '@react-three/fiber';
 import { ContactShadows, OrbitControls, useGLTF } from '@react-three/drei';
 import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
 import * as THREE from 'three';
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
 import { composeArtwork, composeEngravingMask } from './compose';
-import type { Layer, ProductSource } from '@minoveaz/product-viewer';
+import type { Layer, ProductFace, ProductSource } from '@minoveaz/product-viewer';
 import { Minus, Plus, Rotate3d, RotateCcw } from 'lucide-react';
 import { useTranslation } from '../../hooks/useTranslation';
 
@@ -236,9 +236,111 @@ export interface Product3DProps {
   layers?: Layer[];
   frontLayers?: Layer[];
   backLayers?: Layer[];
+  side?: ProductFace;
   model?: Model3D;
   className?: string;
   label?: string;
+}
+
+/**
+ * Smoothly rotates the camera around the tag when switching faces or writing on front/back,
+ * using exponential damping (lerp) for silky movements while yielding instantly to manual orbiting.
+ */
+function SmoothFaceController({
+  side = 'front',
+  controlsRef,
+}: {
+  side: ProductFace;
+  controlsRef: React.RefObject<OrbitControlsImpl | null>;
+}) {
+  const camera = useThree((state) => state.camera);
+  const isInteracting = useRef(false);
+  const animating = useRef(false);
+  const targetThetaRef = useRef(side === 'back' ? Math.PI : 0);
+
+  // Monitor user manual dragging to yield immediately
+  useEffect(() => {
+    const controls = controlsRef.current;
+    if (!controls) return undefined;
+
+    const handleStart = () => {
+      isInteracting.current = true;
+      animating.current = false;
+    };
+    const handleEnd = () => {
+      isInteracting.current = false;
+    };
+
+    controls.addEventListener('start', handleStart);
+    controls.addEventListener('end', handleEnd);
+
+    return () => {
+      controls.removeEventListener('start', handleStart);
+      controls.removeEventListener('end', handleEnd);
+    };
+  }, [controlsRef]);
+
+  // Trigger smooth rotation when side changes
+  useEffect(() => {
+    targetThetaRef.current = side === 'back' ? Math.PI : 0;
+    animating.current = true;
+  }, [side]);
+
+  useFrame((_, delta) => {
+    if (!animating.current || isInteracting.current || !controlsRef.current) return;
+
+    const controls = controlsRef.current;
+    const cam = camera;
+    const target = controls.target;
+
+    const dx = cam.position.x - target.x;
+    const dy = cam.position.y - target.y;
+    const dz = cam.position.z - target.z;
+
+    const R = Math.sqrt(dx * dx + dy * dy + dz * dz);
+    if (R < 0.001) return;
+
+    const currentTheta = Math.atan2(dx, dz);
+    const currentPhi = Math.acos(Math.max(-1, Math.min(1, dy / R)));
+
+    const targetTheta = targetThetaRef.current;
+
+    // Calculate shortest angular difference on the circle
+    let diffTheta = targetTheta - currentTheta;
+    while (diffTheta > Math.PI) diffTheta -= 2 * Math.PI;
+    while (diffTheta < -Math.PI) diffTheta += 2 * Math.PI;
+
+    // Target polar angle: slight, natural vertical tilt (~88 degrees)
+    const targetPhi = Math.PI / 2 - 0.04;
+    const diffPhi = targetPhi - currentPhi;
+
+    // Settle when close enough
+    if (Math.abs(diffTheta) < 0.0025 && Math.abs(diffPhi) < 0.0025) {
+      cam.position.x = target.x + R * Math.sin(targetPhi) * Math.sin(targetTheta);
+      cam.position.y = target.y + R * Math.cos(targetPhi);
+      cam.position.z = target.z + R * Math.sin(targetPhi) * Math.cos(targetTheta);
+      cam.lookAt(target);
+      controls.update();
+      animating.current = false;
+      return;
+    }
+
+    // Smooth exponential damping (~0.45s fluid glide)
+    const damping = 5.2;
+    const stepTheta = diffTheta * (1 - Math.exp(-damping * delta));
+    const stepPhi = diffPhi * (1 - Math.exp(-damping * delta));
+
+    const nextTheta = currentTheta + stepTheta;
+    const nextPhi = currentPhi + stepPhi;
+
+    cam.position.x = target.x + R * Math.sin(nextPhi) * Math.sin(nextTheta);
+    cam.position.y = target.y + R * Math.cos(nextPhi);
+    cam.position.z = target.z + R * Math.sin(nextPhi) * Math.cos(nextTheta);
+    cam.lookAt(target);
+    controls.update();
+  });
+
+  return null;
 }
 
 export function Product3D({
@@ -246,6 +348,7 @@ export function Product3D({
   layers,
   frontLayers,
   backLayers,
+  side = 'front',
   model = { kind: 'extrude' },
   className,
   label = 'Vista 3D del producto',
@@ -290,6 +393,8 @@ export function Product3D({
         <StudioEnvironment />
         <ambientLight intensity={0.55} />
         <directionalLight position={[-width, height * 2, width * 2]} intensity={0.9} />
+        <directionalLight position={[width, height * 2, -width * 2]} intensity={0.8} />
+        <SmoothFaceController side={side} controlsRef={controlsRef} />
         {model.kind === 'glb' ? (
           <GlbObject url={model.url} />
         ) : (

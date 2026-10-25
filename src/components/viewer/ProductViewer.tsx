@@ -69,6 +69,7 @@ export function ProductViewer({
         layers={layers}
         frontLayers={frontLayers}
         backLayers={backLayers}
+        side={side}
         model={model}
         className={className}
         label={label}

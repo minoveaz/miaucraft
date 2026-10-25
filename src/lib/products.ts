@@ -140,7 +140,7 @@ export const products: Product[] = [
   {
     handle: 'golden-cat',
     title: 'Cat Tag',
-    priceFrom: 0.99,
+    priceFrom: 9.99,
     collections: ['id-tags-anderson', 'tag-cat'],
     description: 'Placa identificativa de acero inoxidable con diseño de gato, acabados metálicos y opciones de personalización.',
     tagStudio: goldenCatTagStudio,

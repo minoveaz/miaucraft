@@ -1,31 +1,16 @@
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
+import type { CartContextValue, CartLine } from '../types/cart';
 
-// Carrito local de demo. Se sustituye por el carrito de Shopify (Storefront API) al conectar la tienda.
-export interface CartLine {
-  handle: string;
-  title: string;
-  unitPrice: number;
-  quantity: number;
-  options?: Record<string, string>;
-}
+export type { CartLine, CartContextValue };
 
 export function cartLineKey(line: Pick<CartLine, 'handle' | 'options'>): string {
   const options = Object.entries(line.options ?? {}).sort(([left], [right]) => left.localeCompare(right));
   return `${line.handle}:${JSON.stringify(options)}`;
 }
 
-interface CartContextValue {
-  lines: CartLine[];
-  count: number;
-  subtotal: number;
-  addLine: (line: Omit<CartLine, 'quantity'>, quantity?: number) => void;
-  setQuantity: (lineKey: string, quantity: number) => void;
-  removeLine: (lineKey: string) => void;
-  clear: () => void;
-}
-
 const STORAGE_KEY = 'miaucraft-cart';
 const MAX_QUANTITY = 10;
+const FREE_SHIPPING_THRESHOLD = 50;
 
 const CartContext = createContext<CartContextValue | null>(null);
 
@@ -42,6 +27,7 @@ function readStoredCart(): CartLine[] {
 
 export function CartProvider({ children }: { children: ReactNode }) {
   const [lines, setLines] = useState<CartLine[]>(readStoredCart);
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
   useEffect(() => {
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(lines));
@@ -49,11 +35,26 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   const value = useMemo<CartContextValue>(() => {
     const clampQuantity = (quantity: number) => Math.min(MAX_QUANTITY, Math.max(1, Math.floor(quantity)));
+    const count = lines.reduce((total, line) => total + line.quantity, 0);
+    const subtotal = lines.reduce((total, line) => total + line.unitPrice * line.quantity, 0);
+    const remainingForFreeShipping = Math.max(0, FREE_SHIPPING_THRESHOLD - subtotal);
+    const hasFreeShipping = subtotal >= FREE_SHIPPING_THRESHOLD;
+    const freeShippingProgressPct = Math.min(100, Math.round((subtotal / FREE_SHIPPING_THRESHOLD) * 100));
+
     return {
       lines,
-      count: lines.reduce((total, line) => total + line.quantity, 0),
-      subtotal: lines.reduce((total, line) => total + line.unitPrice * line.quantity, 0),
-      addLine: (line, quantity = 1) =>
+      count,
+      subtotal,
+      currency: 'USD',
+      freeShippingThreshold: FREE_SHIPPING_THRESHOLD,
+      remainingForFreeShipping,
+      freeShippingProgressPct,
+      hasFreeShipping,
+      isDrawerOpen,
+      openDrawer: () => setIsDrawerOpen(true),
+      closeDrawer: () => setIsDrawerOpen(false),
+      toggleDrawer: () => setIsDrawerOpen((prev) => !prev),
+      addLine: (line, quantity = 1, openDrawerOnAdd = true) => {
         setLines((current) => {
           const key = cartLineKey(line);
           const existing = current.find((item) => cartLineKey(item) === key);
@@ -65,7 +66,11 @@ export function CartProvider({ children }: { children: ReactNode }) {
             );
           }
           return [...current, { ...line, quantity: clampQuantity(quantity) }];
-        }),
+        });
+        if (openDrawerOnAdd) {
+          setIsDrawerOpen(true);
+        }
+      },
       setQuantity: (lineKey, quantity) =>
         setLines((current) =>
           current.map((item) => (cartLineKey(item) === lineKey ? { ...item, quantity: clampQuantity(quantity) } : item)),
@@ -73,7 +78,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
       removeLine: (lineKey) => setLines((current) => current.filter((item) => cartLineKey(item) !== lineKey)),
       clear: () => setLines([]),
     };
-  }, [lines]);
+  }, [lines, isDrawerOpen]);
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
 }

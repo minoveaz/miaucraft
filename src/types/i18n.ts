@@ -92,6 +92,14 @@ export interface I18nDictionary {
     sizingFit: string;
     materialsCare: string;
     relatedProducts: string;
+    dragToRotate: string;
+    surgicalSteelBadge: string;
+    viewFront: string;
+    viewBack: string;
+    allShapes: string;
+    collapseShapes: string;
+    popularFonts: string;
+    backPhoneHelp: string;
     specs: {
       material: string;
       materialVal: string;

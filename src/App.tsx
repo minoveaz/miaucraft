@@ -6,8 +6,7 @@ import AboutPage from './pages/AboutPage';
 import CartPage from './pages/CartPage';
 import CheckoutPage from './pages/CheckoutPage';
 import ProductPage from './pages/ProductPage';
-import StaticPage from './pages/StaticPage';
-import { BlogPage, NotFoundPage } from './pages/StaticPages';
+import { BlogPage, ContactPage, FaqPage, NotFoundPage } from './pages/StaticPages';
 
 export default function App() {
   return (
@@ -20,14 +19,8 @@ export default function App() {
         <Route path="/checkout" element={<CheckoutPage />} />
         <Route path="/coleccion/:handle" element={<CollectionPage />} />
         <Route path="/producto/:handle" element={<ProductPage />} />
-        <Route
-          path="/preguntas-frecuentes"
-          element={<StaticPage title="Preguntas frecuentes" body="La información sobre pedidos, envíos, tallas y devoluciones todavía no está configurada en esta vista previa." />}
-        />
-        <Route
-          path="/contacto"
-          element={<StaticPage title="Contacto" body="Los canales de atención todavía no están configurados en esta vista previa." />}
-        />
+        <Route path="/preguntas-frecuentes" element={<FaqPage />} />
+        <Route path="/contacto" element={<ContactPage />} />
         <Route path="*" element={<NotFoundPage />} />
       </Route>
     </Routes>

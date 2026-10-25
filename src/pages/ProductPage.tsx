@@ -2,8 +2,9 @@ import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { BadgeCheck, Clock, Minus, Plus, RotateCcw, Truck, type LucideIcon } from 'lucide-react';
 import { collectionLinks } from '../lib/navigation';
-import { formatPrice, productImage, products, type Product } from '../lib/products';
+import { productImage, products, type Product } from '../lib/products';
 import { useCart } from '../lib/cart';
+import { useTranslation } from '../hooks/useTranslation';
 import TagStudio, { type TagStudioValue } from '../components/shop/TagStudio';
 import { FaceToggle, ProductViewer, ViewToggle, type Layer, type ProductFace, type ViewMode } from '@minoveaz/product-viewer';
 import type { TagStudioConfig } from '../lib/products';
@@ -84,6 +85,7 @@ function TagViewer({
 }
 
 function ProductGallery({ product, tagValue }: { product: Product; tagValue: TagStudioValue }) {
+  const { t } = useTranslation();
   const photos = product.media ?? [{ image: productImage(product), alt: product.title }];
   const tagConfig = product.tagStudio;
   const slots: GallerySlot[] = [
@@ -96,17 +98,17 @@ function ProductGallery({ product, tagValue }: { product: Product; tagValue: Tag
   useEffect(() => setSelectedIndex(0), [tagValue.finish]);
   const selected = slots[selectedIndex] ?? slots[0];
   const slotKey = (slot: GallerySlot) => (slot.kind === 'tag' ? 'tag' : slot.image);
-  const slotLabel = (slot: GallerySlot) => (slot.kind === 'tag' ? 'Mi tag personalizado' : slot.alt);
+  const slotLabel = (slot: GallerySlot) => (slot.kind === 'tag' ? t.product.myCustomTag : slot.alt);
 
   return (
-    <section aria-label={`Imágenes de ${product.title}`}>
+    <section aria-label={`Media for ${product.title}`}>
       <div className="grid gap-3 md:grid-cols-[72px_minmax(0,1fr)] lg:grid-cols-[84px_minmax(0,1fr)]">
         <div className="order-2 flex gap-2 overflow-x-auto md:order-1 md:h-[632px] md:flex-col md:overflow-y-auto lg:h-[728px]">
           {slots.map((slot, index) => (
             <button
               key={slotKey(slot)}
               type="button"
-              aria-label={`Ver ${slot.kind === 'tag' ? 'vista previa de tu tag' : `imagen ${index}`}: ${slotLabel(slot)}`}
+              aria-label={`View ${slot.kind === 'tag' ? t.product.myCustomTag : `image ${index}`}: ${slotLabel(slot)}`}
               aria-pressed={selectedIndex === index}
               onClick={() => setSelectedIndex(index)}
               className={`h-16 w-16 shrink-0 overflow-hidden rounded-lg border-2 bg-brand-cream focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand md:h-[72px] md:w-[72px] lg:h-[84px] lg:w-[84px] ${
@@ -149,7 +151,7 @@ function ProductGallery({ product, tagValue }: { product: Product; tagValue: Tag
                   />
                 )}
                 <p className="mt-1 text-center text-xs text-brand-ink/70">
-                  Vista previa orientativa; el grabado final puede variar.
+                  {t.product.livePreviewBadge}
                 </p>
               </div>
             </div>
@@ -215,52 +217,56 @@ function ProductOptions({
   );
 }
 
-function highlightIcon(text: string): { Icon: LucideIcon; title: string } {
-  const lower = text.toLowerCase();
-  if (lower.includes('entrega')) return { Icon: Clock, title: 'Entrega' };
-  if (lower.includes('devoluci')) return { Icon: RotateCcw, title: 'Devolución' };
-  if (lower.includes('envío') || lower.includes('envio')) return { Icon: Truck, title: 'Envío' };
-  return { Icon: BadgeCheck, title: 'Compra' };
-}
-
 function ProductInfoBlocks({ product }: { product: Product }) {
-  const purchaseHighlights = product.purchaseHighlights ?? [
-    'Envío gratis en pedidos superiores a $50',
-    'Política de devolución de 14 días',
+  const { t, isEn } = useTranslation();
+
+  const purchaseHighlights = [
+    { Icon: Clock, title: t.product.highlights.deliveryTitle, desc: t.product.highlights.deliveryDesc },
+    { Icon: RotateCcw, title: t.product.highlights.returnsTitle, desc: t.product.highlights.returnsDesc },
+    { Icon: Truck, title: t.product.highlights.shippingTitle, desc: t.product.highlights.shippingDesc },
   ];
-  const details = product.details ?? [
-    { title: 'Descripción', content: product.description ?? `Detalles de ${product.title}.` },
-    { title: 'Medidas y ajuste', content: 'Consulta las opciones disponibles de este producto.' },
-    { title: 'Materiales y cuidado', content: 'Consulta los detalles del producto antes de comprar.' },
-    { title: 'Envíos y devoluciones', content: 'Envío gratis en pedidos superiores a $50. Devoluciones durante los 14 días posteriores a la compra.' },
+
+  const specsList = product.tagStudio ? [
+    { label: t.product.specs.material, value: t.product.specs.materialVal },
+    { label: t.product.specs.size, value: t.product.specs.sizeVal },
+    { label: t.product.specs.thickness, value: t.product.specs.thicknessVal },
+    { label: t.product.specs.engraving, value: t.product.specs.engravingVal },
+    { label: t.product.specs.text, value: t.product.specs.textVal },
+  ] : [];
+
+  const details = [
+    { title: t.product.description, content: t.product.details.descriptionContent },
+    { title: t.product.shippingReturns, content: t.product.details.shippingContent },
+    { title: t.product.sizingFit, content: t.product.details.sizingContent },
+    { title: t.product.materialsCare, content: t.product.details.materialsContent },
   ];
 
   return (
     <div className="mt-6 space-y-6">
       <ul className="grid gap-3 sm:grid-cols-3">
         {purchaseHighlights.map((highlight) => {
-          const { Icon, title } = highlightIcon(highlight);
+          const Icon = highlight.Icon;
           return (
-            <li key={highlight} className="flex items-start gap-3 rounded-xl border border-[#e6dcd3] bg-white p-4">
+            <li key={highlight.title} className="flex items-start gap-3 rounded-xl border border-[#e6dcd3] bg-white p-4">
               <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand-soft text-brand-strong">
                 <Icon aria-hidden="true" className="h-5 w-5" strokeWidth={1.8} />
               </span>
               <span>
-                <span className="block text-sm font-semibold text-brand-ink">{title}</span>
-                <span className="mt-1 block text-sm leading-6 text-brand-ink/70">{highlight}</span>
+                <span className="block text-sm font-semibold text-brand-ink">{highlight.title}</span>
+                <span className="mt-1 block text-sm leading-6 text-brand-ink/70">{highlight.desc}</span>
               </span>
             </li>
           );
         })}
       </ul>
 
-      {product.tagStudio?.specs && (
+      {specsList.length > 0 && (
         <section aria-labelledby="tag-specs-title" className="rounded-xl border border-[#e6dcd3] bg-white p-5">
           <h3 id="tag-specs-title" className="font-display text-lg font-semibold text-brand-ink">
-            Detalles del tag
+            {t.product.tagSpecsTitle}
           </h3>
           <dl className="mt-4 grid gap-4 sm:grid-cols-2">
-            {product.tagStudio.specs.map((spec) => (
+            {specsList.map((spec) => (
               <div key={spec.label} className="flex items-start gap-3">
                 <BadgeCheck aria-hidden="true" className="mt-0.5 h-5 w-5 shrink-0 text-brand" strokeWidth={1.8} />
                 <div>
@@ -308,6 +314,7 @@ function ProductDetails({
   added: boolean;
   setAdded: (value: boolean) => void;
 }) {
+  const { t, formatPrice, isEn } = useTranslation();
   const { addLine } = useCart();
   const navigate = useNavigate();
   const [quantity, setQuantity] = useState(1);
@@ -323,12 +330,12 @@ function ProductDetails({
   const canPurchase = !product.tagStudio || tagStudioReady;
   const tagStudioOptions = product.tagStudio
     ? {
-        'Diseño del tag': tagStudioValue.design,
-        Color: product.tagStudio.finishes.find((finish) => finish.value === tagStudioValue.finish)?.label ?? tagStudioValue.finish,
-        'Nombre grabado': tagStudioValue.name.trim(),
-        Tipografía: tagStudioValue.font,
+        [isEn ? 'Tag Design' : 'Diseño del tag']: tagStudioValue.design,
+        [isEn ? 'Finish' : 'Color']: product.tagStudio.finishes.find((finish) => finish.value === tagStudioValue.finish)?.label ?? tagStudioValue.finish,
+        [isEn ? 'Engraved Name' : 'Nombre grabado']: tagStudioValue.name.trim(),
+        [isEn ? 'Typography' : 'Tipografía']: tagStudioValue.font,
         ...(product.tagStudio.phoneEnabled && tagStudioValue.phone.trim()
-          ? { Teléfono: tagStudioValue.phone.trim() }
+          ? { [isEn ? 'Phone' : 'Teléfono']: tagStudioValue.phone.trim() }
           : {}),
       }
     : {};
@@ -339,7 +346,7 @@ function ProductDetails({
       : product.personalization && personalizationStyle
       ? {
           [product.personalization.label]: personalizationStyle,
-          ...(personalization.trim() ? { 'Texto grabado': personalization.trim() } : {}),
+          ...(personalization.trim() ? { [t.product.engravedText]: personalization.trim() } : {}),
         }
       : {}),
   };
@@ -353,6 +360,12 @@ function ProductDetails({
     }, quantity);
     setAdded(true);
   };
+
+  const localizedDescription = product.handle === 'golden-cat'
+    ? (isEn
+        ? 'Surgical grade stainless steel cat ID tag with custom metallic finishes and personalized engraved text.'
+        : product.description)
+    : product.description;
 
   return (
     <section aria-labelledby="product-title">
@@ -369,13 +382,13 @@ function ProductDetails({
               {'☆'.repeat(5 - Math.round(product.rating))}
             </span>
             <a href="#reviews" className="text-brand-ink/70 underline-offset-2 hover:underline">
-              {product.rating.toFixed(1)} ({product.reviewCount} reseñas)
+              {product.rating.toFixed(1)} ({product.reviewCount} {t.product.reviews})
             </a>
           </div>
         )}
         {product.personalization && !product.badge && (
           <span className="rounded-full bg-brand-soft px-2 py-1 text-[11px] font-bold text-brand-strong">
-            Personalizable
+            {t.product.customizable}
           </span>
         )}
       </div>
@@ -383,7 +396,7 @@ function ProductDetails({
       <h1 id="product-title" className="mt-3 font-display text-3xl font-bold leading-tight text-brand-ink sm:text-4xl">
         {product.title}
       </h1>
-      {product.description && <p className="mt-3 text-sm leading-6 text-brand-ink/70">{product.description}</p>}
+      {localizedDescription && <p className="mt-3 text-sm leading-6 text-brand-ink/70">{localizedDescription}</p>}
       <p className="mt-5 text-2xl font-bold text-brand-ink">{formatPrice(product.priceFrom)}</p>
 
       {product.tagStudio ? (
@@ -428,7 +441,7 @@ function ProductDetails({
             )}
           </fieldset>
           <label htmlFor="product-personalization" className="mb-2 mt-3 block text-sm font-semibold text-brand-ink">
-            Texto grabado
+            {t.product.engravedText}
           </label>
           <input
             id="product-personalization"
@@ -438,7 +451,7 @@ function ProductDetails({
               setPersonalization(event.target.value);
               setAdded(false);
             }}
-            placeholder="Escribe el nombre"
+            placeholder={t.product.writeName}
             className="h-11 w-full rounded-lg border border-[#cfc4bb] bg-white px-3 text-sm text-brand-ink outline-none placeholder:text-[#6b6b6b] focus:border-brand focus:ring-2 focus:ring-brand/20"
           />
           {product.personalization.description && (
@@ -450,14 +463,14 @@ function ProductDetails({
       {product.collections.includes('bandanas') && (
         <section aria-labelledby="size-guide-title" className="mt-6">
           <h2 id="size-guide-title" className="font-display text-lg font-semibold text-brand-ink">
-            Guía de tallas
+            {t.product.sizeGuide}
           </h2>
           <p className="mt-1 text-sm text-brand-ink/70">
-            Mide el contorno del cuello de tu mascota antes de elegir la bandana.
+            {t.product.sizeGuideHelp}
           </p>
           <img
             src={image('9_guia blog.png')}
-            alt="Guía visual para medir el cuello de una mascota"
+            alt=""
             width={1200}
             height={675}
             loading="lazy"
@@ -470,7 +483,7 @@ function ProductDetails({
         <div className="flex h-11 w-28 shrink-0 items-center justify-between rounded-lg border border-[#cfc4bb] bg-white px-2">
           <button
             type="button"
-            aria-label="Reducir cantidad"
+            aria-label={t.product.decreaseQuantity}
             disabled={quantity <= 1}
             onClick={() => setQuantity((current) => Math.max(1, current - 1))}
             className="flex h-8 w-8 items-center justify-center rounded text-brand-ink hover:bg-brand-cream disabled:opacity-40"
@@ -480,7 +493,7 @@ function ProductDetails({
           <span aria-live="polite" className="min-w-5 text-center text-sm">{quantity}</span>
           <button
             type="button"
-            aria-label="Aumentar cantidad"
+            aria-label={t.product.increaseQuantity}
             disabled={quantity >= 10}
             onClick={() => setQuantity((current) => Math.min(10, current + 1))}
             className="flex h-8 w-8 items-center justify-center rounded text-brand-ink hover:bg-brand-cream disabled:opacity-40"
@@ -494,8 +507,8 @@ function ProductDetails({
           disabled={!canPurchase}
           className="inline-flex min-h-11 flex-1 items-center justify-center rounded-full bg-brand px-4 text-sm font-bold text-white hover:bg-brand-strong focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand disabled:cursor-not-allowed disabled:opacity-50"
         >
-          <span className="sm:hidden">Añadir · {formatPrice(product.priceFrom)}</span>
-          <span className="hidden sm:inline">Añadir al carrito · {formatPrice(product.priceFrom)}</span>
+          <span className="sm:hidden">{t.product.addToCartShort} · {formatPrice(product.priceFrom)}</span>
+          <span className="hidden sm:inline">{t.product.addToCart} · {formatPrice(product.priceFrom)}</span>
         </button>
       </div>
       <button
@@ -507,11 +520,11 @@ function ProductDetails({
         disabled={!canPurchase}
         className="mt-2 inline-flex min-h-11 w-full items-center justify-center rounded-full border border-brand-ink px-4 text-sm font-semibold text-brand-ink hover:bg-brand-cream focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand disabled:cursor-not-allowed disabled:opacity-50"
       >
-        Comprar ahora
+        {isEn ? 'Buy Now' : 'Comprar ahora'}
       </button>
       {added && (
         <p role="status" className="mt-3 text-sm font-medium text-brand-strong">
-          Añadido al carrito. <Link to="/carrito" className="underline">Ver carrito</Link>
+          {t.product.addedToCart} <Link to="/carrito" className="underline">{t.product.viewCart}</Link>
         </p>
       )}
     </section>
@@ -519,10 +532,12 @@ function ProductDetails({
 }
 
 function ProductReviews({ product }: { product: Product }) {
+  const { t, isEn } = useTranslation();
+
   return (
     <section id="reviews" aria-labelledby="reviews-title" className="mt-12 grid gap-5 lg:grid-cols-[340px_minmax(0,1fr)] lg:gap-10">
       <div className="rounded-[14px] border border-[#e6dcd3] bg-white p-5 sm:p-6">
-        <h2 id="reviews-title" className="font-display text-2xl font-semibold text-brand-ink">Reseñas</h2>
+        <h2 id="reviews-title" className="font-display text-2xl font-semibold text-brand-ink">{t.product.customerReviews}</h2>
         {product.rating !== undefined && product.reviewCount !== undefined ? (
           <>
             <div className="mt-3 flex items-center gap-3">
@@ -532,21 +547,27 @@ function ProductReviews({ product }: { product: Product }) {
                   {'★'.repeat(Math.round(product.rating))}
                   {'☆'.repeat(5 - Math.round(product.rating))}
                 </span>
-                <p className="text-xs text-brand-ink/70">{product.reviewCount} reseñas</p>
+                <p className="text-xs text-brand-ink/70">{product.reviewCount} {t.product.reviews}</p>
               </div>
             </div>
-            <p className="mt-4 text-sm text-brand-ink/70">Opiniones de clientes sobre este producto.</p>
+            <p className="mt-4 text-sm text-brand-ink/70">
+              {isEn ? 'Verified customer ratings for this item.' : 'Opiniones de clientes sobre este producto.'}
+            </p>
           </>
         ) : (
-          <p className="mt-3 text-sm leading-6 text-brand-ink/70">Todavía no hay reseñas para este producto.</p>
+          <p className="mt-3 text-sm leading-6 text-brand-ink/70">
+            {isEn ? 'No reviews yet for this product.' : 'Todavía no hay reseñas para este producto.'}
+          </p>
         )}
       </div>
       <div className="rounded-[14px] border border-[#e6dcd3] bg-white p-5 sm:p-6">
         {product.rating !== undefined && product.reviewCount !== undefined ? (
-          <p className="text-sm text-brand-ink/70">Las opiniones verificadas aparecerán aquí.</p>
+          <p className="text-sm text-brand-ink/70">
+            {isEn ? 'Verified customer reviews will appear here.' : 'Las opiniones verificadas aparecerán aquí.'}
+          </p>
         ) : (
           <div className="flex h-full min-h-24 items-center justify-center text-center text-sm text-brand-ink/70">
-            Comparte tu experiencia cuando las reseñas estén disponibles.
+            {isEn ? 'Share your experience once reviews are enabled.' : 'Comparte tu experiencia cuando las reseñas estén disponibles.'}
           </div>
         )}
       </div>
@@ -555,6 +576,7 @@ function ProductReviews({ product }: { product: Product }) {
 }
 
 function RelatedProducts({ product }: { product: Product }) {
+  const { t, formatPrice, isEn } = useTranslation();
   const explicitRelated = (product.relatedHandles ?? [])
     .map((handle) => products.find((item) => item.handle === handle))
     .filter((item): item is Product => item !== undefined);
@@ -570,9 +592,11 @@ function RelatedProducts({ product }: { product: Product }) {
   return (
     <section aria-labelledby="related-title" className="mt-14">
       <h2 id="related-title" className="font-display text-2xl font-bold text-brand-ink sm:text-[26px]">
-        Completa el look
+        {t.product.relatedProducts}
       </h2>
-      <p className="mt-1 text-sm text-brand-ink/70">Descubre otros accesorios para tu mascota.</p>
+      <p className="mt-1 text-sm text-brand-ink/70">
+        {isEn ? 'Discover matching accessories for your pet.' : 'Descubre otros accesorios para tu mascota.'}
+      </p>
       <ul className="mt-5 grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-4">
         {related.map((item) => (
           <li key={item.handle} className="rounded-[14px] border border-[#e6dcd3] bg-white p-2.5 sm:p-3.5">
@@ -600,6 +624,7 @@ function RelatedProducts({ product }: { product: Product }) {
 }
 
 function ProductDetail({ product }: { product: Product }) {
+  const { t } = useTranslation();
   const collection = collectionLinks.find((item) => product.collections.includes(item.handle));
   const [tagStudioValue, setTagStudioValue] = useState<TagStudioValue>(() => ({
     design: product.tagStudio?.defaultDesign ?? product.tagStudio?.designs[0]?.value ?? '',
@@ -615,8 +640,8 @@ function ProductDetail({ product }: { product: Product }) {
 
   return (
     <div className="mx-auto max-w-[1440px] px-4 py-6 sm:px-6 sm:py-8 lg:px-10">
-      <nav aria-label="Ruta de navegación" className="mb-5 text-xs text-brand-ink/70 sm:text-sm">
-        <Link to="/" className="hover:text-brand-strong hover:underline">Inicio</Link>
+      <nav aria-label="Breadcrumb navigation" className="mb-5 text-xs text-brand-ink/70 sm:text-sm">
+        <Link to="/" className="hover:text-brand-strong hover:underline">{t.nav.home}</Link>
         {collection && (
           <>
             <span aria-hidden="true"> / </span>
@@ -661,11 +686,17 @@ function ProductDetail({ product }: { product: Product }) {
 }
 
 export default function ProductPage() {
+  const { isEn } = useTranslation();
   const { handle } = useParams();
   const product = products.find((item) => item.handle === handle);
 
   if (!product) {
-    return <StaticPage title="Producto no encontrado" body="Este producto ya no está disponible." />;
+    return (
+      <StaticPage
+        title={isEn ? 'Product Not Found' : 'Producto no encontrado'}
+        body={isEn ? 'This product is no longer available.' : 'Este producto ya no está disponible.'}
+      />
+    );
   }
 
   return <ProductDetail key={product.handle} product={product} />;

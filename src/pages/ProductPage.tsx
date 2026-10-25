@@ -109,8 +109,8 @@ function ProductGallery({ product, tagValue }: { product: Product; tagValue: Tag
 
   return (
     <section aria-label={`Media for ${product.title}`}>
-      <div className="grid gap-3 md:grid-cols-[68px_minmax(0,1fr)] lg:grid-cols-[76px_minmax(0,1fr)]">
-        <div className="order-2 flex gap-2 overflow-x-auto md:order-1 md:h-[460px] md:flex-col md:overflow-y-auto lg:h-[490px]">
+      <div className="grid gap-2 sm:gap-3 md:grid-cols-[68px_minmax(0,1fr)] lg:grid-cols-[76px_minmax(0,1fr)]">
+        <div className="order-2 flex gap-1.5 overflow-x-auto py-0.5 md:order-1 md:h-[460px] md:flex-col md:overflow-y-auto lg:h-[490px]">
           {slots.map((slot, index) => (
             <button
               key={slotKey(slot)}
@@ -118,12 +118,12 @@ function ProductGallery({ product, tagValue }: { product: Product; tagValue: Tag
               aria-label={`View ${slot.kind === 'tag' ? t.product.myCustomTag : `image ${index}`}: ${slotLabel(slot)}`}
               aria-pressed={selectedIndex === index}
               onClick={() => setSelectedIndex(index)}
-              className={`h-16 w-16 shrink-0 overflow-hidden rounded-lg border-2 bg-brand-cream focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand md:h-[68px] md:w-[68px] lg:h-[76px] lg:w-[76px] ${
+              className={`h-11 w-11 shrink-0 overflow-hidden rounded-lg border-2 bg-brand-cream focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand sm:h-12 sm:w-12 md:h-[68px] md:w-[68px] lg:h-[76px] lg:w-[76px] ${
                 selectedIndex === index ? 'border-brand shadow-xs' : 'border-transparent opacity-80 hover:opacity-100'
               }`}
             >
               {slot.kind === 'tag' && tagConfig ? (
-                <span className="block h-full w-full p-1">
+                <span className="block h-full w-full p-0.5 sm:p-1">
                   <TagViewer config={tagConfig} value={tagValue} view="2d" side="front" className="h-full w-full" />
                 </span>
               ) : (
@@ -132,34 +132,37 @@ function ProductGallery({ product, tagValue }: { product: Product; tagValue: Tag
             </button>
           ))}
         </div>
-        <div className="relative order-1 aspect-square overflow-hidden rounded-2xl bg-brand-cream md:order-2 md:aspect-auto md:h-[460px] lg:h-[490px]">
+        <div className="relative order-1 h-[190px] sm:h-[220px] overflow-hidden rounded-xl bg-brand-cream md:order-2 md:h-[460px] lg:h-[490px] md:rounded-2xl">
           {selected.kind === 'tag' && tagConfig ? (
-            <div className="flex h-full flex-col p-4 sm:p-5">
-              <div className="flex shrink-0 justify-end">
+            <div className="flex h-full flex-col p-2 sm:p-3.5 md:p-5">
+              <div className="flex shrink-0 items-center justify-between">
+                <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-brand-strong">
+                  {isEn ? 'Live 3D/2D' : 'Vista en Vivo'}
+                </span>
                 <ViewToggle
                   value={tagView}
                   onChange={setTagView}
-                  className="flex overflow-hidden rounded-full border-2 border-brand-strong/20 bg-white text-xs sm:text-sm font-bold shadow-sm"
-                  buttonClassName="px-4 py-2 sm:px-5 sm:py-2 text-brand-ink transition-colors"
+                  className="flex overflow-hidden rounded-full border border-brand-strong/20 bg-white text-[11px] sm:text-xs md:text-sm font-bold shadow-xs"
+                  buttonClassName="px-2.5 py-0.5 sm:px-4 sm:py-1 md:px-5 md:py-2 text-brand-ink transition-colors"
                   activeClassName="bg-brand-strong text-white"
                 />
               </div>
               <div className="min-h-0 w-full flex-1">
                 <TagViewer config={tagConfig} value={tagValue} view={tagView} side={tagSide} className="h-full w-full" />
               </div>
-              <div className="flex shrink-0 flex-col items-end gap-2">
+              <div className="flex shrink-0 items-center justify-between pt-0.5 sm:pt-1">
+                <p className="text-[9px] sm:text-xs text-brand-ink/70">
+                  {t.product.livePreviewBadge}
+                </p>
                 {tagView === '2d' && (
                   <FaceToggle
                     value={tagSide}
                     onChange={setTagSide}
-                    className="flex overflow-hidden rounded-full border border-[#e6dcd3] bg-white/90 text-xs font-medium"
-                    buttonClassName="px-3.5 py-1.5 text-brand-ink/75 transition-colors"
-                    activeClassName="bg-brand-soft text-brand-strong"
+                    className="flex overflow-hidden rounded-full border border-[#e6dcd3] bg-white/90 text-[10px] sm:text-xs font-medium"
+                    buttonClassName="px-2 py-0.5 sm:px-3 sm:py-1 text-brand-ink/75 transition-colors"
+                    activeClassName="bg-brand-soft text-brand-strong font-semibold"
                   />
                 )}
-                <p className="mt-1 text-center text-xs text-brand-ink/70">
-                  {t.product.livePreviewBadge}
-                </p>
               </div>
             </div>
           ) : (
@@ -171,7 +174,7 @@ function ProductGallery({ product, tagValue }: { product: Product; tagValue: Tag
                 width={1200}
                 height={1000}
                 fetchPriority="high"
-                className="h-full w-full object-contain p-3 sm:p-4"
+                className="h-full w-full object-contain p-2 sm:p-4"
               />
             )
           )}
@@ -180,7 +183,7 @@ function ProductGallery({ product, tagValue }: { product: Product; tagValue: Tag
 
       {/* Escala real y accesos rápidos en mano / en mascota */}
       {tagConfig && (
-        <div className="mt-3 flex flex-wrap items-center justify-between gap-2 rounded-xl border border-[#e6dcd3] bg-brand-cream/60 p-2.5 px-3 text-xs">
+        <div className="hidden sm:flex mt-3 flex-wrap items-center justify-between gap-2 rounded-xl border border-[#e6dcd3] bg-brand-cream/60 p-2.5 px-3 text-xs">
           <div className="flex items-center gap-1.5 font-medium text-brand-ink/80">
             <span className="text-sm">📏</span>
             <span>
@@ -724,10 +727,10 @@ function ProductDetail({ product }: { product: Product }) {
       </nav>
 
       <div className="grid items-start gap-8 lg:grid-cols-2 xl:gap-12">
-        <div className="lg:sticky lg:top-24">
+        <div className="sticky top-14 z-30 -mx-4 border-b border-[#e6dcd3]/80 bg-white/95 px-4 pb-2.5 pt-2 shadow-[0_4px_12px_rgba(16,16,16,0.06)] backdrop-blur-md md:static md:mx-0 md:border-b-0 md:bg-transparent md:p-0 md:shadow-none lg:sticky lg:top-24">
           <ProductGallery product={product} tagValue={tagStudioValue} />
         </div>
-        <div className="min-w-0">
+        <div className="min-w-0 pt-2 md:pt-0">
           <ProductDetails
             key={product.handle}
             product={product}

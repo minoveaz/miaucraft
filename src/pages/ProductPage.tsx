@@ -49,7 +49,7 @@ function wrapTextToLines(text: string, maxCharsPerLine = 19): string[] {
 }
 
 const clampFontSize = (desired: number, text: string) => {
-  const maxAllowable = 0.62 / Math.max(1, text.length * 0.56);
+  const maxAllowable = 0.78 / Math.max(1, text.length * 0.52);
   return Math.min(desired, maxAllowable);
 };
 
@@ -121,10 +121,10 @@ function buildFaceLayers(
     const finalSize = clampFontSize(baseSize * scale, displayText);
 
     const yNudge = item.yOffset ?? 0;
-    const finalY = Math.max(0.39, Math.min(0.74, baseY + yNudge));
+    const finalY = Math.max(0.38, Math.min(0.80, baseY + yNudge));
 
     const xNudge = item.xOffset ?? 0;
-    const finalX = Math.max(0.24, Math.min(0.76, 0.5 + xNudge));
+    const finalX = Math.max(0.18, Math.min(0.82, 0.5 + xNudge));
 
     const wrapped = wrapTextToLines(displayText, 19);
 
@@ -254,26 +254,26 @@ function TagViewer({
         <div className="pointer-events-none absolute inset-0 flex items-center justify-center p-2">
           <svg viewBox="0 0 100 100" className="h-full w-full max-h-full max-w-full">
             <rect
-              x="18"
+              x="13"
               y="37"
-              width="64"
-              height="39"
-              rx="10"
+              width="74"
+              height="41"
+              rx="14"
               fill="rgba(229, 44, 119, 0.05)"
               stroke="#E52C77"
               strokeWidth="0.9"
               strokeDasharray="2.5 2"
             />
-            <line x1="20" y1="48" x2="80" y2="48" stroke="#E52C77" strokeWidth="0.5" strokeDasharray="1.5 1.5" opacity="0.6" />
-            <line x1="20" y1="63" x2="80" y2="63" stroke="#E52C77" strokeWidth="0.5" strokeDasharray="1.5 1.5" opacity="0.6" />
+            <line x1="15" y1="48" x2="85" y2="48" stroke="#E52C77" strokeWidth="0.5" strokeDasharray="1.5 1.5" opacity="0.6" />
+            <line x1="15" y1="63" x2="85" y2="63" stroke="#E52C77" strokeWidth="0.5" strokeDasharray="1.5 1.5" opacity="0.6" />
 
-            <text x="80" y="44" textAnchor="end" fontSize="2.2" fontWeight="bold" fill="#C81E63" opacity="0.8">
+            <text x="85" y="44" textAnchor="end" fontSize="2.2" fontWeight="bold" fill="#C81E63" opacity="0.8">
               ARRIBA
             </text>
-            <text x="80" y="56" textAnchor="end" fontSize="2.2" fontWeight="bold" fill="#C81E63" opacity="0.8">
+            <text x="85" y="56" textAnchor="end" fontSize="2.2" fontWeight="bold" fill="#C81E63" opacity="0.8">
               CENTRO
             </text>
-            <text x="80" y="70" textAnchor="end" fontSize="2.2" fontWeight="bold" fill="#C81E63" opacity="0.8">
+            <text x="85" y="71" textAnchor="end" fontSize="2.2" fontWeight="bold" fill="#C81E63" opacity="0.8">
               ABAJO
             </text>
           </svg>

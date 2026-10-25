@@ -289,7 +289,7 @@ export default function TagStudio({
       currentEngravings.map((e) => {
         if (e.id !== id) return e;
         const current = e.yOffset ?? 0;
-        const next = Math.max(-0.05, Math.min(0.05, Math.round((current + delta) * 1000) / 1000));
+        const next = Math.max(-0.10, Math.min(0.10, Math.round((current + delta) * 1000) / 1000));
         return { ...e, yOffset: next };
       }),
     );
@@ -300,7 +300,7 @@ export default function TagStudio({
       currentEngravings.map((e) => {
         if (e.id !== id) return e;
         const current = e.xOffset ?? 0;
-        const next = Math.max(-0.07, Math.min(0.07, Math.round((current + delta) * 1000) / 1000));
+        const next = Math.max(-0.25, Math.min(0.25, Math.round((current + delta) * 1000) / 1000));
         return { ...e, xOffset: next };
       }),
     );
@@ -651,7 +651,7 @@ export default function TagStudio({
                         <button
                           type="button"
                           onClick={() => adjustY(item.id, -0.015)}
-                          disabled={(item.yOffset ?? 0) <= -0.05}
+                          disabled={(item.yOffset ?? 0) <= -0.09}
                           className="flex h-7 w-7 items-center justify-center text-brand-ink hover:bg-brand-soft disabled:opacity-40 transition-colors"
                           title={isEn ? 'Move up' : 'Mover arriba'}
                         >
@@ -660,7 +660,7 @@ export default function TagStudio({
                         <button
                           type="button"
                           onClick={() => adjustY(item.id, +0.015)}
-                          disabled={(item.yOffset ?? 0) >= 0.05}
+                          disabled={(item.yOffset ?? 0) >= 0.09}
                           className="flex h-7 w-7 items-center justify-center text-brand-ink hover:bg-brand-soft disabled:opacity-40 transition-colors"
                           title={isEn ? 'Move down' : 'Mover abajo'}
                         >
@@ -672,8 +672,8 @@ export default function TagStudio({
                       <div className="flex items-center rounded-md border border-[#cfc4bb] bg-white shadow-2xs">
                         <button
                           type="button"
-                          onClick={() => adjustX(item.id, -0.02)}
-                          disabled={(item.xOffset ?? 0) <= -0.07}
+                          onClick={() => adjustX(item.id, -0.025)}
+                          disabled={(item.xOffset ?? 0) <= -0.24}
                           className="flex h-7 w-7 items-center justify-center text-brand-ink hover:bg-brand-soft disabled:opacity-40 transition-colors"
                           title={isEn ? 'Nudge left' : 'Mover a la izquierda'}
                         >
@@ -691,8 +691,8 @@ export default function TagStudio({
                         </button>
                         <button
                           type="button"
-                          onClick={() => adjustX(item.id, +0.02)}
-                          disabled={(item.xOffset ?? 0) >= 0.07}
+                          onClick={() => adjustX(item.id, +0.025)}
+                          disabled={(item.xOffset ?? 0) >= 0.24}
                           className="flex h-7 w-7 items-center justify-center text-brand-ink hover:bg-brand-soft disabled:opacity-40 transition-colors"
                           title={isEn ? 'Nudge right' : 'Mover a la derecha'}
                         >

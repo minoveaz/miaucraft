@@ -112,6 +112,15 @@ export interface I18nDictionary {
     customerReviews: string;
     decreaseQuantity: string;
     increaseQuantity: string;
+    openCustomizer: string;
+    editCustomizer: string;
+    customizationReady: string;
+    customizationIncluded: string;
+    customizationHelp: string;
+    applyDesign: string;
+    studioModalTitle: string;
+    discardChanges: string;
+    resetDesign: string;
     description: string;
     shippingReturns: string;
     sizingFit: string;

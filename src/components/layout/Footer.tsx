@@ -18,10 +18,8 @@ export default function Footer() {
   const { t, isEn } = useTranslation();
 
   const shopLinks = [
-    { label: t.nav.tags, to: '/coleccion/tag-cat' },
+    { label: t.nav.tagStudio, to: '/producto/golden-cat' },
     { label: t.nav.catTags, to: '/coleccion/tag-cat' },
-    { label: t.nav.dogTags, to: '/coleccion/id-tags-anderson' },
-    { label: t.nav.bandanas, to: '/coleccion/bandanas' },
   ];
 
   const helpLinks = [

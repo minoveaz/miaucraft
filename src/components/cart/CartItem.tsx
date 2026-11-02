@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { Minus, Plus, Trash2 } from 'lucide-react';
 import type { CartLine } from '../../types/cart';
-import { productImage, products } from '../../lib/products';
+import { productImage, products, allProducts } from '../../lib/products';
 import { useTranslation } from '../../hooks/useTranslation';
 
 const base = import.meta.env.BASE_URL;
@@ -21,7 +21,7 @@ export function CartItem({
   compact = false,
 }: CartItemProps) {
   const { t, formatPrice } = useTranslation();
-  const product = products.find((item) => item.handle === line.handle);
+  const product = (allProducts ?? products).find((item) => item.handle === line.handle);
   const imageSrc = line.image || (product ? `${base}images/${productImage(product)}` : '');
 
   const lineTotal = line.unitPrice * line.quantity;

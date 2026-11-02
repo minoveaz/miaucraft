@@ -32,7 +32,7 @@ export default function HomePage() {
       title: isEn ? 'Dogs' : 'Perros',
       image: '11-perros.jpeg',
       alt: isEn ? 'Dog with Miaucraft tag' : 'Perro con bandana y placa Miaucraft',
-      to: '/coleccion/id-tags-anderson',
+      to: '/producto/golden-cat',
       imagePosition: 'object-top',
     },
     {
@@ -120,27 +120,99 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Lo más vendido */}
+      {/* Producto Destacado / Flagship 3D Tag */}
       <section className={frame} aria-labelledby="home-vendidos">
         <div className="flex items-center justify-between">
           <div>
             <h2 id="home-vendidos" className={sectionHead}>
-              {isEn ? 'Best Selling Tags' : 'Tags más populares'}
+              {isEn ? 'Signature Product' : 'Producto Insignia'}
             </h2>
+            <p className="text-sm text-brand-ink/70">
+              {isEn
+                ? 'Surgical-grade stainless steel with real-time 3D preview and custom laser engraving.'
+                : 'Acero inoxidable quirúrgico con grabado láser de alta precisión y personalizador interactivo 3D.'}
+            </p>
           </div>
           <Link to="/coleccion/tag-cat" className={link}>
-            {isEn ? 'View all →' : 'Ver todos →'}
+            {isEn ? 'View Collection →' : 'Ver Colección →'}
           </Link>
         </div>
-        <div className="mt-5 grid grid-cols-4 gap-5 max-md:grid-cols-2">
-          {products.filter((product) => ['golden-cat', 'bone-product', 'cat-product', 'rose-cat'].includes(product.handle)).map((product) => (
-            <ProductCard
+        <div className="mt-5">
+          {products.map((product) => (
+            <div
               key={product.handle}
-              href={`/producto/${product.handle}`}
-              image={image(productImage(product))}
-              name={product.title}
-              price={formatPrice(product.priceFrom)}
-            />
+              className="group relative flex flex-col md:flex-row items-center overflow-hidden rounded-2xl border border-[#e6dcd3] bg-white p-6 sm:p-8 shadow-xs hover:border-brand/40 transition-all gap-6 sm:gap-10"
+            >
+              <Link
+                to={`/producto/${product.handle}`}
+                className="relative aspect-square w-full md:w-[320px] shrink-0 overflow-hidden rounded-2xl bg-gradient-to-br from-brand-cream/80 to-brand-soft/40 p-4"
+              >
+                <img
+                  src={image(productImage(product))}
+                  alt={product.title}
+                  width={800}
+                  height={800}
+                  loading="lazy"
+                  className="h-full w-full object-contain transition-transform duration-500 group-hover:scale-105"
+                />
+                <span className="absolute top-4 left-4 rounded-full bg-brand-strong px-3 py-1 text-xs font-bold text-white shadow-xs">
+                  {isEn ? '3D Interactive' : 'Interactivo 3D'}
+                </span>
+              </Link>
+
+              <div className="flex flex-1 flex-col justify-between self-stretch">
+                <div>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="rounded-full bg-brand-soft px-2.5 py-0.5 text-xs font-bold text-brand-strong">
+                      {isEn ? 'Featured Tag' : 'Placa Destacada'}
+                    </span>
+                    <span className="text-xs text-brand-ink/60">
+                      · {isEn ? '23 Feline Artworks · 3 Finishes' : '23 Diseños · 3 Acabados'}
+                    </span>
+                  </div>
+
+                  <h3 className="mt-3 font-display text-2xl sm:text-3xl font-bold text-brand-ink">
+                    <Link to={`/producto/${product.handle}`} className="hover:text-brand-strong transition-colors">
+                      {product.title}
+                    </Link>
+                  </h3>
+
+                  <p className="mt-2 text-sm text-brand-ink/75 leading-relaxed max-w-xl">
+                    {isEn
+                      ? 'Customize both front and back with your cat’s name, phone number, and unique feline artwork. Smooth 3D real-time preview and surgical-grade durability.'
+                      : 'Personaliza el frente y reverso con el nombre de tu gato, teléfono y diseño felino único. Vista previa 3D fluida en tiempo real y durabilidad de grado quirúrgico.'}
+                  </p>
+
+                  <div className="mt-4 flex flex-wrap items-center gap-4 text-xs font-semibold text-brand-ink/80">
+                    <span className="flex items-center gap-1.5">
+                      <span className="h-3 w-3 rounded-full bg-[#e3c27c] ring-1 ring-black/10" />
+                      Gold
+                    </span>
+                    <span className="flex items-center gap-1.5">
+                      <span className="h-3 w-3 rounded-full bg-[#c98d8a] ring-1 ring-black/10" />
+                      Rose Gold
+                    </span>
+                    <span className="flex items-center gap-1.5">
+                      <span className="h-3 w-3 rounded-full bg-[#c1c7ce] ring-1 ring-black/10" />
+                      Silver
+                    </span>
+                  </div>
+                </div>
+
+                <div className="mt-6 flex flex-wrap items-center justify-between gap-4 border-t border-[#e6dcd3] pt-5">
+                  <div>
+                    <span className="text-xs text-brand-ink/60">{isEn ? 'Price' : 'Precio'}</span>
+                    <p className="font-display text-2xl font-bold text-brand-ink">{formatPrice(product.priceFrom)}</p>
+                  </div>
+                  <Link
+                    to={`/producto/${product.handle}`}
+                    className="inline-flex min-h-11 items-center justify-center rounded-full bg-brand-strong px-7 text-sm font-bold text-white shadow-xs hover:bg-brand-ink transition-colors"
+                  >
+                    {isEn ? 'Customize in 3D' : 'Personalizar en 3D'}
+                  </Link>
+                </div>
+              </div>
+            </div>
           ))}
         </div>
       </section>

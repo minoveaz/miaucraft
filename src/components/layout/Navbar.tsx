@@ -38,10 +38,8 @@ export default function Navbar() {
 
   const navItems = useMemo(() => [
     { label: t.nav.home, to: '/' },
-    { label: t.nav.tags, to: '/coleccion/tag-cat' },
+    { label: t.nav.tagStudio, to: '/producto/golden-cat' },
     { label: t.nav.catTags, to: '/coleccion/tag-cat' },
-    { label: t.nav.dogTags, to: '/coleccion/id-tags-anderson' },
-    { label: t.nav.bandanas, to: '/coleccion/bandanas' },
     { label: t.nav.about, to: '/nosotros' },
     { label: t.nav.blog, to: '/blog' },
   ], [t]);

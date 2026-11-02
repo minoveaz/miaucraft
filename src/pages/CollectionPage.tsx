@@ -1,4 +1,5 @@
 import { Link, useParams } from 'react-router-dom';
+import { Sparkles } from 'lucide-react';
 import ProductCard from '../components/shop/ProductCard';
 import { collectionLinks } from '../lib/navigation';
 import { productImage, productsInCollection } from '../lib/products';
@@ -63,9 +64,23 @@ export default function CollectionPage() {
           ))}
         </ul>
       ) : (
-        <p className="mt-8 rounded-xl border border-brand-soft p-6 text-brand-ink/70">
-          {isEn ? 'No products available in this collection yet.' : 'No hay productos disponibles en esta colección.'}
-        </p>
+        <div className="mt-8 rounded-2xl border border-brand-soft bg-gradient-to-br from-brand-soft/40 to-brand-cream/60 p-8 sm:p-12 text-center shadow-xs">
+          <Sparkles className="mx-auto h-12 w-12 text-brand-strong mb-3" />
+          <h2 className="font-display text-xl font-bold text-brand-ink sm:text-2xl">
+            {isEn ? 'Coming Soon' : 'Próximamente'}
+          </h2>
+          <p className="mx-auto mt-2 max-w-md text-sm text-brand-ink/70">
+            {isEn
+              ? 'We are currently preparing and testing new models for this collection. In the meantime, try our fully customizable Cat Tag in 3D.'
+              : 'Estamos preparando y probando nuevos modelos para esta colección. Mientras tanto, prueba nuestra placa Cat Tag 100% personalizable en 3D.'}
+          </p>
+          <Link
+            to="/producto/golden-cat"
+            className="mt-6 inline-flex h-11 items-center justify-center rounded-full bg-brand-strong px-6 text-sm font-bold text-white shadow-xs hover:bg-brand-ink transition-colors"
+          >
+            {isEn ? 'Customize Cat Tag in 3D' : 'Personalizar Cat Tag en 3D'}
+          </Link>
+        </div>
       )}
     </div>
   );

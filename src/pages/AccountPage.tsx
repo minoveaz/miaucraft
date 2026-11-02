@@ -24,7 +24,7 @@ import {
 import { useAuth } from '../lib/auth';
 import { useCart } from '../lib/cart';
 import { useTranslation } from '../hooks/useTranslation';
-import { products, productImage } from '../lib/products';
+import { products, productImage, allProducts } from '../lib/products';
 import type { CustomerOrder, UserAddress, OrderStatus } from '../types/customer';
 
 const base = import.meta.env.BASE_URL;

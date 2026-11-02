@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import {
   ChevronDown,
@@ -548,6 +548,10 @@ function ProductDetail({ product }: { product: Product }) {
     Object.fromEntries((product.options ?? []).map((option) => [option.name, option.values[0]?.value ?? ''])),
   );
   const [added, setAdded] = useState(false);
+
+  useEffect(() => {
+    document.title = `${product.title} · Miaucraft`;
+  }, [product.title]);
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-5 sm:px-6 sm:py-7 lg:px-8">

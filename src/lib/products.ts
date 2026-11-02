@@ -117,31 +117,32 @@ export function productsInCollection(handle: string): Product[] {
   return products.filter((p) => p.collections.includes(handle));
 }
 
-export const products: Product[] = [
-  { handle: 'pet-bandana-collar', title: 'Pet bandana collar', priceFrom: 22.5, collections: ['bandanas'] },
-  { handle: 'pet-bandana-collar-animal-print', title: 'Pet bandana collar Animal Print', priceFrom: 22, collections: ['bandanas'] },
-  { handle: 'pet-bandana-collar-spain', title: 'Pet bandana collar - Spain', priceFrom: 22.5, collections: ['bandanas'] },
-  { handle: 'pet-bandana-collar-colombia', title: 'Pet bandana collar - Colombia', priceFrom: 22.5, collections: ['bandanas'] },
-  { handle: 'bone-product', title: 'Cat / Dog Tag Bone', priceFrom: 9.99, collections: ['id-tags-anderson'] },
-  { handle: 'round-diamond-product', title: 'Cat / Dog Tag Diamond Round', priceFrom: 9.99, collections: ['id-tags-anderson'] },
-  { handle: 'diamond-bone-product', title: 'Cat / Dog Tag Diamond Bone', priceFrom: 9.99, collections: ['id-tags-anderson'] },
-  { handle: 'diamond-heart-product', title: 'Cat / Dog Tag Diamond Heart', priceFrom: 9.99, collections: ['id-tags-anderson'] },
-  { handle: 'bowtie-product', title: 'Cat / Dog Tag Bowtie', priceFrom: 9.99, collections: ['id-tags-anderson'] },
-  { handle: 'misifu-product', title: 'Cat / Dog Tag Misifu', priceFrom: 9.99, collections: ['id-tags-anderson'] },
-  { handle: 'sheriff-shield-product', title: 'Cat / Dog Tag Sheriff Shield', priceFrom: 9.99, collections: ['id-tags-anderson'] },
-  { handle: 'patrol-shield-product', title: 'Cat / Dog Tag Patrol Shield', priceFrom: 9.99, collections: ['id-tags-anderson'] },
-  { handle: 'fish-product', title: 'Cat / Dog Tag Fish', priceFrom: 9.99, collections: ['id-tags-anderson'] },
-  { handle: 'heart-product', title: 'Cat / Dog Tag Heart', priceFrom: 9.99, collections: ['id-tags-anderson'] },
-  { handle: 'hexagon-product', title: 'Cat / Dog Tag Hexagon', priceFrom: 9.99, collections: ['id-tags-anderson'] },
-  { handle: 'bone-pawprint-product', title: 'Cat / Dog Tag Bone-PawPrint', priceFrom: 9.99, collections: ['id-tags-anderson'] },
-  { handle: 'tags-orbits-collection', title: 'Tags Orbits Collection', priceFrom: 9.99, collections: ['id-tags-anderson'] },
-  { handle: 'rose-cat', title: 'Rose Cat', priceFrom: 9.99, collections: ['id-tags-anderson', 'tag-cat'] },
-  { handle: 'cat-product', title: 'Silver Cat', priceFrom: 9.99, collections: ['id-tags-anderson', 'tag-cat'] },
+export const allProducts: Product[] = [
+  { handle: 'pet-bandana-collar', title: 'Pet bandana collar', priceFrom: 22.5, collections: ['bandanas'], isAvailable: false },
+  { handle: 'pet-bandana-collar-animal-print', title: 'Pet bandana collar Animal Print', priceFrom: 22, collections: ['bandanas'], isAvailable: false },
+  { handle: 'pet-bandana-collar-spain', title: 'Pet bandana collar - Spain', priceFrom: 22.5, collections: ['bandanas'], isAvailable: false },
+  { handle: 'pet-bandana-collar-colombia', title: 'Pet bandana collar - Colombia', priceFrom: 22.5, collections: ['bandanas'], isAvailable: false },
+  { handle: 'bone-product', title: 'Cat / Dog Tag Bone', priceFrom: 9.99, collections: ['id-tags-anderson'], isAvailable: false },
+  { handle: 'round-diamond-product', title: 'Cat / Dog Tag Diamond Round', priceFrom: 9.99, collections: ['id-tags-anderson'], isAvailable: false },
+  { handle: 'diamond-bone-product', title: 'Cat / Dog Tag Diamond Bone', priceFrom: 9.99, collections: ['id-tags-anderson'], isAvailable: false },
+  { handle: 'diamond-heart-product', title: 'Cat / Dog Tag Diamond Heart', priceFrom: 9.99, collections: ['id-tags-anderson'], isAvailable: false },
+  { handle: 'bowtie-product', title: 'Cat / Dog Tag Bowtie', priceFrom: 9.99, collections: ['id-tags-anderson'], isAvailable: false },
+  { handle: 'misifu-product', title: 'Cat / Dog Tag Misifu', priceFrom: 9.99, collections: ['id-tags-anderson'], isAvailable: false },
+  { handle: 'sheriff-shield-product', title: 'Cat / Dog Tag Sheriff Shield', priceFrom: 9.99, collections: ['id-tags-anderson'], isAvailable: false },
+  { handle: 'patrol-shield-product', title: 'Cat / Dog Tag Patrol Shield', priceFrom: 9.99, collections: ['id-tags-anderson'], isAvailable: false },
+  { handle: 'fish-product', title: 'Cat / Dog Tag Fish', priceFrom: 9.99, collections: ['id-tags-anderson'], isAvailable: false },
+  { handle: 'heart-product', title: 'Cat / Dog Tag Heart', priceFrom: 9.99, collections: ['id-tags-anderson'], isAvailable: false },
+  { handle: 'hexagon-product', title: 'Cat / Dog Tag Hexagon', priceFrom: 9.99, collections: ['id-tags-anderson'], isAvailable: false },
+  { handle: 'bone-pawprint-product', title: 'Cat / Dog Tag Bone-PawPrint', priceFrom: 9.99, collections: ['id-tags-anderson'], isAvailable: false },
+  { handle: 'tags-orbits-collection', title: 'Tags Orbits Collection', priceFrom: 9.99, collections: ['id-tags-anderson'], isAvailable: false },
+  { handle: 'rose-cat', title: 'Rose Cat', priceFrom: 9.99, collections: ['id-tags-anderson', 'tag-cat'], isAvailable: false },
+  { handle: 'cat-product', title: 'Silver Cat', priceFrom: 9.99, collections: ['id-tags-anderson', 'tag-cat'], isAvailable: false },
   {
     handle: 'golden-cat',
     title: 'Cat Tag',
     priceFrom: 9.99,
-    collections: ['id-tags-anderson', 'tag-cat'],
+    collections: ['tag-cat'],
+    isAvailable: true,
     description: 'Placa identificativa de acero inoxidable con diseño de gato, acabados metálicos y opciones de personalización.',
     tagStudio: goldenCatTagStudio,
     media: [
@@ -190,6 +191,9 @@ export const products: Product[] = [
         content: 'Enviamos con seguimiento. Puedes solicitar una devolución durante los 14 días posteriores a la compra para obtener un reembolso o cambio. Envío gratis en pedidos superiores a $50.',
       },
     ],
-    relatedHandles: ['rose-cat', 'cat-product'],
+    relatedHandles: [],
   },
 ];
+
+// Catálogo disponible para la tienda pública (solo productos activos):
+export const products: Product[] = allProducts.filter((p) => p.isAvailable === true);

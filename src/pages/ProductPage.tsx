@@ -1,24 +1,25 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import {
+  ChevronDown,
   Clock,
   Minus,
   Plus,
   RotateCcw,
-  Ruler,
   ShieldCheck,
   Sparkles,
   Truck,
-  Edit3,
   Check,
+  Eye,
+  Camera,
 } from 'lucide-react';
 import { collectionLinks } from '../lib/navigation';
 import { productImage, products, type Product } from '../lib/products';
 import { useCart } from '../lib/cart';
 import { useTranslation } from '../hooks/useTranslation';
-import type { TagStudioValue, TagSide } from '../components/shop/TagStudio';
+import type { TagStudioValue } from '../components/shop/TagStudio';
 import { getInitialEngravings } from '../components/shop/TagStudio';
-import { FaceToggle, ViewToggle, type ProductFace, type ViewMode } from '@minoveaz/product-viewer';
+import { FaceToggle, type ProductFace } from '@minoveaz/product-viewer';
 import { TagViewer } from '../components/shop/TagViewer';
 import { TagStudioModal } from '../components/shop/TagStudioModal';
 import StaticPage from './StaticPage';
@@ -44,185 +45,104 @@ function ProductGallery({
   const { t, isEn } = useTranslation();
   const photos = product.media ?? [];
   const tagConfig = product.tagStudio;
+
   const slots: GallerySlot[] = [
     ...(tagConfig ? [{ kind: 'tag' as const }] : []),
     ...photos.map((item) => ({ kind: 'image' as const, image: item.image, alt: item.alt })),
   ];
+
   const [selectedIndex, setSelectedIndex] = useState(0);
-  const [tagView, setTagView] = useState<ViewMode>('3d');
-  const [showSafeZone, setShowSafeZone] = useState(false);
-
-  useEffect(() => setSelectedIndex(0), [tagValue.finish]);
   const selected = slots[selectedIndex] ?? slots[0];
-  const slotKey = (slot: GallerySlot) => (slot.kind === 'tag' ? 'tag' : slot.image);
-  const slotLabel = (slot: GallerySlot) => (slot.kind === 'tag' ? t.product.myCustomTag : slot.alt);
-
-  const petPhotoIndex = slots.findIndex(
-    (s) => s.kind === 'image' && (s.image.includes('tag-Cat-Gold-7') || s.image.includes('tag-Cat-Gold-5') || s.image.includes('Cat-Gold-4')),
-  );
-  const specsPhotoIndex = slots.findIndex(
-    (s) => s.kind === 'image' && (s.image.includes('tag view') || s.image.includes('tag-Cat-Gold-2')),
-  );
 
   return (
-    <section aria-label={`Media for ${product.title}`}>
-      <div className="grid gap-2 sm:gap-3 md:grid-cols-[68px_minmax(0,1fr)] lg:grid-cols-[76px_minmax(0,1fr)]">
-        {/* Miniaturas */}
-        <div className="order-2 flex gap-1.5 overflow-x-auto py-0.5 md:order-1 md:h-[460px] md:flex-col md:overflow-y-auto lg:h-[490px]">
-          {slots.map((slot, index) => (
-            <button
-              key={slotKey(slot)}
-              type="button"
-              aria-label={`View ${slot.kind === 'tag' ? t.product.myCustomTag : `image ${index}`}: ${slotLabel(slot)}`}
-              aria-pressed={selectedIndex === index}
-              onClick={() => setSelectedIndex(index)}
-              className={`h-11 w-11 shrink-0 overflow-hidden rounded-lg border-2 bg-brand-cream focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand sm:h-12 sm:w-12 md:h-[68px] md:w-[68px] lg:h-[76px] lg:w-[76px] ${
-                selectedIndex === index ? 'border-brand shadow-xs' : 'border-transparent opacity-80 hover:opacity-100'
-              }`}
-            >
-              {slot.kind === 'tag' && tagConfig ? (
-                <span className="block h-full w-full p-0.5 sm:p-1">
-                  <TagViewer config={tagConfig} value={tagValue} view="2d" side="front" className="h-full w-full" />
-                </span>
-              ) : (
-                slot.kind === 'image' && <img src={image(slot.image)} alt="" className="h-full w-full object-cover" />
-              )}
-            </button>
-          ))}
-        </div>
+    <section aria-label={`Media for ${product.title}`} className="flex flex-col items-center">
+      {/* Contenedor Principal de Imagen / 3D con proporción fija */}
+      <div className="relative aspect-square w-full max-w-[500px] overflow-hidden rounded-2xl border border-[#e6dcd3] bg-[#fbf9f6] shadow-xs">
+        {selected.kind === 'tag' && tagConfig ? (
+          <div className="relative h-full w-full p-4 flex flex-col justify-between">
+            {/* Cabecera sutil sobre el visor */}
+            <div className="flex items-center justify-between z-10">
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-white/90 px-3 py-1 text-[11px] font-bold text-brand-strong shadow-2xs border border-[#e6dcd3]">
+                <Eye className="h-3 w-3" />
+                {isEn ? '3D Interactive' : 'Interactivo 3D'}
+              </span>
 
-        {/* Visor Principal */}
-        <div className="relative order-1 h-[260px] sm:h-[320px] overflow-hidden rounded-2xl bg-brand-cream md:order-2 md:h-[460px] lg:h-[490px] shadow-2xs border border-[#e6dcd3]">
-          {selected.kind === 'tag' && tagConfig ? (
-            <div className="flex h-full flex-col p-2.5 sm:p-4">
-              <div className="flex shrink-0 items-center justify-between gap-2">
-                <span className="rounded-full bg-brand-soft px-2.5 py-0.5 text-[10px] sm:text-xs font-bold uppercase tracking-wider text-brand-strong">
-                  {isEn ? '3D Live Preview' : 'Vista en Vivo 3D'}
-                </span>
-                <div className="flex items-center gap-1.5">
-                  <FaceToggle
-                    value={tagSide}
-                    onChange={(newSide) => setTagSide(newSide as ProductFace)}
-                    className="flex overflow-hidden rounded-full border border-[#cfc4bb] bg-white/90 text-[10px] sm:text-xs font-medium"
-                    buttonClassName="px-2.5 py-0.5 sm:px-3 sm:py-1 text-brand-ink/75 transition-colors"
-                    activeClassName="bg-brand-soft text-brand-strong font-semibold"
-                  />
-                  <ViewToggle
-                    value={tagView}
-                    onChange={setTagView}
-                    className="flex overflow-hidden rounded-full border border-brand-strong/20 bg-white text-[10px] sm:text-xs font-bold shadow-2xs"
-                    buttonClassName="px-2.5 py-0.5 sm:px-3 sm:py-1 text-brand-ink transition-colors"
-                    activeClassName="bg-brand-strong text-white"
-                  />
-                </div>
-              </div>
+              <FaceToggle
+                value={tagSide}
+                onChange={(newSide) => setTagSide(newSide as ProductFace)}
+                className="flex overflow-hidden rounded-full border border-[#cfc4bb] bg-white text-xs font-semibold shadow-2xs"
+                buttonClassName="px-3 py-1 text-brand-ink/75 transition-colors"
+                activeClassName="bg-brand-soft text-brand-strong font-bold"
+              />
+            </div>
 
-              <div className="min-h-0 w-full flex-1 my-1">
-                <TagViewer
-                  config={tagConfig}
-                  value={tagValue}
-                  view={tagView}
-                  side={tagSide}
-                  showSafeZone={showSafeZone}
-                  className="h-full w-full"
-                />
-              </div>
+            {/* Modelo 3D */}
+            <div className="absolute inset-0 flex items-center justify-center p-6">
+              <TagViewer
+                config={tagConfig}
+                value={tagValue}
+                view="3d"
+                side={tagSide}
+                className="h-full w-full"
+              />
+            </div>
 
-              <div className="flex shrink-0 items-center justify-between pt-1 border-t border-[#e6dcd3]/60">
+            {/* Botón flotante inferior para abrir el estudio */}
+            <div className="flex justify-end z-10 mt-auto">
+              {onOpenStudio && (
                 <button
                   type="button"
-                  onClick={() => setShowSafeZone(!showSafeZone)}
-                  className={`flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] sm:text-xs transition-all ${
-                    showSafeZone
-                      ? 'border-brand bg-brand-soft text-brand-strong font-semibold'
-                      : 'border-[#cfc4bb] bg-white text-brand-ink/75 hover:border-brand/40'
-                  }`}
-                  aria-pressed={showSafeZone}
+                  onClick={onOpenStudio}
+                  className="inline-flex items-center gap-1.5 rounded-full bg-brand-strong px-4 py-2 text-xs font-bold text-white shadow-md hover:bg-brand-ink transition-colors"
                 >
-                  <ShieldCheck className="h-3 w-3 text-brand" strokeWidth={2} />
-                  <span>{t.product.safeZoneToggle}</span>
+                  <Sparkles className="h-3.5 w-3.5" />
+                  <span>{isEn ? 'Open 3D Studio' : 'Personalizar en 3D'}</span>
                 </button>
-
-                {onOpenStudio && (
-                  <button
-                    type="button"
-                    onClick={onOpenStudio}
-                    className="inline-flex items-center gap-1 text-[11px] sm:text-xs font-bold text-brand-strong hover:underline"
-                  >
-                    <Sparkles className="h-3.5 w-3.5" />
-                    <span>{t.product.editCustomizer}</span>
-                  </button>
-                )}
-              </div>
+              )}
             </div>
-          ) : (
-            selected.kind === 'image' && (
-              <img
-                key={selected.image}
-                src={image(selected.image)}
-                alt={selected.alt}
-                width={1200}
-                height={1000}
-                fetchPriority="high"
-                className="h-full w-full object-contain p-2 sm:p-4"
-              />
-            )
-          )}
-        </div>
+          </div>
+        ) : (
+          selected.kind === 'image' && (
+            <img
+              key={selected.image}
+              src={image(selected.image)}
+              alt={selected.alt}
+              width={1000}
+              height={1000}
+              fetchPriority="high"
+              className="h-full w-full object-cover p-1 sm:p-2"
+            />
+          )
+        )}
       </div>
 
-      {/* Escala real y accesos rápidos */}
-      {tagConfig && (
-        <div className="hidden sm:flex mt-3 flex-wrap items-center justify-between gap-2 rounded-xl border border-[#e6dcd3] bg-brand-cream/60 p-2.5 px-3 text-xs">
-          <div className="flex items-center gap-1.5 font-medium text-brand-ink/80">
-            <Ruler className="h-3.5 w-3.5 text-brand" strokeWidth={2} />
-            <span>
-              {isEn
-                ? 'Real size: 35 × 32 mm · ~12g (coin size in palm)'
-                : 'Escala real: 35 × 32 mm · ~12g (tamaño moneda en mano)'}
-            </span>
-          </div>
-          <div className="flex items-center gap-1.5">
+      {/* Miniaturas compactas en fila */}
+      <div className="mt-3.5 flex flex-wrap justify-center gap-2">
+        {slots.map((slot, index) => {
+          const isSelected = selectedIndex === index;
+          return (
             <button
+              key={slot.kind === 'tag' ? 'tag' : slot.image}
               type="button"
-              onClick={() => setSelectedIndex(0)}
-              className={`rounded-full px-2.5 py-1 text-xs font-semibold transition-all ${
-                selectedIndex === 0
-                  ? 'bg-brand text-white shadow-xs'
-                  : 'border border-[#cfc4bb] bg-white text-brand-ink hover:bg-brand-soft'
+              onClick={() => setSelectedIndex(index)}
+              className={`relative h-14 w-14 shrink-0 overflow-hidden rounded-xl border-2 bg-white transition-all ${
+                isSelected
+                  ? 'border-brand-strong ring-2 ring-brand-soft shadow-xs scale-105'
+                  : 'border-[#e6dcd3] opacity-70 hover:opacity-100 hover:border-brand/40'
               }`}
             >
-              {isEn ? 'Custom Tag' : 'Personalizar'}
+              {slot.kind === 'tag' ? (
+                <div className="flex h-full w-full flex-col items-center justify-center bg-brand-cream/60 text-[10px] font-bold text-brand-strong">
+                  <Eye className="h-4 w-4 mb-0.5" />
+                  3D
+                </div>
+              ) : (
+                <img src={image(slot.image)} alt="" className="h-full w-full object-cover" />
+              )}
             </button>
-            {petPhotoIndex !== -1 && (
-              <button
-                type="button"
-                onClick={() => setSelectedIndex(petPhotoIndex)}
-                className={`rounded-full px-2.5 py-1 text-xs font-semibold transition-all ${
-                  selectedIndex === petPhotoIndex
-                    ? 'bg-brand text-white shadow-xs'
-                    : 'border border-[#cfc4bb] bg-white text-brand-ink hover:bg-brand-soft'
-                }`}
-              >
-                {isEn ? 'On Pet' : 'En mascota'}
-              </button>
-            )}
-            {specsPhotoIndex !== -1 && (
-              <button
-                type="button"
-                onClick={() => setSelectedIndex(specsPhotoIndex)}
-                className={`rounded-full px-2.5 py-1 text-xs font-semibold transition-all ${
-                  selectedIndex === specsPhotoIndex
-                    ? 'bg-brand text-white shadow-xs'
-                    : 'border border-[#cfc4bb] bg-white text-brand-ink hover:bg-brand-soft'
-                }`}
-              >
-                {isEn ? 'Measures' : 'Medidas'}
-              </button>
-            )}
-          </div>
-        </div>
-      )}
+          );
+        })}
+      </div>
     </section>
   );
 }
@@ -243,19 +163,19 @@ function ProductOptions({
   const { isEn } = useTranslation();
 
   return (
-    <div className="mt-5 space-y-4">
+    <div className="mt-4 space-y-3.5">
       {/* Selector de Acabados / Colores */}
       {product.tagStudio && (
         <fieldset>
-          <div className="flex items-center justify-between mb-2">
-            <legend className="text-sm font-semibold text-brand-ink">
+          <div className="flex items-center justify-between mb-1.5">
+            <legend className="text-xs font-bold uppercase tracking-wider text-brand-ink/70">
               {isEn ? 'Finish / Material' : 'Acabado Metálico'}
             </legend>
             <span className="text-xs font-bold text-brand-strong">
               {product.tagStudio.finishes.find((f) => f.value === activeFinish)?.label ?? activeFinish}
             </span>
           </div>
-          <div className="flex flex-wrap gap-2.5">
+          <div className="flex flex-wrap gap-2">
             {product.tagStudio.finishes.map((finish) => {
               const selected = activeFinish === finish.value;
               const swatchColor = product.tagStudio?.finishSwatches?.[finish.value] ?? '#cfc4bb';
@@ -266,14 +186,14 @@ function ProductOptions({
                   type="button"
                   aria-pressed={selected}
                   onClick={() => onFinishChange?.(finish.value)}
-                  className={`flex items-center gap-2 rounded-xl border px-3.5 py-2 text-xs font-bold transition-all ${
+                  className={`inline-flex items-center gap-2 rounded-xl border px-3 py-1.5 text-xs font-bold transition-all ${
                     selected
-                      ? 'border-brand-strong bg-brand-soft text-brand-strong shadow-xs ring-1 ring-brand-strong'
-                      : 'border-[#cfc4bb] bg-white text-brand-ink hover:border-brand/50'
+                      ? 'border-brand-strong bg-brand-soft/60 text-brand-strong shadow-2xs ring-1 ring-brand-strong'
+                      : 'border-[#cfc4bb] bg-white text-brand-ink/80 hover:border-brand/40'
                   }`}
                 >
                   <span
-                    className="h-4 w-4 rounded-full ring-1 ring-black/10 shrink-0"
+                    className="h-3.5 w-3.5 rounded-full ring-1 ring-black/10 shrink-0"
                     style={{ backgroundColor: swatchColor }}
                   />
                   <span>{finish.label}</span>
@@ -284,10 +204,12 @@ function ProductOptions({
         </fieldset>
       )}
 
-      {/* Otras opciones (Talla) */}
+      {/* Selector de Tallas */}
       {product.options?.map((option) => (
         <fieldset key={option.name}>
-          <legend className="mb-2 text-sm font-semibold text-brand-ink">{option.label}</legend>
+          <legend className="mb-1.5 text-xs font-bold uppercase tracking-wider text-brand-ink/70">
+            {option.label}
+          </legend>
           <div className="flex flex-wrap gap-2">
             {option.values.map((value) => {
               const selected = selectedOptions[option.name] === value.value;
@@ -298,10 +220,10 @@ function ProductOptions({
                   disabled={value.available === false}
                   aria-pressed={selected}
                   onClick={() => onSelect(option.name, value.value)}
-                  className={`min-h-10 rounded-xl border px-3.5 text-xs font-bold transition-all focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand disabled:cursor-not-allowed disabled:opacity-40 ${
+                  className={`min-h-9 rounded-xl border px-3 text-xs font-semibold transition-all focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand disabled:cursor-not-allowed disabled:opacity-40 ${
                     selected
-                      ? 'border-brand-strong bg-brand-soft text-brand-strong shadow-xs ring-1 ring-brand-strong'
-                      : 'border-[#cfc4bb] bg-white text-brand-ink hover:border-brand'
+                      ? 'border-brand-strong bg-brand-soft/60 text-brand-strong shadow-2xs ring-1 ring-brand-strong font-bold'
+                      : 'border-[#cfc4bb] bg-white text-brand-ink/80 hover:border-brand/40'
                   }`}
                 >
                   {value.label}
@@ -315,57 +237,85 @@ function ProductOptions({
   );
 }
 
-function ProductInfoBlocks({ product }: { product: Product }) {
-  const { t } = useTranslation();
+function ProductAccordions({ product }: { product: Product }) {
+  const { t, isEn } = useTranslation();
+  const [openId, setOpenId] = useState<string | null>('specs');
 
-  const purchaseHighlights = [
-    { Icon: Clock, title: t.product.highlights.deliveryTitle, desc: t.product.highlights.deliveryDesc },
-    { Icon: RotateCcw, title: t.product.highlights.returnsTitle, desc: t.product.highlights.returnsDesc },
-    { Icon: Truck, title: t.product.highlights.shippingTitle, desc: t.product.highlights.shippingDesc },
-  ];
+  const toggle = (id: string) => {
+    setOpenId((curr) => (curr === id ? null : id));
+  };
 
   const specsList = product.tagStudio ? [
     { label: t.product.specs.material, value: t.product.specs.materialVal },
-    { label: t.product.specs.size, value: t.product.specs.sizeVal },
+    { label: t.product.specs.size, value: `${t.product.specs.sizeVal} (1.38 × 1.26 in)` },
     { label: t.product.specs.thickness, value: t.product.specs.thicknessVal },
     { label: t.product.specs.engraving, value: t.product.specs.engravingVal },
     { label: t.product.specs.text, value: t.product.specs.textVal },
   ] : [];
 
   return (
-    <div className="mt-8 space-y-6">
-      <ul className="grid gap-3 sm:grid-cols-3">
-        {purchaseHighlights.map((highlight) => {
-          const Icon = highlight.Icon;
-          return (
-            <li key={highlight.title} className="flex items-start gap-3 rounded-2xl border border-[#e6dcd3] bg-white p-4 shadow-2xs">
-              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-soft text-brand-strong">
-                <Icon aria-hidden="true" className="h-5 w-5" strokeWidth={1.8} />
-              </span>
-              <span>
-                <span className="block text-xs font-bold text-brand-ink">{highlight.title}</span>
-                <span className="mt-0.5 block text-xs leading-5 text-brand-ink/70">{highlight.desc}</span>
-              </span>
-            </li>
-          );
-        })}
-      </ul>
-
-      {specsList.length > 0 && (
-        <section aria-labelledby="tag-specs-title" className="rounded-2xl border border-[#e6dcd3] bg-white p-5 sm:p-6 shadow-2xs">
-          <h3 id="tag-specs-title" className="font-display text-base font-bold text-brand-ink">
-            {t.product.tagSpecsTitle}
-          </h3>
-          <dl className="mt-4 grid gap-3 sm:grid-cols-2 text-xs">
-            {specsList.map((spec) => (
-              <div key={spec.label} className="border-b border-[#e6dcd3]/60 pb-2">
-                <dt className="font-semibold text-brand-ink/60">{spec.label}</dt>
-                <dd className="mt-0.5 font-bold text-brand-ink">{spec.value}</dd>
+    <div className="mt-6 border-t border-[#e6dcd3] divide-y divide-[#e6dcd3] text-xs">
+      {/* Acordeón: Especificaciones */}
+      <div>
+        <button
+          type="button"
+          onClick={() => toggle('specs')}
+          className="flex w-full items-center justify-between py-3.5 text-left font-bold text-brand-ink hover:text-brand-strong transition-colors"
+        >
+          <span>{t.product.tagSpecsTitle}</span>
+          <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${openId === 'specs' ? 'rotate-180' : ''}`} />
+        </button>
+        {openId === 'specs' && (
+          <div className="pb-4 pt-1 grid grid-cols-2 gap-3 text-brand-ink/80">
+            {specsList.map((item) => (
+              <div key={item.label}>
+                <span className="text-[11px] font-semibold text-brand-ink/50 block">{item.label}</span>
+                <span className="font-medium text-brand-ink">{item.value}</span>
               </div>
             ))}
-          </dl>
-        </section>
-      )}
+          </div>
+        )}
+      </div>
+
+      {/* Acordeón: Descripción */}
+      <div>
+        <button
+          type="button"
+          onClick={() => toggle('desc')}
+          className="flex w-full items-center justify-between py-3.5 text-left font-bold text-brand-ink hover:text-brand-strong transition-colors"
+        >
+          <span>{t.product.description}</span>
+          <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${openId === 'desc' ? 'rotate-180' : ''}`} />
+        </button>
+        {openId === 'desc' && (
+          <div className="pb-4 pt-1 leading-relaxed text-brand-ink/75">
+            <p>
+              {isEn
+                ? 'High-precision surgical stainless steel pet ID tag with custom feline artwork and deep black laser engraving. Water-resistant, rust-free, and designed to comfortably accompany your cat on every adventure.'
+                : 'Placa identificativa de acero inoxidable quirúrgico de alta precisión con diseños felinos y grabado láser permanente negro. Resistente al agua, no se raya y acompaña a tu gato con total comodidad.'}
+            </p>
+          </div>
+        )}
+      </div>
+
+      {/* Acordeón: Envíos y Garantía */}
+      <div>
+        <button
+          type="button"
+          onClick={() => toggle('shipping')}
+          className="flex w-full items-center justify-between py-3.5 text-left font-bold text-brand-ink hover:text-brand-strong transition-colors"
+        >
+          <span>{t.product.shippingReturns}</span>
+          <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${openId === 'shipping' ? 'rotate-180' : ''}`} />
+        </button>
+        {openId === 'shipping' && (
+          <div className="pb-4 pt-1 leading-relaxed text-brand-ink/75 space-y-1">
+            <p>• {isEn ? 'Estimated delivery: 3–5 business days.' : 'Entrega estimada: 3–5 días hábiles.'}</p>
+            <p>• {isEn ? '14-day return and exchange policy.' : 'Política de devolución y cambio de 14 días.'}</p>
+            <p>• {isEn ? 'Free tracking included on all orders.' : 'Seguimiento con tracking incluido en todos los pedidos.'}</p>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
@@ -391,7 +341,6 @@ function ProductDetails({
 }) {
   const { t, formatPrice, isEn } = useTranslation();
   const { addLine } = useCart();
-  const navigate = useNavigate();
   const [quantity, setQuantity] = useState(1);
 
   const activeDesign = product.tagStudio?.designs.find((d) => d.value === tagStudioValue.design);
@@ -421,12 +370,6 @@ function ProductDetails({
         const scaleLabel = e.scale && e.scale !== 1.0 ? `, ${Math.round(e.scale * 100)}%` : '';
         tagStudioOptions[`${sideLabel} (${zoneLabel})`] = `${textToSave} [${fontName}${scaleLabel}]`;
       });
-    } else if (tagStudioValue.name.trim()) {
-      tagStudioOptions[isEn ? 'Engraved Name' : 'Nombre grabado'] = tagStudioValue.name.trim();
-      tagStudioOptions[isEn ? 'Typography' : 'Tipografía'] = tagStudioValue.font;
-      if (tagStudioValue.phone.trim()) {
-        tagStudioOptions[isEn ? 'Phone' : 'Teléfono'] = tagStudioValue.phone.trim();
-      }
     }
   }
 
@@ -445,31 +388,30 @@ function ProductDetails({
     setAdded(true);
   };
 
-  const localizedDescription = product.handle === 'golden-cat'
-    ? (isEn
-        ? 'Surgical grade stainless steel cat ID tag with custom metallic finishes and personalized engraved text.'
-        : product.description)
-    : product.description;
-
   return (
-    <section aria-labelledby="product-title">
-      <div className="flex flex-wrap items-center gap-2">
-        <span className="rounded-full bg-brand-soft px-2.5 py-0.5 text-xs font-bold text-brand-strong">
-          {isEn ? '3D Customizable' : 'Personalizable en 3D'}
-        </span>
-        <div className="flex items-center gap-1.5 text-xs font-bold text-brand-ink/80">
-          <span className="tracking-[1px] text-brand">★★★★★</span>
-          <span>4.9 (128 {t.product.reviews})</span>
+    <section aria-labelledby="product-title" className="flex flex-col">
+      {/* Título, Calificación y Precio */}
+      <div>
+        <div className="flex items-center justify-between gap-2">
+          <span className="inline-flex items-center gap-1 text-xs font-bold text-brand-ink/70">
+            <span className="tracking-[1px] text-brand">★★★★★</span>
+            <span>4.9 (128)</span>
+          </span>
+          <span className="rounded-full bg-brand-soft px-2.5 py-0.5 text-[10px] font-bold text-brand-strong">
+            {t.product.surgicalSteelBadge}
+          </span>
         </div>
+
+        <h1 id="product-title" className="mt-1.5 font-display text-2xl sm:text-3xl font-bold text-brand-ink">
+          {product.title}
+        </h1>
+
+        <p className="mt-1 font-display text-2xl font-bold text-brand-ink">
+          {formatPrice(product.priceFrom)}
+        </p>
       </div>
 
-      <h1 id="product-title" className="mt-2.5 font-display text-3xl font-bold leading-tight text-brand-ink sm:text-4xl">
-        {product.title}
-      </h1>
-      {localizedDescription && <p className="mt-2 text-sm leading-6 text-brand-ink/75">{localizedDescription}</p>}
-      <p className="mt-4 font-display text-3xl font-bold text-brand-ink">{formatPrice(product.priceFrom)}</p>
-
-      {/* Opciones estándar (Acabado & Talla) */}
+      {/* Opciones (Color & Talla) */}
       <ProductOptions
         product={product}
         selectedOptions={selectedOptions}
@@ -484,196 +426,95 @@ function ProductDetails({
         }}
       />
 
-      {/* Tarjeta de Personalización 3D Desacoplada */}
+      {/* Bloque Limpio de Personalización 3D */}
       {product.tagStudio && (
-        <div className="mt-6 overflow-hidden rounded-2xl border border-brand/40 bg-gradient-to-br from-brand-soft/40 via-white to-brand-cream/60 p-5 sm:p-6 shadow-xs">
-          <div className="flex items-start justify-between gap-4">
-            <div className="flex items-start gap-3">
-              <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-brand-soft text-brand-strong shadow-2xs">
-                <Sparkles className="h-6 w-6" />
+        <div className="mt-4 rounded-2xl border border-brand/30 bg-brand-cream/40 p-3.5 sm:p-4">
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex items-center gap-2.5 min-w-0">
+              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-brand-soft text-brand-strong">
+                <Sparkles className="h-4 w-4" />
               </span>
-              <div>
-                <div className="flex items-center gap-2">
-                  <h3 className="font-display text-base font-bold text-brand-ink">
-                    {t.product.customizationIncluded}
-                  </h3>
-                  <span className="rounded-full bg-brand-strong px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white">
-                    3D Studio
-                  </span>
-                </div>
-                <p className="mt-1 text-xs leading-relaxed text-brand-ink/70">
-                  {t.product.customizationHelp}
+              <div className="min-w-0">
+                <p className="text-xs font-bold text-brand-ink truncate">
+                  {t.product.customizationIncluded}
+                </p>
+                <p className="text-[11px] text-brand-ink/65 truncate">
+                  {activeDesign?.label} · {frontItem?.text ? `"${frontItem.text}"` : (isEn ? 'Sample name' : 'Nombre de muestra')}
+                  {backItem?.text ? ` · ${backItem.text}` : ''}
                 </p>
               </div>
             </div>
-          </div>
 
-          {/* Resumen del grabado activo */}
-          <div className="mt-4 rounded-xl border border-[#e6dcd3] bg-white p-3.5 text-xs shadow-2xs">
-            <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#e6dcd3]/60 pb-2">
-              <span className="inline-flex items-center gap-1.5 font-bold text-emerald-700">
-                <Check className="h-3.5 w-3.5" />
-                {t.product.customizationReady}
-              </span>
-              <span className="font-bold text-brand-ink">
-                {activeDesign?.label} · {tagStudioValue.finish}
-              </span>
-            </div>
-
-            <div className="mt-2.5 flex flex-wrap gap-x-4 gap-y-1 text-xs">
-              {frontItem?.text && (
-                <span className="text-brand-ink/80">
-                  <span className="font-bold text-brand-strong">{isEn ? 'Front:' : 'Frente:'}</span> "{frontItem.text}"
-                </span>
-              )}
-              {backItem?.text && (
-                <span className="text-brand-ink/80">
-                  <span className="font-bold text-brand-strong">{isEn ? 'Back:' : 'Reverso:'}</span> "{backItem.text}"
-                </span>
-              )}
-              {!frontItem?.text && !backItem?.text && (
-                <span className="text-brand-ink/60">
-                  {isEn ? 'Using default design & sample text' : 'Diseño y texto de muestra activo'}
-                </span>
-              )}
-            </div>
-          </div>
-
-          {/* Botón protagonista para abrir el Estudio 3D */}
-          <div className="mt-4 flex flex-wrap items-center gap-3">
             <button
               type="button"
               onClick={onOpenStudio}
-              className="inline-flex min-h-11 flex-1 items-center justify-center gap-2 rounded-full bg-brand-strong px-6 text-xs sm:text-sm font-bold text-white shadow-xs hover:bg-brand-ink transition-colors"
+              className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-brand-strong bg-white px-3.5 py-1.5 text-xs font-bold text-brand-strong hover:bg-brand-strong hover:text-white transition-colors shadow-2xs"
             >
-              <Sparkles className="h-4 w-4" />
-              <span>{t.product.editCustomizer}</span>
+              <Sparkles className="h-3 w-3" />
+              <span>{isEn ? 'Edit in 3D' : 'Editar en 3D'}</span>
             </button>
           </div>
         </div>
       )}
 
-      {/* Botones de Compra y Carrito */}
-      <div className="mt-6 flex items-center gap-2.5">
-        <div className="flex h-11 w-28 shrink-0 items-center justify-between rounded-xl border border-[#cfc4bb] bg-white px-2">
+      {/* Fila de Compra: Cantidad + Botón Añadir al Carrito en una sola línea */}
+      <div className="mt-5 flex items-center gap-2.5">
+        <div className="flex h-11 w-24 shrink-0 items-center justify-between rounded-xl border border-[#cfc4bb] bg-white px-2">
           <button
             type="button"
             aria-label={t.product.decreaseQuantity}
             disabled={quantity <= 1}
             onClick={() => setQuantity((current) => Math.max(1, current - 1))}
-            className="flex h-8 w-8 items-center justify-center rounded text-brand-ink hover:bg-brand-cream disabled:opacity-40"
+            className="flex h-7 w-7 items-center justify-center rounded text-brand-ink hover:bg-brand-cream disabled:opacity-40"
           >
-            <Minus aria-hidden="true" className="h-4 w-4" />
+            <Minus aria-hidden="true" className="h-3.5 w-3.5" />
           </button>
-          <span aria-live="polite" className="min-w-5 text-center text-sm font-bold">{quantity}</span>
+          <span aria-live="polite" className="min-w-4 text-center text-xs font-bold">{quantity}</span>
           <button
             type="button"
             aria-label={t.product.increaseQuantity}
             disabled={quantity >= 10}
             onClick={() => setQuantity((current) => Math.min(10, current + 1))}
-            className="flex h-8 w-8 items-center justify-center rounded text-brand-ink hover:bg-brand-cream disabled:opacity-40"
+            className="flex h-7 w-7 items-center justify-center rounded text-brand-ink hover:bg-brand-cream disabled:opacity-40"
           >
-            <Plus aria-hidden="true" className="h-4 w-4" />
+            <Plus aria-hidden="true" className="h-3.5 w-3.5" />
           </button>
         </div>
 
         <button
           type="button"
           onClick={addConfiguredProduct}
-          className="inline-flex min-h-11 flex-1 items-center justify-center rounded-full bg-brand px-4 text-sm font-bold text-white shadow-xs hover:bg-brand-strong transition-colors"
+          className="inline-flex min-h-11 flex-1 items-center justify-center gap-2 rounded-full bg-brand px-6 text-sm font-bold text-white shadow-xs hover:bg-brand-strong transition-colors"
         >
           {added ? (
-            <span className="flex items-center gap-1.5">
+            <>
               <Check className="h-4 w-4" />
-              {t.product.addedToCart}
-            </span>
+              <span>{t.product.addedToCart}</span>
+            </>
           ) : (
             <span>{t.product.addToCart} · {formatPrice(product.priceFrom * quantity)}</span>
           )}
         </button>
       </div>
 
-      <button
-        type="button"
-        onClick={() => {
-          addConfiguredProduct();
-          navigate('/carrito');
-        }}
-        className="mt-2.5 inline-flex min-h-11 w-full items-center justify-center rounded-full border border-brand-ink px-4 text-sm font-semibold text-brand-ink hover:bg-brand-cream transition-colors"
-      >
-        {t.common.checkout}
-      </button>
-    </section>
-  );
-}
-
-function ProductReviews({ product }: { product: Product }) {
-  const { t, isEn } = useTranslation();
-
-  return (
-    <section id="reviews" aria-labelledby="reviews-title" className="mt-14">
-      <div className="mb-4">
-        <h2 id="reviews-title" className="font-display text-2xl font-bold text-brand-ink">
-          {t.product.customerReviews}
-        </h2>
-        <p className="mt-1 text-xs text-brand-ink/70">
-          {isEn ? 'Real reviews from pet parents.' : 'Opiniones reales de dueños de mascotas.'}
-        </p>
+      {/* Barra de Confianza Compacta */}
+      <div className="mt-4 flex flex-wrap items-center justify-between gap-2 border-t border-[#e6dcd3]/60 pt-3 text-[11px] text-brand-ink/70">
+        <span className="flex items-center gap-1.5">
+          <Truck className="h-3.5 w-3.5 text-brand" />
+          {t.common.freeShippingNotice}
+        </span>
+        <span className="flex items-center gap-1.5">
+          <RotateCcw className="h-3.5 w-3.5 text-brand" />
+          {isEn ? '14-Day Returns' : 'Devolución 14 días'}
+        </span>
+        <span className="flex items-center gap-1.5">
+          <ShieldCheck className="h-3.5 w-3.5 text-brand" />
+          {isEn ? '316L Stainless Steel' : 'Acero Quirúrgico 316L'}
+        </span>
       </div>
-      <div className="rounded-2xl border border-[#e6dcd3] bg-white p-6 shadow-2xs">
-        <div className="flex items-center gap-3">
-          <span className="font-display text-3xl font-bold text-brand-ink">4.9</span>
-          <div>
-            <div className="tracking-[1px] text-brand">★★★★★</div>
-            <p className="text-xs text-brand-ink/60">{isEn ? 'Based on 128 verified ratings' : 'Basado en 128 valoraciones verificadas'}</p>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
 
-function RelatedProducts({ product }: { product: Product }) {
-  const { t, formatPrice, isEn } = useTranslation();
-  const explicitRelated = (product.relatedHandles ?? [])
-    .map((handle) => products.find((item) => item.handle === handle))
-    .filter((item): item is Product => item !== undefined);
-  const sameCollection = products.filter(
-    (item) => item.handle !== product.handle && item.collections.some((collection) => product.collections.includes(collection)),
-  );
-  const related = [...explicitRelated, ...sameCollection]
-    .filter((item, index, all) => item.handle !== product.handle && all.findIndex((candidate) => candidate.handle === item.handle) === index)
-    .slice(0, 4);
-
-  if (related.length === 0) return null;
-
-  return (
-    <section aria-labelledby="related-title" className="mt-14">
-      <h2 id="related-title" className="font-display text-2xl font-bold text-brand-ink sm:text-[26px]">
-        {t.product.relatedProducts}
-      </h2>
-      <ul className="mt-5 grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-4">
-        {related.map((item) => (
-          <li key={item.handle} className="rounded-2xl border border-[#e6dcd3] bg-white p-3 shadow-2xs">
-            <Link to={`/producto/${item.handle}`} className="block aspect-square overflow-hidden rounded-xl bg-brand-cream">
-              <img
-                src={image(productImage(item))}
-                alt=""
-                width={800}
-                height={800}
-                loading="lazy"
-                className="h-full w-full object-cover"
-              />
-            </Link>
-            <div className="px-0.5 py-2.5">
-              <h3 className="text-sm font-semibold text-brand-ink">
-                <Link to={`/producto/${item.handle}`} className="hover:text-brand-strong">{item.title}</Link>
-              </h3>
-              <p className="mt-0.5 text-sm font-bold text-brand-ink">{formatPrice(item.priceFrom)}</p>
-            </div>
-          </li>
-        ))}
-      </ul>
+      {/* Acordeones plegables de Información (Reemplaza las tablas masivas estáticas) */}
+      <ProductAccordions product={product} />
     </section>
   );
 }
@@ -709,52 +550,44 @@ function ProductDetail({ product }: { product: Product }) {
   const [added, setAdded] = useState(false);
 
   return (
-    <div className="mx-auto max-w-[1440px] px-4 py-6 sm:px-6 sm:py-8 lg:px-10">
-      {/* Breadcrumbs */}
-      <nav aria-label="Breadcrumb navigation" className="mb-5 text-xs text-brand-ink/70 sm:text-sm">
-        <Link to="/" className="hover:text-brand-strong hover:underline">{t.nav.home}</Link>
+    <div className="mx-auto max-w-6xl px-4 py-5 sm:px-6 sm:py-7 lg:px-8">
+      {/* Breadcrumbs Compactos */}
+      <nav aria-label="Breadcrumb navigation" className="mb-4 text-xs text-brand-ink/60">
+        <Link to="/" className="hover:text-brand-strong">{t.nav.home}</Link>
         {collection && (
           <>
             <span aria-hidden="true"> / </span>
-            <Link to={`/coleccion/${collection.handle}`} className="hover:text-brand-strong hover:underline">
+            <Link to={`/coleccion/${collection.handle}`} className="hover:text-brand-strong">
               {collection.title}
             </Link>
           </>
         )}
         <span aria-hidden="true"> / </span>
-        <span aria-current="page">{product.title}</span>
+        <span aria-current="page" className="font-semibold text-brand-ink">{product.title}</span>
       </nav>
 
-      {/* Grid Principal Desacoplado: Galería a la izquierda y Detalles/Personalización a la derecha */}
-      <div className="grid items-start gap-8 lg:grid-cols-2 xl:gap-12">
-        <div className="md:sticky md:top-24">
-          <ProductGallery
-            product={product}
-            tagValue={tagStudioValue}
-            tagSide={tagSide}
-            setTagSide={setTagSide}
-            onOpenStudio={() => setIsStudioOpen(true)}
-          />
-        </div>
+      {/* Grid 2 Columnas Equilibrado: Galería a la izquierda y Detalles a la derecha */}
+      <div className="grid items-start gap-8 md:grid-cols-2 lg:gap-12">
+        <ProductGallery
+          product={product}
+          tagValue={tagStudioValue}
+          tagSide={tagSide}
+          setTagSide={setTagSide}
+          onOpenStudio={() => setIsStudioOpen(true)}
+        />
 
-        <div className="min-w-0">
-          <ProductDetails
-            key={product.handle}
-            product={product}
-            tagStudioValue={tagStudioValue}
-            setTagStudioValue={setTagStudioValue}
-            selectedOptions={selectedOptions}
-            setSelectedOptions={setSelectedOptions}
-            added={added}
-            setAdded={setAdded}
-            onOpenStudio={() => setIsStudioOpen(true)}
-          />
-          <ProductInfoBlocks product={product} />
-        </div>
+        <ProductDetails
+          key={product.handle}
+          product={product}
+          tagStudioValue={tagStudioValue}
+          setTagStudioValue={setTagStudioValue}
+          selectedOptions={selectedOptions}
+          setSelectedOptions={setSelectedOptions}
+          added={added}
+          setAdded={setAdded}
+          onOpenStudio={() => setIsStudioOpen(true)}
+        />
       </div>
-
-      <ProductReviews product={product} />
-      <RelatedProducts product={product} />
 
       {/* Modal Desacoplado de Estudio 3D */}
       {product.tagStudio && (
